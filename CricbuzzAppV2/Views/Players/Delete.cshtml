@@ -1,0 +1,35 @@
+﻿@model CricbuzzAppV2.Models.Player
+
+@{
+    ViewData["Title"] = "Delete Player";
+}
+
+<h2 class="mb-4">🗑️ Delete Player</h2>
+
+<div class="card shadow-sm p-4">
+    <h5>Are you sure you want to delete this player?</h5>
+
+    <dl class="row mt-3">
+        <dt class="col-sm-3">Full Name</dt>
+        <dd class="col-sm-9">@Model.FullName</dd>
+
+        <dt class="col-sm-3">Role</dt>
+        <dd class="col-sm-9">@Model.Role</dd>
+
+        <dt class="col-sm-3">Team</dt>
+        <dd class="col-sm-9">@Model.Team?.TeamName</dd>
+
+        <dt class="col-sm-3">Image URL</dt>
+        <dd class="col-sm-9">@Model.ImageUrl</dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="PlayerId" />
+
+        <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-danger">🗑️ Confirm Delete</button>
+            <a asp-action="Index" class="btn btn-secondary">↩ Cancel</a>
+        </div>
+    </form>
+</div>

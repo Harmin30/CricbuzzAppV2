@@ -1,0 +1,29 @@
+﻿@model CricbuzzAppV2.Models.PlayerPersonalInfo
+@{
+    ViewData["Title"] = "Delete Player Personal Info";
+}
+
+<h2>🗑️ Delete Player Personal Info</h2>
+
+<div class="alert alert-danger">
+    Are you sure you want to delete this player info?
+</div>
+
+<div class="card p-3">
+    <dl class="row">
+        <dt class="col-sm-3">Player</dt>
+        <dd class="col-sm-9">@Model.Player.FullName</dd>
+
+        <dt class="col-sm-3">Date of Birth</dt>
+        <dd class="col-sm-9">@Model.DateOfBirth.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Role</dt>
+        <dd class="col-sm-9">@Model.Role</dd>
+    </dl>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="PlayerPersonalInfoId" />
+    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

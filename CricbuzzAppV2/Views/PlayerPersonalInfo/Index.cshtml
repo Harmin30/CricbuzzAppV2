@@ -1,0 +1,45 @@
+﻿@model IEnumerable<CricbuzzAppV2.Models.PlayerPersonalInfo>
+@{
+    ViewData["Title"] = "Player Personal Info";
+}
+
+<h2 class="mb-4">📋 Player Personal Info</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<table class="table table-striped table-hover table-bordered table-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Player</th>
+            <th>Date of Birth</th>
+            <th>Height</th>
+            <th>Batting Style</th>
+            <th>Bowling Style</th>
+            <th>Role</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var info in Model)
+        {
+            <tr>
+                <td>@info.Player.FullName</td>
+                <td>@info.DateOfBirth.ToShortDateString()</td>
+                <td>@info.Height</td>
+                <td>@info.BattingStyle</td>
+                <td>@info.BowlingStyle</td>
+                <td>@info.Role</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@info.PlayerPersonalInfoId" class="btn btn-info btn-sm">View</a>
+                    <a asp-action="Edit" asp-route-id="@info.PlayerPersonalInfoId" class="btn btn-sm btn-warning"> Edit</a>
+                    <a asp-action="Delete" asp-route-id="@info.PlayerPersonalInfoId" class="btn btn-sm btn-danger"> Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-success mt-3">➕ Add New Player Info</a>

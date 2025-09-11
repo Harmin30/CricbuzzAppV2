@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36414.22 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CricbuzzAppV2", "CricbuzzAppV2\CricbuzzAppV2.csproj", "{CC1AD62A-A5A5-4545-AA72-A50D7CAC26F2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CC1AD62A-A5A5-4545-AA72-A50D7CAC26F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC1AD62A-A5A5-4545-AA72-A50D7CAC26F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC1AD62A-A5A5-4545-AA72-A50D7CAC26F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC1AD62A-A5A5-4545-AA72-A50D7CAC26F2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6BA11BA0-48CB-48D2-8AB3-3C42C34EC4C5}
+	EndGlobalSection
+EndGlobal

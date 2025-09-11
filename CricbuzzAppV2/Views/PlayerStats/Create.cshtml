@@ -1,0 +1,89 @@
+﻿@model CricbuzzAppV2.Models.PlayerStats
+
+@{
+    ViewData["Title"] = "Add Player Stats";
+}
+
+<h2>➕ Add Player Stats</h2>
+
+<div class="card shadow-sm p-4">
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label asp-for="PlayerId" class="form-label">Player</label>
+            <select asp-for="PlayerId" class="form-select" asp-items="@(ViewData["Players"] as SelectList)">
+                <option value="">-- Select Player --</option>
+            </select>
+            <span asp-validation-for="PlayerId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Format" class="form-label">Format</label>
+            <select asp-for="Format" class="form-select" asp-items="@(ViewData["Formats"] as SelectList)"></select>
+            <span asp-validation-for="Format" class="text-danger"></span>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label asp-for="MatchesPlayed" class="form-label">Matches</label>
+                <input asp-for="MatchesPlayed" type="number" class="form-control" />
+            </div>
+            <div class="col-md-3 mb-3">
+                <label asp-for="Innings" class="form-label">Innings</label>
+                <input asp-for="Innings" type="number" class="form-control" />
+            </div>
+            <div class="col-md-3 mb-3">
+                <label asp-for="Runs" class="form-label">Runs</label>
+                <input asp-for="Runs" type="number" class="form-control" />
+            </div>
+            <div class="col-md-3 mb-3">
+                <label asp-for="BallsFaced" class="form-label">Balls Faced</label>
+                <input asp-for="BallsFaced" type="number" class="form-control" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label asp-for="HighestScore" class="form-label">HS</label>
+                <input asp-for="HighestScore" type="number" class="form-control" />
+            </div>
+            <div class="col-md-3 mb-3">
+                <label asp-for="Hundreds" class="form-label">100s</label>
+                <input asp-for="Hundreds" type="number" class="form-control" />
+            </div>
+            <div class="col-md-3 mb-3">
+                <label asp-for="Fifties" class="form-label">50s</label>
+                <input asp-for="Fifties" type="number" class="form-control" />
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-3 mb-3">
+                <label asp-for="BallsBowled" class="form-label">Balls Bowled</label>
+                <input asp-for="BallsBowled" type="number" class="form-control" />
+            </div>
+            <div class="col-md-3 mb-3">
+                <label asp-for="RunsConceded" class="form-label">Runs Conceded</label>
+                <input asp-for="RunsConceded" type="number" class="form-control" />
+            </div>
+            <div class="col-md-3 mb-3">
+                <label asp-for="Wickets" class="form-label">Wickets</label>
+                <input asp-for="Wickets" type="number" class="form-control" />
+            </div>
+            <div class="col-md-3 mb-3">
+                <label asp-for="BestBowling" class="form-label">Best Bowling</label>
+                <input asp-for="BestBowling" type="text" class="form-control" />
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-success">💾 Save</button>
+            <a asp-action="Index" class="btn btn-secondary">↩ Back</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

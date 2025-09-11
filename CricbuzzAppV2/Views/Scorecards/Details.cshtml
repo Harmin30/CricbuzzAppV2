@@ -1,0 +1,67 @@
+﻿@model CricbuzzAppV2.Models.Scorecard
+
+@{
+    ViewData["Title"] = "Scorecard Details";
+}
+
+<h2>📋 Scorecard Details</h2>
+
+<div class="card shadow-sm p-4 mb-4">
+    <h5 class="mb-3">🏟 Match</h5>
+    <p>
+        <strong>Match:</strong> @Model.Match.TeamA.TeamName vs @Model.Match.TeamB.TeamName<br />
+        <strong>Date:</strong> @Model.Match.Date.ToShortDateString() <br />
+        <strong>Venue:</strong> @Model.Match.Venue <br />
+        <strong>Winner:</strong> @(Model.Match.WinnerTeam != null ? Model.Match.WinnerTeam.TeamName : "-")
+    </p>
+
+    <h5 class="mb-3">👤 Player</h5>
+    <p>
+        <strong>Name:</strong> @Model.Player.FullName
+    </p>
+
+    <h5 class="text-info mb-2">🏏 Batting Stats</h5>
+    <table class="table table-bordered table-sm">
+        <tr>
+            <th>Runs</th>
+            <th>Balls</th>
+            <th>4s</th>
+            <th>6s</th>
+            <th>1s</th>
+            <th>2s</th>
+            <th>3s</th>
+            <th>How Out</th>
+        </tr>
+        <tr>
+            <td>@(Model.RunsScored != 0 ? Model.RunsScored.ToString() : "-")</td>
+            <td>@(Model.BallsFaced != 0 ? Model.BallsFaced.ToString() : "-")</td>
+            <td>@(Model.Fours != 0 ? Model.Fours.ToString() : "-")</td>
+            <td>@(Model.Sixes != 0 ? Model.Sixes.ToString() : "-")</td>
+            <td>@(Model.Ones != 0 ? Model.Ones.ToString() : "-")</td>
+            <td>@(Model.Twos != 0 ? Model.Twos.ToString() : "-")</td>
+            <td>@(Model.Threes != 0 ? Model.Threes.ToString() : "-")</td>
+            <td>@(!string.IsNullOrEmpty(Model.HowOut) ? Model.HowOut : "-")</td>
+        </tr>
+    </table>
+
+    <h5 class="text-success mb-2">🎯 Bowling Stats</h5>
+    <table class="table table-bordered table-sm">
+        <tr>
+            <th>Overs</th>
+            <th>Runs Conceded</th>
+            <th>Wickets</th>
+            <th>Maidens</th>
+        </tr>
+        <tr>
+            <td>@(Model.OversBowled != 0 ? string.Format("{0:0.0}", Model.OversBowled) : "-")</td>
+            <td>@(Model.RunsConceded != 0 ? Model.RunsConceded.ToString() : "-")</td>
+            <td>@(Model.WicketsTaken != 0 ? Model.WicketsTaken.ToString() : "-")</td>
+            <td>@(Model.Maidens != 0 ? Model.Maidens.ToString() : "-")</td>
+        </tr>
+    </table>
+
+    <div class="mt-3">
+        <a asp-action="Index" class="btn btn-secondary">↩ Back to Scorecards</a>
+        <a asp-action="Edit" asp-route-id="@Model.ScorecardId" class="btn btn-warning">✏ Edit</a>
+    </div>
+</div>

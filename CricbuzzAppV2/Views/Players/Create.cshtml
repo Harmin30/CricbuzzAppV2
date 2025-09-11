@@ -1,0 +1,60 @@
+﻿@model CricbuzzAppV2.Models.Player
+
+@{
+    ViewData["Title"] = "Add Player";
+}
+
+<h2 class="mb-4">➕ Add New Player</h2>
+
+<div class="card shadow-sm p-4">
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+
+        <!-- Full Name -->
+        <div class="mb-3">
+            <label asp-for="FullName" class="form-label"></label>
+            <input asp-for="FullName" class="form-control" placeholder="Enter full name" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+
+        <!-- Role Dropdown -->
+        <div class="mb-3">
+            <label asp-for="Role" class="form-label">Role</label>
+            <select asp-for="Role" class="form-select">
+                <option value="">-- Select Role --</option>
+                <option value="Batsman">Batsman</option>
+                <option value="Bowler">Bowler</option>
+                <option value="All-rounder">All-rounder</option>
+                <option value="Wicket-Keeper">Wicket-Keeper</option>
+            </select>
+            <span asp-validation-for="Role" class="text-danger"></span>
+        </div>
+
+        <!-- Team Dropdown -->
+        <div class="mb-3">
+            <label asp-for="TeamId" class="form-label">Team</label>
+            <select asp-for="TeamId" class="form-select"
+                    asp-items="@(new SelectList(ViewData["Teams"] as List<CricbuzzAppV2.Models.Team>, "TeamId", "TeamName"))">
+                <option value="">-- Select Team --</option>
+            </select>
+            <span asp-validation-for="TeamId" class="text-danger"></span>
+        </div>
+
+        <!-- Image URL -->
+        <div class="mb-3">
+            <label asp-for="ImageUrl" class="form-label">Image URL</label>
+            <input asp-for="ImageUrl" class="form-control" placeholder="Enter image URL or leave blank" />
+            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">💾 Save</button>
+            <a asp-action="Index" class="btn btn-secondary">↩ Back</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

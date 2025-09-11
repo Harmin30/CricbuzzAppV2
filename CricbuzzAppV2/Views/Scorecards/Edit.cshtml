@@ -1,0 +1,69 @@
+﻿@model CricbuzzAppV2.Models.Scorecard
+
+@{
+    ViewData["Title"] = "Edit Scorecard";
+}
+
+<h2>✏ Edit Scorecard</h2>
+
+<div class="card shadow-sm p-4 mb-4">
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="ScorecardId" />
+
+        @* --- Match & Player Selection --- *@
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label asp-for="MatchId" class="form-label">Match</label>
+                <select asp-for="MatchId" class="form-select" asp-items="ViewBag.MatchId">
+                    <option value="">-- Select Match --</option>
+                </select>
+                <span asp-validation-for="MatchId" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="PlayerId" class="form-label">Player</label>
+                <select asp-for="PlayerId" class="form-select" asp-items="ViewBag.PlayerId">
+                    <option value="">-- Select Player --</option>
+                </select>
+                <span asp-validation-for="PlayerId" class="text-danger"></span>
+            </div>
+        </div>
+
+        @* --- Batting Stats Section --- *@
+        <div class="card p-3 mb-3 border-info">
+            <h5 class="text-info mb-3">🏏 Batting Stats (optional)</h5>
+            <div class="row mb-2">
+                <div class="col-md-2"><label asp-for="RunsScored"></label><input asp-for="RunsScored" class="form-control" /></div>
+                <div class="col-md-2"><label asp-for="BallsFaced"></label><input asp-for="BallsFaced" class="form-control" /></div>
+                <div class="col-md-2"><label asp-for="Fours"></label><input asp-for="Fours" class="form-control" /></div>
+                <div class="col-md-2"><label asp-for="Sixes"></label><input asp-for="Sixes" class="form-control" /></div>
+                <div class="col-md-2"><label asp-for="Ones"></label><input asp-for="Ones" class="form-control" /></div>
+                <div class="col-md-2"><label asp-for="Twos"></label><input asp-for="Twos" class="form-control" /></div>
+                <div class="col-md-2 mt-2"><label asp-for="Threes"></label><input asp-for="Threes" class="form-control" /></div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="HowOut" class="form-label">How Out</label>
+                <select asp-for="HowOut" class="form-select" asp-items="ViewBag.HowOutOptions">
+                    <option value="">-- Select Dismissal --</option>
+                </select>
+            </div>
+        </div>
+
+        @* --- Bowling Stats Section --- *@
+        <div class="card p-3 mb-3 border-success">
+            <h5 class="text-success mb-3">🎯 Bowling Stats (optional)</h5>
+            <div class="row mb-2">
+                <div class="col-md-3"><label asp-for="OversBowled"></label><input asp-for="OversBowled" class="form-control" /></div>
+                <div class="col-md-3"><label asp-for="RunsConceded"></label><input asp-for="RunsConceded" class="form-control" /></div>
+                <div class="col-md-3"><label asp-for="WicketsTaken"></label><input asp-for="WicketsTaken" class="form-control" /></div>
+                <div class="col-md-3"><label asp-for="Maidens"></label><input asp-for="Maidens" class="form-control" /></div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">💾 Update</button>
+        <a asp-action="Index" class="btn btn-secondary">↩ Back</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

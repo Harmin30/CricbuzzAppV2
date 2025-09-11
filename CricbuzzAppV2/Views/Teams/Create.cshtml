@@ -1,0 +1,39 @@
+﻿@model CricbuzzAppV2.Models.Team
+
+@{
+    ViewData["Title"] = "Add Team";
+    Layout = "_Layout";
+}
+
+<h2 class="mb-4">➕ Add New Team</h2>
+
+<div class="card shadow-sm p-4">
+    <form asp-action="Create" method="post">
+        <div class="mb-3">
+            <label asp-for="TeamName" class="form-label"></label>
+            <input asp-for="TeamName" class="form-control" placeholder="Enter team name" />
+            <span asp-validation-for="TeamName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Country" class="form-label"></label>
+            <input asp-for="Country" class="form-control" placeholder="Enter country" />
+            <span asp-validation-for="Country" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Coach" class="form-label"></label>
+            <input asp-for="Coach" class="form-control" placeholder="Enter coach name" />
+            <span asp-validation-for="Coach" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">💾 Save</button>
+            <a asp-action="Index" class="btn btn-secondary">↩ Back to List</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

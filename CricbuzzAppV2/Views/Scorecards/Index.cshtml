@@ -1,0 +1,84 @@
+﻿@model IEnumerable<CricbuzzAppV2.Models.Scorecard>
+
+@{
+    ViewData["Title"] = "Scorecards";
+}
+
+<h2>📋 Scorecards</h2>
+
+<a asp-action="Create" class="btn btn-success mb-3">➕ Add Scorecard</a>
+
+<table class="table table-bordered table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Match</th>
+            <th>Player</th>
+            <th colspan="7" class="text-center">Batting</th>
+            <th colspan="4" class="text-center">Bowling</th>
+            <th>How Out</th>
+            <th>Actions</th>
+        </tr>
+        <tr>
+            <th></th>
+            <th></th>
+            <th>Runs</th>
+            <th>Balls</th>
+            <th>4s</th>
+            <th>6s</th>
+            <th>1s</th>
+            <th>2s</th>
+            <th>3s</th>
+            <th>Overs</th>
+            <th>Runs Conceded</th>
+            <th>Wickets</th>
+            <th>Maidens</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var score in Model)
+            {
+                <tr>
+                    <td>@score.Match?.TeamA?.TeamName vs @score.Match?.TeamB?.TeamName</td>
+                    <td>@score.Player?.FullName</td>
+
+                    <!-- Batting -->
+                    <td>@(score.RunsScored != 0 ? score.RunsScored.ToString() : "-")</td>
+                    <td>@(score.BallsFaced != 0 ? score.BallsFaced.ToString() : "-")</td>
+                    <td>@(score.Fours != 0 ? score.Fours.ToString() : "-")</td>
+                    <td>@(score.Sixes != 0 ? score.Sixes.ToString() : "-")</td>
+                    <td>@(score.Ones != 0 ? score.Ones.ToString() : "-")</td>
+                    <td>@(score.Twos != 0 ? score.Twos.ToString() : "-")</td>
+                    <td>@(score.Threes != 0 ? score.Threes.ToString() : "-")</td>
+
+                    <!-- Bowling -->
+                    <td>@(score.OversBowled != 0 ? string.Format("{0:0.0}", score.OversBowled) : "-")</td>
+                    <td>@(score.RunsConceded != 0 ? score.RunsConceded.ToString() : "-")</td>
+                    <td>@(score.WicketsTaken != 0 ? score.WicketsTaken.ToString() : "-")</td>
+                    <td>@(score.Maidens != 0 ? score.Maidens.ToString() : "-")</td>
+
+                    <!-- How Out -->
+                    <td>@(!string.IsNullOrEmpty(score.HowOut) ? score.HowOut : "-")</td>
+
+                    <!-- Actions -->
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a asp-action="Details" asp-route-id="@score.ScorecardId" class="btn btn-sm btn-info">View</a>
+                            <a asp-action="Edit" asp-route-id="@score.ScorecardId" class="btn btn-sm btn-primary">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@score.ScorecardId" class="btn btn-sm btn-danger">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="16" class="text-center">No scorecards found.</td>
+            </tr>
+        }
+    </tbody>
+</table>

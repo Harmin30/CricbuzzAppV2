@@ -1,0 +1,44 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model CricbuzzAppV2.Models.Team
+
+@{
+    ViewData["Title"] = "Edit Team";
+    Layout = "_Layout";
+}
+
+<h2 class="mb-4">✏ Edit Team</h2>
+
+<div class="card shadow-sm p-4">
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="TeamId" />
+
+        <div class="mb-3">
+            <label asp-for="TeamName" class="form-label"></label>
+            <input asp-for="TeamName" class="form-control" />
+            <span asp-validation-for="TeamName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Country" class="form-label"></label>
+            <input asp-for="Country" class="form-control" />
+            <span asp-validation-for="Country" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Coach" class="form-label"></label>
+            <input asp-for="Coach" class="form-control" />
+            <span asp-validation-for="Coach" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">💾 Update</button>
+            <a asp-action="Index" class="btn btn-secondary">↩ Back to List</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

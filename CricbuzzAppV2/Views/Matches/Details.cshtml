@@ -1,0 +1,35 @@
+﻿@model CricbuzzAppV2.Models.Match
+
+@{
+    ViewData["Title"] = "Match Details";
+    Layout = "_Layout";
+}
+
+<h2 class="mb-4">🏏 Match Details</h2>
+
+<div class="card shadow-sm p-4">
+    <dl class="row">
+        <dt class="col-sm-3">Team A</dt>
+        <dd class="col-sm-9">@Model.TeamA?.TeamName</dd>
+
+        <dt class="col-sm-3">Team B</dt>
+        <dd class="col-sm-9">@Model.TeamB?.TeamName</dd>
+
+        <dt class="col-sm-3">Match Type</dt>
+        <dd class="col-sm-9">@Model.MatchType</dd>
+
+        <dt class="col-sm-3">Date</dt>
+        <dd class="col-sm-9">@Model.Date.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Venue</dt>
+        <dd class="col-sm-9">@Model.Venue</dd>
+
+        <dt class="col-sm-3">Winner</dt>
+        <dd class="col-sm-9">@Model.WinnerTeam?.TeamName</dd>   <!-- ✅ Removed "N/A" -->
+    </dl>
+</div>
+
+<div class="mt-3 d-flex gap-2">
+    <a asp-action="Edit" asp-route-id="@Model.MatchId" class="btn btn-warning">✏ Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">↩ Back to List</a>
+</div>

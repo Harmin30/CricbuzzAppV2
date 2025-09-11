@@ -1,0 +1,36 @@
+﻿@model CricbuzzAppV2.Models.Match
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Delete Match";
+    Layout = "_Layout";
+}
+
+<h2 class="mb-4">🗑 Delete Match</h2>
+
+<div class="card shadow-sm p-4">
+    <h5>Are you sure you want to delete this match?</h5>
+
+    <dl class="row mt-3">
+        <dt class="col-sm-3">Team A</dt>
+        <dd class="col-sm-9">@Model.TeamA?.TeamName</dd>
+
+        <dt class="col-sm-3">Team B</dt>
+        <dd class="col-sm-9">@Model.TeamB?.TeamName</dd>
+
+        <dt class="col-sm-3">Match Type</dt>
+        <dd class="col-sm-9">@Model.MatchType</dd>
+
+        <dt class="col-sm-3">Date</dt>
+        <dd class="col-sm-9">@Model.Date.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Venue</dt>
+        <dd class="col-sm-9">@Model.Venue</dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="MatchId" />
+        <button type="submit" class="btn btn-danger">🗑 Delete</button>
+        <a asp-action="Index" class="btn btn-secondary">↩ Back to List</a>
+    </form>
+</div>

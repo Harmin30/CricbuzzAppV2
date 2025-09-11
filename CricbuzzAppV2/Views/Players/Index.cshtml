@@ -1,0 +1,53 @@
+﻿@model IEnumerable<CricbuzzAppV2.Models.Player>
+
+@{
+    ViewData["Title"] = "Players List";
+}
+
+<h2 class="mb-4">🏏 Players</h2>
+
+<a asp-action="Create" class="btn btn-success mb-3">➕ Add New Player</a>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Image</th>
+            <th>Full Name</th>
+            <th>Role</th>
+            <th>Team</th>
+            <th class="text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var player in Model)
+        {
+            <tr>
+                <td>
+                    @if (!string.IsNullOrEmpty(player.ImageUrl))
+                    {
+                        <img src="@player.ImageUrl" alt="@player.FullName" width="60" />
+                    }
+                    else
+                    {
+                        <span class="text-muted">No image</span>
+                    }
+                </td>
+                <td>@player.FullName</td>
+                <td>@player.Role</td>
+                <td>@player.Team?.TeamName</td>
+                <td class="text-center">
+                    <a asp-action="Edit" asp-route-id="@player.PlayerId" class="btn btn-primary btn-sm me-1">✏️ Edit</a>
+                    <a asp-action="Delete" asp-route-id="@player.PlayerId" class="btn btn-danger btn-sm">🗑️ Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,78 @@
+﻿@model CricbuzzAppV2.Models.PlayerStats
+
+@{
+    ViewData["Title"] = Model != null && Model.Player != null
+        ? $"Player Stats - {Model.Player.FullName}"
+        : "Player Stats Details";
+}
+
+<h2>📊 Player Stats Details</h2>
+
+@if (Model == null)
+{
+    <div class="alert alert-danger">Player stats not found.</div>
+}
+else
+{
+    <div class="card shadow-sm p-4 mb-4">
+
+        <h5 class="mb-3">👤 Player</h5>
+        <p>
+            <strong>Name:</strong> @(Model.Player?.FullName ?? "-") <br />
+            <strong>Role:</strong> @(Model.Player?.Role ?? "-") <br />
+            <strong>Team:</strong> @(Model.Player?.Team?.TeamName ?? "-")
+        </p>
+
+        <h5 class="text-info mb-2">🏏 Batting Stats</h5>
+        <table class="table table-bordered table-sm">
+            <tr>
+                <th>Matches Played</th>
+                <th>Innings</th>
+                <th>Runs</th>
+                <th>Balls Faced</th>
+                <th>Highest Score</th>
+                <th>Hundreds</th>
+                <th>Fifties</th>
+                <th>Average</th>
+                <th>Strike Rate</th>
+            </tr>
+            <tr>
+                <td>@Model.MatchesPlayed</td>
+                <td>@Model.Innings</td>
+                <td>@Model.Runs</td>
+                <td>@Model.BallsFaced</td>
+                <td>@Model.HighestScore</td>
+                <td>@Model.Hundreds</td>
+                <td>@Model.Fifties</td>
+                <td>@Model.BattingAverage</td>
+                <td>@Model.StrikeRate</td>
+            </tr>
+        </table>
+
+        <h5 class="text-success mb-2">🎯 Bowling Stats</h5>
+        <table class="table table-bordered table-sm">
+            <tr>
+                <th>Balls Bowled</th>
+                <th>Runs Conceded</th>
+                <th>Wickets</th>
+                <th>Best Bowling</th>
+                <th>Average</th>
+                <th>Economy</th>
+            </tr>
+            <tr>
+                <td>@Model.BallsBowled</td>
+                <td>@Model.RunsConceded</td>
+                <td>@Model.Wickets</td>
+                <td>@(string.IsNullOrEmpty(Model.BestBowling) ? "-" : Model.BestBowling)</td>
+                <td>@Model.BowlingAverage</td>
+                <td>@Model.Economy</td>
+            </tr>
+        </table>
+
+        <div class="mt-3">
+            <a asp-action="Index" class="btn btn-secondary">↩ Back to Player Stats</a>
+            <a asp-action="Edit" asp-route-id="@Model.PlayerStatsId" class="btn btn-warning">✏ Edit</a>
+        </div>
+
+    </div>
+}

@@ -1,0 +1,66 @@
+﻿@model IEnumerable<CricbuzzAppV2.Models.PlayerStats>
+
+@{
+    ViewData["Title"] = "Player Stats";
+}
+
+<h2 class="mb-4">📊 Player Stats</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<table class="table table-striped table-hover table-bordered table-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Player</th>
+            <th>Format</th>
+            <th>Matches</th>
+            <th>Innings</th>
+            <th>Runs</th>
+            <th>HS</th>
+            <th>100s</th>
+            <th>50s</th>
+            <th>Bat Avg</th>
+            <th>SR</th>
+            <th>Balls Bowled</th>
+            <th>Runs Conceded</th>
+            <th>Wickets</th>
+            <th>BB</th>
+            <th>Bowl Avg</th>
+            <th>Eco</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var stat in Model)
+        {
+            <tr>
+                <td>@stat.Player.FullName</td>
+                <td>@stat.Format</td>
+                <td>@stat.MatchesPlayed</td>
+                <td>@stat.Innings</td>
+                <td>@stat.Runs</td>
+                <td>@stat.HighestScore</td>
+                <td>@stat.Hundreds</td>
+                <td>@stat.Fifties</td>
+                <td>@stat.BattingAverage</td>
+                <td>@stat.StrikeRate</td>
+                <td>@stat.BallsBowled</td>
+                <td>@stat.RunsConceded</td>
+                <td>@stat.Wickets</td>
+                <td>@stat.BestBowling</td>
+                <td>@stat.BowlingAverage</td>
+                <td>@stat.Economy</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@stat.PlayerStatsId" class="btn btn-info btn-sm">View</a>
+                    <a asp-action="Edit" asp-route-id="@stat.PlayerStatsId" class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@stat.PlayerStatsId" class="btn btn-sm btn-danger"> Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-success mt-3">➕ Add New Stats</a>

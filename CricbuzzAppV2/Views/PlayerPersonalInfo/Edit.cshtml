@@ -1,0 +1,51 @@
+﻿@model CricbuzzAppV2.Models.PlayerPersonalInfo
+@{
+    ViewData["Title"] = "Edit Player Personal Info";
+    var roles = new List<string> { "Batsman", "Bowler", "All-Rounder", "Wicket-Keeper" };
+    var battingStyles = new List<string> { "Right-hand Bat", "Left-hand Bat" };
+    var bowlingStyles = new List<string> { "Right-arm Fast", "Left-arm Fast", "Right-arm Spin", "Left-arm Spin" };
+}
+
+<h2>✏️ Edit Player Personal Info</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="PlayerPersonalInfoId" />
+
+    <div class="mb-3">
+        <label asp-for="PlayerId" class="form-label"></label>
+        <select asp-for="PlayerId" class="form-select" asp-items="ViewBag.Players"></select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DateOfBirth" class="form-label"></label>
+        <input asp-for="DateOfBirth" type="date" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="BirthPlace" class="form-label"></label>
+        <input asp-for="BirthPlace" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Height" class="form-label"></label>
+        <input asp-for="Height" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="BattingStyle" class="form-label"></label>
+        <select asp-for="BattingStyle" class="form-select" asp-items="@(new SelectList(battingStyles, Model.BattingStyle))"></select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="BowlingStyle" class="form-label"></label>
+        <select asp-for="BowlingStyle" class="form-select" asp-items="@(new SelectList(bowlingStyles, Model.BowlingStyle))"></select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Role" class="form-label"></label>
+        <select asp-for="Role" class="form-select" asp-items="@(new SelectList(roles, Model.Role))"></select>
+    </div>
+
+    <button type="submit" class="btn btn-warning">Update</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

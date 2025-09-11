@@ -1,0 +1,44 @@
+﻿@model CricbuzzAppV2.Models.Player
+
+@{
+    ViewData["Title"] = "Player Details";
+}
+
+<h2>👤 Player Details</h2>
+
+<div class="card shadow-sm p-4">
+    <div class="row">
+        <!-- Player Image -->
+        <div class="col-md-4 text-center">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" alt="@Model.FullName"
+                     class="img-fluid rounded shadow-sm mb-3"
+                     style="max-height:300px; object-fit:cover;" />
+            }
+            else
+            {
+                <div class="text-muted fst-italic">No image available</div>
+            }
+        </div>
+
+        <!-- Player Info -->
+        <div class="col-md-8">
+            <dl class="row">
+                <dt class="col-sm-3">Full Name</dt>
+                <dd class="col-sm-9">@Model.FullName</dd>
+
+                <dt class="col-sm-3">Role</dt>
+                <dd class="col-sm-9">@Model.Role</dd>
+
+                <dt class="col-sm-3">Team</dt>
+                <dd class="col-sm-9">@Model.Team?.TeamName</dd>
+            </dl>
+
+            <div class="d-flex gap-2 mt-3">
+                <a asp-action="Edit" asp-route-id="@Model.PlayerId" class="btn btn-warning">✏ Edit</a>
+                <a asp-action="Index" class="btn btn-secondary">↩ Back</a>
+            </div>
+        </div>
+    </div>
+</div>
