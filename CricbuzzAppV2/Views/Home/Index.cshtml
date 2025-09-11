@@ -1,8 +1,116 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "CricbuzzAppV2 - Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+    <div class="text-center">
+        <!-- Header -->
+        <h1 class="display-3 fw-bold text-success">🏏 CricbuzzAppV2</h1>
+        <p class="lead text-muted">Your cricket companion for players, stats, and teams</p>
+        <hr class="my-4" />
+
+        <!-- Navigation Cards -->
+        <div class="row mt-4">
+            <!-- Players -->
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-lg border-0 rounded-3">
+                    <div class="card-body text-center">
+                        <h3 class="card-title">👥 Players</h3>
+                        <p class="text-muted">Browse all cricket players and their details.</p>
+                        <a asp-controller="Players" asp-action="Index" class="btn btn-success">View Players</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teams -->
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-lg border-0 rounded-3">
+                    <div class="card-body text-center">
+                        <h3 class="card-title">🌍 Teams</h3>
+                        <p class="text-muted">Check out teams and their squads.</p>
+                        <a asp-controller="Teams" asp-action="Index" class="btn btn-primary">View Teams</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player Stats -->
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-lg border-0 rounded-3">
+                    <div class="card-body text-center">
+                        <h3 class="card-title">📊 Player Stats</h3>
+                        <p class="text-muted">See batting & bowling records.</p>
+                        <a asp-controller="PlayerStats" asp-action="Index" class="btn btn-warning text-dark">View Stats</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Highlights Section -->
+        <div class="mt-5">
+            <h2 class="fw-bold text-dark">🔥 Latest Highlights</h2>
+            <p class="text-muted">Stay updated with the latest cricket stats</p>
+
+            <div class="row mt-4">
+                <!-- Top Batsman -->
+                <div class="col-md-4 mb-4">
+                    <div class="card border-0 shadow-sm rounded-3">
+                        <div class="card-body text-center">
+                            <h4 class="text-success">🏆 Top Batsman</h4>
+                            @if (ViewBag.TopBatsman != null)
+                            {
+                                <p class="fw-bold">@ViewBag.TopBatsman.Player?.FullName</p>
+                                <p class="text-muted">Runs: @ViewBag.TopBatsman.Runs | Avg: @ViewBag.TopBatsman.BattingAverage</p>
+                            }
+                            else
+                            {
+                                <p class="text-muted">No data available</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Bowler -->
+                <div class="col-md-4 mb-4">
+                    <div class="card border-0 shadow-sm rounded-3">
+                        <div class="card-body text-center">
+                            <h4 class="text-primary">🎯 Top Bowler</h4>
+                            @if (ViewBag.TopBowler != null)
+                            {
+                                <p class="fw-bold">@ViewBag.TopBowler.Player?.FullName</p>
+                                <p class="text-muted">Wickets: @ViewBag.TopBowler.Wickets | Econ: @ViewBag.TopBowler.Economy</p>
+                            }
+                            else
+                            {
+                                <p class="text-muted">No data available</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Top Team -->
+                <div class="col-md-4 mb-4">
+                    <div class="card border-0 shadow-sm rounded-3">
+                        <div class="card-body text-center">
+                            <h4 class="text-warning">🌍 Top Team</h4>
+                            @if (ViewBag.TopTeam != null)
+                            {
+                                <p class="fw-bold">@ViewBag.TopTeam.TeamName</p>
+                                <p class="text-muted">Country: @ViewBag.TopTeam.Country</p>
+                            }
+                            else
+                            {
+                                <p class="text-muted">No data available</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-5 text-muted">
+            <p>⚡ Powered by ASP.NET Core MVC | CricbuzzAppV2</p>
+        </footer>
+    </div>
 </div>
