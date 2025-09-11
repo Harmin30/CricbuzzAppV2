@@ -4,26 +4,23 @@
     ViewData["Title"] = "Delete Player Stats";
 }
 
-<h2 class="mb-4">🗑 Delete Player Stats</h2>
+<h2 class="mb-4 text-danger">⚠️ Confirm Delete</h2>
+
+<div class="alert alert-warning">
+    Are you sure you want to delete stats for
+    <strong>@Model.Player.FullName (@Model.Format)</strong>?
+</div>
 
 <div class="card shadow-sm p-4">
-    <h5>Are you sure you want to delete stats for <strong>@Model.Player.FullName</strong>?</h5>
-
-    <dl class="row mt-3">
-        <dt class="col-sm-3">Format</dt>
-        <dd class="col-sm-9">@Model.Format</dd>
-
-        <dt class="col-sm-3">Matches</dt>
-        <dd class="col-sm-9">@Model.MatchesPlayed</dd>
-
-        <dt class="col-sm-3">Runs</dt>
-        <dd class="col-sm-9">@Model.Runs</dd>
-    </dl>
-
-    <form asp-action="Delete" method="post">
-        @Html.AntiForgeryToken()
-        <input type="hidden" asp-for="PlayerStatsId" />
-        <button type="submit" class="btn btn-danger">🗑 Delete</button>
-        <a asp-action="Index" class="btn btn-secondary">↩ Cancel</a>
-    </form>
+    <h4>Quick Info</h4>
+    <ul>
+        <li><b>Matches:</b> @Model.MatchesPlayed</li>
+        <li><b>Runs:</b> @Model.Runs</li>
+        <li><b>Wickets:</b> @Model.Wickets</li>
+    </ul>
 </div>
+<form asp-action="DeleteConfirmed" asp-route-id="@Model.PlayerStatsId" method="post" class="mt-3">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-danger me-2">🗑 Confirm Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">⬅️ Cancel</a>
+</form>

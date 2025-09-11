@@ -4,6 +4,7 @@ using CricbuzzAppV2.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CricbuzzAppV2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250911110147_UpdatePlayerStatsModel_v2")]
+    partial class UpdatePlayerStatsModel_v2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,46 +146,44 @@ namespace CricbuzzAppV2.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlayerStatsId"));
 
-                    b.Property<int?>("BallsBowled")
+                    b.Property<int>("BallsBowled")
                         .HasColumnType("int");
 
-                    b.Property<int?>("BallsFaced")
+                    b.Property<int>("BallsFaced")
                         .HasColumnType("int");
 
                     b.Property<string>("BestBowling")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("DoubleHundreds")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Fifties")
+                    b.Property<int>("Fifties")
                         .HasColumnType("int");
 
                     b.Property<int>("Format")
                         .HasColumnType("int");
 
-                    b.Property<int?>("HighestScore")
+                    b.Property<int>("HighestScore")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Hundreds")
+                    b.Property<int>("Hundreds")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Innings")
+                    b.Property<int>("Innings")
                         .HasColumnType("int");
 
-                    b.Property<int?>("MatchesPlayed")
+                    b.Property<int>("MatchesPlayed")
                         .HasColumnType("int");
 
                     b.Property<int>("PlayerId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Runs")
+                    b.Property<int>("Runs")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RunsConceded")
+                    b.Property<int>("RunsConceded")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Wickets")
+                    b.Property<int>("Wickets")
                         .HasColumnType("int");
 
                     b.HasKey("PlayerStatsId");

@@ -114,17 +114,21 @@ namespace CricbuzzAppV2.Controllers
         // GET: PlayerStats/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
+            if (id <= 0)
+                return BadRequest();
+
             var stats = await _context.PlayerStats
                 .Include(p => p.Player)
                 .FirstOrDefaultAsync(p => p.PlayerStatsId == id);
 
-            if (stats == null) return NotFound();
+            if (stats == null)
+                return NotFound();
 
-            return View(stats);
+            return View(stats); // Opens Delete.cshtml for confirmation
         }
 
         // POST: PlayerStats/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -135,7 +139,11 @@ namespace CricbuzzAppV2.Controllers
                 await _context.SaveChangesAsync();
                 TempData["Success"] = "Player stats deleted successfully!";
             }
+
             return RedirectToAction(nameof(Index));
         }
+
+
+
     }
 }

@@ -4,61 +4,113 @@
     ViewData["Title"] = "Player Stats";
 }
 
-<h2 class="mb-4">📊 Player Stats</h2>
+<h2 class="mb-4">📊 Player Career Stats</h2>
 
 @if (TempData["Success"] != null)
 {
     <div class="alert alert-success">@TempData["Success"]</div>
 }
 
-<table class="table table-striped table-hover table-bordered table-sm">
+<table class="table table-striped table-hover table-bordered table-sm text-center align-middle">
     <thead class="table-dark">
         <tr>
-            <th>Player</th>
-            <th>Format</th>
-            <th>Matches</th>
-            <th>Innings</th>
+            <th rowspan="2">Player Name</th>
+            <th rowspan="2">Format</th>
+            <th colspan="10">Batting Stats</th>
+            <th colspan="6">Bowling Stats</th>
+            <th rowspan="2">Actions</th>
+        </tr>
+        <tr>
+            @* Batting *@
+            <th>M</th>
+            <th>Inn</th>
             <th>Runs</th>
+            <th>BF</th>
             <th>HS</th>
             <th>100s</th>
             <th>50s</th>
+            <th>200s</th>
             <th>Bat Avg</th>
             <th>SR</th>
-            <th>Balls Bowled</th>
+            @* Bowling *@
+            <th >Balls</th>
             <th>Runs Conceded</th>
             <th>Wickets</th>
             <th>BB</th>
             <th>Bowl Avg</th>
             <th>Eco</th>
-            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var stat in Model)
+        @foreach (var playerGroup in Model.GroupBy(s => s.PlayerId))
         {
-            <tr>
-                <td>@stat.Player.FullName</td>
-                <td>@stat.Format</td>
-                <td>@stat.MatchesPlayed</td>
-                <td>@stat.Innings</td>
-                <td>@stat.Runs</td>
-                <td>@stat.HighestScore</td>
-                <td>@stat.Hundreds</td>
-                <td>@stat.Fifties</td>
-                <td>@stat.BattingAverage</td>
-                <td>@stat.StrikeRate</td>
-                <td>@stat.BallsBowled</td>
-                <td>@stat.RunsConceded</td>
-                <td>@stat.Wickets</td>
-                <td>@stat.BestBowling</td>
-                <td>@stat.BowlingAverage</td>
-                <td>@stat.Economy</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@stat.PlayerStatsId" class="btn btn-info btn-sm">View</a>
-                    <a asp-action="Edit" asp-route-id="@stat.PlayerStatsId" class="btn btn-sm btn-warning">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@stat.PlayerStatsId" class="btn btn-sm btn-danger"> Delete</a>
-                </td>
-            </tr>
+            var statsList = playerGroup.ToList();
+            var playerName = statsList.FirstOrDefault()?.Player?.FullName ?? "Unknown Player";
+
+            var formats = new[] {
+                PlayerStats.CricketFormat.Test,
+                PlayerStats.CricketFormat.ODI,
+                PlayerStats.CricketFormat.T20
+                };
+
+            for (int i = 0; i < formats.Length; i++)
+            {
+                var fmt = formats[i];
+                var stat = statsList.FirstOrDefault(s => s.Format == fmt);
+
+                <tr>
+                    @if (i == 0)
+                    {
+                        <td rowspan="3" class="align-middle text-start fw-bold">@playerName</td>
+                    }
+
+                    <td class="fw-semibold">@fmt</td>
+
+                    @* Batting stats *@
+                    <td>@(stat?.MatchesPlayed?.ToString() ?? "-")</td>
+                    <td>@(stat?.Innings?.ToString() ?? "-")</td>
+                    <td>@(stat?.Runs?.ToString() ?? "-")</td>
+                    <td>@(stat?.BallsFaced?.ToString() ?? "-")</td>
+                    <td>@(stat?.HighestScore?.ToString() ?? "-")</td>
+                    <td>@(stat?.Hundreds?.ToString() ?? "-")</td>
+                    <td>@(stat?.Fifties?.ToString() ?? "-")</td>
+                    <td>@(stat?.DoubleHundreds?.ToString() ?? "-")</td>
+                    <td>@(stat != null ? stat.BattingAverage.ToString("0.00") : "-")</td>
+                    <td>@(stat != null ? stat.StrikeRate.ToString("0.00") : "-")</td>
+
+                    @* Bowling stats *@
+                    <td>@(stat?.BallsBowled?.ToString() ?? "-")</td>
+                    <td>@(stat?.RunsConceded?.ToString() ?? "-")</td>
+                    <td>@(stat?.Wickets?.ToString() ?? "-")</td>
+                    <td>@(stat?.BestBowling ?? "-")</td>
+                    <td>@(stat != null ? stat.BowlingAverage.ToString("0.00") : "-")</td>
+                    <td>@(stat != null ? stat.Economy.ToString("0.00") : "-")</td>
+
+                    @if (i == 0)
+                    {
+                        <td rowspan="3" class="align-middle">
+                            <div class="d-flex flex-column">
+                                @foreach (var f in formats)
+                                {
+                                    var s = statsList.FirstOrDefault(x => x.Format == f);
+                                    if (s != null)
+                                    {
+                                        <div class="d-flex gap-2 mb-2">
+                                            <a asp-action="Details" asp-route-id="@s.PlayerStatsId" class="btn btn-sm btn-info">View</a>
+                                            <a asp-action="Edit" asp-route-id="@s.PlayerStatsId" class="btn btn-sm btn-warning">Edit</a>
+                                            <a asp-action="Delete" asp-route-id="@s.PlayerStatsId" class="btn btn-sm btn-danger">Delete</a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="text-muted small mb-2">No @f</div>
+                                    }
+                                }
+                            </div>
+                        </td>
+                    }
+                </tr>
+            }
         }
     </tbody>
 </table>
