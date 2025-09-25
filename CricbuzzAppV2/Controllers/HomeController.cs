@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
-using CricbuzzAppV2.Data;   // ✅ add this (namespace for your DbContext)
+using CricbuzzAppV2.Data;
 using CricbuzzAppV2.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; // for Include
+using Microsoft.EntityFrameworkCore;
 
 namespace CricbuzzAppV2.Controllers
 {
@@ -19,24 +19,38 @@ namespace CricbuzzAppV2.Controllers
 
         public IActionResult Index()
         {
-            // Top Batsman by Runs
+            // Summary stats
+            ViewBag.TotalPlayers = _context.Players.Count();
+            ViewBag.TotalTeams = _context.Teams.Count();
+            ViewBag.TotalMatches = _context.Matches.Count();
+            ViewBag.TotalScorecards = _context.Scorecards.Count();
+
+            // Highlights
             var topBatsman = _context.PlayerStats
                 .Include(ps => ps.Player)
                 .OrderByDescending(ps => ps.Runs)
                 .FirstOrDefault();
 
-            // Top Bowler by Wickets
             var topBowler = _context.PlayerStats
                 .Include(ps => ps.Player)
                 .OrderByDescending(ps => ps.Wickets)
                 .FirstOrDefault();
 
-            // Top Team (just pick first team)
             var topTeam = _context.Teams.FirstOrDefault();
 
             ViewBag.TopBatsman = topBatsman;
             ViewBag.TopBowler = topBowler;
             ViewBag.TopTeam = topTeam;
+
+            // Recent Matches
+            var recentMatches = _context.Matches
+                .Include(m => m.TeamA)
+                .Include(m => m.TeamB)
+                .OrderByDescending(m => m.Date)
+                .Take(5)
+                .ToList();
+
+            ViewBag.RecentMatches = recentMatches;
 
             return View();
         }

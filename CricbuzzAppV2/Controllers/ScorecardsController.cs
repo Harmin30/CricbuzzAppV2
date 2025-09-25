@@ -184,7 +184,7 @@ namespace CricbuzzAppV2.Controllers
         #region Helper Methods
         private void PopulateDropdowns(Scorecard scorecard = null)
         {
-            // Matches dropdown: "TeamA vs TeamB"
+            // Matches dropdown: "TeamA vs TeamB (MatchType)"
             var matches = _context.Matches
                 .Include(m => m.TeamA)
                 .Include(m => m.TeamB)
@@ -193,7 +193,7 @@ namespace CricbuzzAppV2.Controllers
             ViewBag.MatchId = new SelectList(
                 matches,
                 "MatchId",
-                "DisplayName", // computed property in Match: TeamA vs TeamB
+                "DisplayNameWithType", // updated property to include MatchType
                 scorecard?.MatchId
             );
 
@@ -207,17 +207,18 @@ namespace CricbuzzAppV2.Controllers
 
             // HowOut options
             ViewBag.HowOutOptions = new SelectList(new List<string>
-            {
-                "Bowled",
-                "Caught",
-                "LBW",
-                "Run Out",
-                "Stumped",
-                "Hit Wicket",
-                "Retired Hurt",
-                "Not Out"
-            }, scorecard?.HowOut);
+    {
+        "Bowled",
+        "Caught",
+        "LBW",
+        "Run Out",
+        "Stumped",
+        "Hit Wicket",
+        "Retired Hurt",
+        "Not Out"
+    }, scorecard?.HowOut);
         }
         #endregion
+
     }
 }

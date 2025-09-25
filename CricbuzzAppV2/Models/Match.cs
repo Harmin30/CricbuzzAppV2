@@ -32,5 +32,7 @@ namespace CricbuzzAppV2.Models
         public ICollection<Scorecard>? Scorecards { get; set; }
 
         public string DisplayName => $"{TeamA?.TeamName} vs {TeamB?.TeamName}";
+//       Include MatchType in dropdowns
+        public string DisplayNameWithType => $"{TeamA?.TeamName} vs {TeamB?.TeamName} ({MatchType})";
     }
 }

@@ -1,116 +1,204 @@
 ﻿@{
-    ViewData["Title"] = "CricbuzzAppV2 - Home";
+    ViewData["Title"] = "CricbuzzAppV2 - Admin Dashboard";
 }
 
-<div class="container mt-5">
-    <div class="text-center">
-        <!-- Header -->
-        <h1 class="display-3 fw-bold text-success">🏏 CricbuzzAppV2</h1>
-        <p class="lead text-muted">Your cricket companion for players, stats, and teams</p>
-        <hr class="my-4" />
-
-        <!-- Navigation Cards -->
-        <div class="row mt-4">
-            <!-- Players -->
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-lg border-0 rounded-3">
-                    <div class="card-body text-center">
-                        <h3 class="card-title">👥 Players</h3>
-                        <p class="text-muted">Browse all cricket players and their details.</p>
-                        <a asp-controller="Players" asp-action="Index" class="btn btn-success">View Players</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Teams -->
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-lg border-0 rounded-3">
-                    <div class="card-body text-center">
-                        <h3 class="card-title">🌍 Teams</h3>
-                        <p class="text-muted">Check out teams and their squads.</p>
-                        <a asp-controller="Teams" asp-action="Index" class="btn btn-primary">View Teams</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Player Stats -->
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-lg border-0 rounded-3">
-                    <div class="card-body text-center">
-                        <h3 class="card-title">📊 Player Stats</h3>
-                        <p class="text-muted">See batting & bowling records.</p>
-                        <a asp-controller="PlayerStats" asp-action="Index" class="btn btn-warning text-dark">View Stats</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Highlights Section -->
-        <div class="mt-5">
-            <h2 class="fw-bold text-dark">🔥 Latest Highlights</h2>
-            <p class="text-muted">Stay updated with the latest cricket stats</p>
-
-            <div class="row mt-4">
-                <!-- Top Batsman -->
-                <div class="col-md-4 mb-4">
-                    <div class="card border-0 shadow-sm rounded-3">
-                        <div class="card-body text-center">
-                            <h4 class="text-success">🏆 Top Batsman</h4>
-                            @if (ViewBag.TopBatsman != null)
-                            {
-                                <p class="fw-bold">@ViewBag.TopBatsman.Player?.FullName</p>
-                                <p class="text-muted">Runs: @ViewBag.TopBatsman.Runs | Avg: @ViewBag.TopBatsman.BattingAverage</p>
-                            }
-                            else
-                            {
-                                <p class="text-muted">No data available</p>
-                            }
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Top Bowler -->
-                <div class="col-md-4 mb-4">
-                    <div class="card border-0 shadow-sm rounded-3">
-                        <div class="card-body text-center">
-                            <h4 class="text-primary">🎯 Top Bowler</h4>
-                            @if (ViewBag.TopBowler != null)
-                            {
-                                <p class="fw-bold">@ViewBag.TopBowler.Player?.FullName</p>
-                                <p class="text-muted">Wickets: @ViewBag.TopBowler.Wickets | Econ: @ViewBag.TopBowler.Economy</p>
-                            }
-                            else
-                            {
-                                <p class="text-muted">No data available</p>
-                            }
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- Top Team -->
-                <div class="col-md-4 mb-4">
-                    <div class="card border-0 shadow-sm rounded-3">
-                        <div class="card-body text-center">
-                            <h4 class="text-warning">🌍 Top Team</h4>
-                            @if (ViewBag.TopTeam != null)
-                            {
-                                <p class="fw-bold">@ViewBag.TopTeam.TeamName</p>
-                                <p class="text-muted">Country: @ViewBag.TopTeam.Country</p>
-                            }
-                            else
-                            {
-                                <p class="text-muted">No data available</p>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer class="mt-5 text-muted">
-            <p>⚡ Powered by ASP.NET Core MVC | CricbuzzAppV2</p>
-        </footer>
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-success">🏏 Cricbuzz Admin Dashboard</h1>
+        <p class="lead text-muted">Manage everything with style – players, teams, matches & scorecards</p>
     </div>
+
+    <!-- Row 1: Quick Actions -->
+    <div class="row text-center mb-5">
+        <div class="col-md-3 mb-3">
+            <a asp-controller="Players" asp-action="Create" class="card text-white shadow-lg border-0 bg-success bg-gradient text-decoration-none h-100">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    @* <h2>👥</h2> *@
+                    <h5 class="fw-bold">Add Player</h5>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a asp-controller="Teams" asp-action="Create" class="card text-white shadow-lg border-0 bg-primary bg-gradient text-decoration-none h-100">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    @* <h2>🌍</h2> *@
+                    <h5 class="fw-bold">Add Team</h5>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a asp-controller="Matches" asp-action="Create" class="card text-white shadow-lg border-0 bg-warning bg-gradient text-decoration-none h-100">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    @* <h2>🏟</h2> *@
+                    <h5 class="fw-bold">Add Match</h5>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a asp-controller="Scorecards" asp-action="Create" class="card text-white shadow-lg border-0 bg-danger bg-gradient text-decoration-none h-100">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    @* <h2>📋</h2> *@
+                    <h5 class="fw-bold">Add Scorecard</h5>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Row 2: Summary Stats -->
+    <div class="row text-center mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow border-0 bg-light h-100">
+                <div class="card-body">
+                    <h2 class="text-success">👤</h2>
+                    <h5 class="text-muted">Players</h5>
+                    <h3 class="fw-bold text-success">@ViewBag.TotalPlayers</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow border-0 bg-light h-100">
+                <div class="card-body">
+                    <h2 class="text-primary">🌍</h2>
+                    <h5 class="text-muted">Teams</h5>
+                    <h3 class="fw-bold text-primary">@ViewBag.TotalTeams</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow border-0 bg-light h-100">
+                <div class="card-body">
+                    <h2 class="text-warning">🏟</h2>
+                    <h5 class="text-muted">Matches</h5>
+                    <h3 class="fw-bold text-warning">@ViewBag.TotalMatches</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow border-0 bg-light h-100">
+                <div class="card-body">
+                    <h2 class="text-danger">📋</h2>
+                    <h5 class="text-muted">Scorecards</h5>
+                    <h3 class="fw-bold text-danger">@ViewBag.TotalScorecards</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 3: Highlights -->
+    <div class="mt-5">
+        <h2 class="fw-bold text-dark mb-4">🔥 Highlights</h2>
+        <div class="row">
+            <!-- Top Batsman -->
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-lg rounded-3 bg-success bg-opacity-10 text-center h-100">
+                    <div class="card-body">
+                        <h4 class="text-success">🏆 Top Batsman</h4>
+                        @if (ViewBag.TopBatsman != null)
+                        {
+                            <p class="fw-bold fs-5">@ViewBag.TopBatsman.Player?.FullName</p>
+                            <p class="text-muted">Runs: @ViewBag.TopBatsman.Runs | Avg: @ViewBag.TopBatsman.BattingAverage</p>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No data available</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Bowler -->
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-lg rounded-3 bg-primary bg-opacity-10 text-center h-100">
+                    <div class="card-body">
+                        <h4 class="text-primary">🎯 Top Bowler</h4>
+                        @if (ViewBag.TopBowler != null)
+                        {
+                            <p class="fw-bold fs-5">@ViewBag.TopBowler.Player?.FullName</p>
+                            <p class="text-muted">Wickets: @ViewBag.TopBowler.Wickets | Econ: @ViewBag.TopBowler.Economy</p>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No data available</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Team -->
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-lg rounded-3 bg-warning bg-opacity-10 text-center h-100">
+                    <div class="card-body">
+                        <h4 class="text-warning">🌍 Top Team</h4>
+                        @if (ViewBag.TopTeam != null)
+                        {
+                            <p class="fw-bold fs-5">@ViewBag.TopTeam.TeamName</p>
+                            <p class="text-muted">Country: @ViewBag.TopTeam.Country</p>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No data available</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 4: Recent Matches -->
+    <div class="mt-5">
+        <h2 class="fw-bold text-dark mb-4">Recent Matches</h2>
+        <div class="table-responsive shadow-sm rounded-3">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Match</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Venue</th>
+                        <th scope="col">Winner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.RecentMatches != null && ViewBag.RecentMatches.Count > 0)
+                    {
+                        foreach (var match in ViewBag.RecentMatches)
+                        {
+                            <tr class="align-middle">
+                                <td><strong>@match.TeamA.TeamName</strong> vs <strong>@match.TeamB.TeamName</strong></td>
+                                <td>@match.MatchType</td>
+                                <td>@match.Date.ToString("dd MMM yyyy")</td>
+                                <td>@match.Venue</td>
+                                <td>
+                                    @if (match.WinnerTeam != null)
+                                    {
+                                        <span class="badge text-white" style="background: linear-gradient(135deg, #4CAF50, #81C784);">
+                                            @match.WinnerTeam.TeamName
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Draw / Pending</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No recent matches available</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+    <!-- Footer -->
+    <footer class="mt-5 text-muted text-center">
+        <p>⚡ Powered by <strong>ASP.NET Core MVC</strong> | CricbuzzAppV2</p>
+    </footer>
 </div>

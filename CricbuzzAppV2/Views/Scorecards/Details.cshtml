@@ -9,7 +9,9 @@
 <div class="card shadow-sm p-4 mb-4">
     <h5 class="mb-3">🏟 Match</h5>
     <p>
-        <strong>Match:</strong> @Model.Match.TeamA.TeamName vs @Model.Match.TeamB.TeamName<br />
+        <strong>Match:</strong> @Model.Match.TeamA.TeamName vs @Model.Match.TeamB.TeamName (@Model.Match.MatchType) <br />
+
+
         <strong>Date:</strong> @Model.Match.Date.ToShortDateString() <br />
         <strong>Venue:</strong> @Model.Match.Venue <br />
         <strong>Winner:</strong> @(Model.Match.WinnerTeam != null ? Model.Match.WinnerTeam.TeamName : "-")

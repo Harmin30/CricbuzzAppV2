@@ -8,6 +8,7 @@ namespace CricbuzzAppV2.Helpers
 {
     public static class AppHelper
     {
+
         #region Dropdowns
         public static SelectList PlayerSelectList(ApplicationDbContext context, int? selectedId = null)
         {
