@@ -2,8 +2,11 @@
 @{
     ViewData["Title"] = "Player Personal Info";
 }
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-4">📋 Player Personal Info</h2>
+    <a asp-action="Create" class="btn btn-success mt-3">➕ Add New Player Info</a>
+</div>
 
-<h2 class="mb-4">📋 Player Personal Info</h2>
 
 @if (TempData["Success"] != null)
 {
@@ -42,4 +45,3 @@
     </tbody>
 </table>
 
-<a asp-action="Create" class="btn btn-success mt-3">➕ Add New Player Info</a>

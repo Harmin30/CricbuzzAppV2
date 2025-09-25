@@ -8,11 +8,14 @@ namespace CricbuzzAppV2.Models
 
         [Required]
         public int MatchId { get; set; }
-        public Match? Match { get; set; } 
+        public Match? Match { get; set; }
 
         [Required]
         public int PlayerId { get; set; }
         public Player? Player { get; set; }
+
+        // NEW: MatchType for display only
+        public string? MatchType { get; set; }
 
         // Batting stats (optional)
         [Range(0, int.MaxValue, ErrorMessage = "Runs cannot be negative")]

@@ -4,9 +4,13 @@
     ViewData["Title"] = "Players List";
 }
 
-<h2 class="mb-4">🏏 Players</h2>
 
-<a asp-action="Create" class="btn btn-success mb-3">➕ Add New Player</a>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-4">🏏 Players</h2>
+    <a asp-action="Create" class="btn btn-success mb-3">➕ Add New Player</a>
+</div>
+
+
 
 @if (TempData["SuccessMessage"] != null)
 {

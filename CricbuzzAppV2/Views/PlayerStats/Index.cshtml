@@ -3,8 +3,10 @@
 @{
     ViewData["Title"] = "Player Stats";
 }
-
-<h2 class="mb-4">📊 Player Career Stats</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-4">📊 Player Career Stats</h2>
+    <a asp-action="Create" class="btn btn-success mt-3">➕ Add New Stats</a>
+</div>
 
 @if (TempData["Success"] != null)
 {
@@ -115,4 +117,4 @@
     </tbody>
 </table>
 
-<a asp-action="Create" class="btn btn-success mt-3">➕ Add New Stats</a>
+

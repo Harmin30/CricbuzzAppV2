@@ -3,15 +3,20 @@
 @{
     ViewData["Title"] = "Scorecards";
 }
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>📋 Scorecards</h2>
+    <a asp-action="Create" class="btn btn-success mb-3">➕ Add Scorecard</a>
+</div>
 
-<h2>📋 Scorecards</h2>
 
-<a asp-action="Create" class="btn btn-success mb-3">➕ Add Scorecard</a>
+
+
 
 <table class="table table-bordered table-striped table-hover">
     <thead class="table-dark">
         <tr>
             <th>Match</th>
+            <th>Match Type</th>   <!-- NEW -->
             <th>Player</th>
             <th colspan="7" class="text-center">Batting</th>
             <th colspan="4" class="text-center">Bowling</th>
@@ -20,6 +25,7 @@
         </tr>
         <tr>
             <th></th>
+            <th></th> <!-- NEW -->
             <th></th>
             <th>Runs</th>
             <th>Balls</th>
@@ -36,6 +42,7 @@
             <th></th>
         </tr>
     </thead>
+
     <tbody>
         @if (Model != null && Model.Any())
         {
@@ -43,6 +50,7 @@
             {
                 <tr>
                     <td>@score.Match?.TeamA?.TeamName vs @score.Match?.TeamB?.TeamName</td>
+                    <td>@score.Match?.MatchType</td>  <!-- NEW -->
                     <td>@score.Player?.FullName</td>
 
                     <!-- Batting -->
@@ -72,6 +80,7 @@
                         </div>
                     </td>
                 </tr>
+
             }
         }
         else

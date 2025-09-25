@@ -3,6 +3,8 @@ using CricbuzzAppV2.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using CricbuzzAppV2.Helpers;
+
 
 namespace CricbuzzAppV2.Controllers
 {
@@ -58,20 +60,27 @@ namespace CricbuzzAppV2.Controllers
         public async Task<IActionResult> Create(Scorecard scorecard)
         {
             foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-            {
                 Console.WriteLine($"Model error: {error.ErrorMessage}");
-            }
+
             if (ModelState.IsValid)
             {
+                // Set MatchType for display
+                var match = await _context.Matches.FindAsync(scorecard.MatchId);
+                scorecard.MatchType = match?.MatchType;
+
                 _context.Scorecards.Add(scorecard);
                 await _context.SaveChangesAsync();
+
+                // Update player stats
+                await AppHelper.UpdatePlayerStats(_context, scorecard);
+
                 return RedirectToAction(nameof(Index));
             }
 
-            // If validation fails, repopulate dropdowns
             PopulateDropdowns(scorecard);
             return View(scorecard);
         }
+
 
         // GET: Scorecards/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -96,8 +105,20 @@ namespace CricbuzzAppV2.Controllers
             {
                 try
                 {
+                    // Fetch old scorecard without tracking
+                    var oldScorecard = await _context.Scorecards.AsNoTracking()
+                                                 .FirstOrDefaultAsync(s => s.ScorecardId == id);
+
+                    // Update MatchType in case match changed
+                    var match = await _context.Matches.FindAsync(scorecard.MatchId);
+                    scorecard.MatchType = match?.MatchType;
+
                     _context.Update(scorecard);
                     await _context.SaveChangesAsync();
+
+                    // Update stats
+                    await AppHelper.UpdatePlayerStats(_context, scorecard, oldScorecard);
+
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
@@ -112,6 +133,8 @@ namespace CricbuzzAppV2.Controllers
             PopulateDropdowns(scorecard);
             return View(scorecard);
         }
+
+
 
         // GET: Scorecards/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -137,11 +160,26 @@ namespace CricbuzzAppV2.Controllers
             var scorecard = await _context.Scorecards.FindAsync(id);
             if (scorecard != null)
             {
+                // Reverse the stats before deletion
+                var reverseScorecard = new Scorecard
+                {
+                    PlayerId = scorecard.PlayerId,
+                    RunsScored = -(scorecard.RunsScored ?? 0),
+                    BallsFaced = -(scorecard.BallsFaced ?? 0),
+                    WicketsTaken = -(scorecard.WicketsTaken ?? 0),
+                    RunsConceded = -(scorecard.RunsConceded ?? 0),
+                    OversBowled = -(scorecard.OversBowled ?? 0),
+                    MatchId = scorecard.MatchId
+                };
+
+                await AppHelper.UpdatePlayerStats(_context, reverseScorecard);
+
                 _context.Scorecards.Remove(scorecard);
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
         }
+
 
         #region Helper Methods
         private void PopulateDropdowns(Scorecard scorecard = null)
