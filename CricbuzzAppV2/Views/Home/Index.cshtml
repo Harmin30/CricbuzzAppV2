@@ -5,7 +5,9 @@
 <div class="container mt-4">
     <!-- Header -->
     <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold text-success">🏏 Cricbuzz Admin Dashboard</h1>
+        <h1 class="display-4 fw-bold text-success">
+            <i class="bi bi-controller"></i> Cricbuzz Admin Dashboard
+        </h1>
         <p class="lead text-muted">Manage everything with style – players, teams, matches & scorecards</p>
     </div>
 
@@ -14,7 +16,7 @@
         <div class="col-md-3 mb-3">
             <a asp-controller="Players" asp-action="Create" class="card text-white shadow-lg border-0 bg-success bg-gradient text-decoration-none h-100">
                 <div class="card-body d-flex flex-column justify-content-center">
-                    @* <h2>👥</h2> *@
+                    <i class="bi bi-person-plus-fill fs-1 mb-2"></i>
                     <h5 class="fw-bold">Add Player</h5>
                 </div>
             </a>
@@ -22,7 +24,7 @@
         <div class="col-md-3 mb-3">
             <a asp-controller="Teams" asp-action="Create" class="card text-white shadow-lg border-0 bg-primary bg-gradient text-decoration-none h-100">
                 <div class="card-body d-flex flex-column justify-content-center">
-                    @* <h2>🌍</h2> *@
+                    <i class="bi bi-flag-fill fs-1 mb-2"></i>
                     <h5 class="fw-bold">Add Team</h5>
                 </div>
             </a>
@@ -30,7 +32,7 @@
         <div class="col-md-3 mb-3">
             <a asp-controller="Matches" asp-action="Create" class="card text-white shadow-lg border-0 bg-warning bg-gradient text-decoration-none h-100">
                 <div class="card-body d-flex flex-column justify-content-center">
-                    @* <h2>🏟</h2> *@
+                    <i class="bi bi-trophy-fill fs-1 mb-2"></i>
                     <h5 class="fw-bold">Add Match</h5>
                 </div>
             </a>
@@ -38,7 +40,7 @@
         <div class="col-md-3 mb-3">
             <a asp-controller="Scorecards" asp-action="Create" class="card text-white shadow-lg border-0 bg-danger bg-gradient text-decoration-none h-100">
                 <div class="card-body d-flex flex-column justify-content-center">
-                    @* <h2>📋</h2> *@
+                    <i class="bi bi-card-list fs-1 mb-2"></i>
                     <h5 class="fw-bold">Add Scorecard</h5>
                 </div>
             </a>
@@ -50,7 +52,7 @@
         <div class="col-md-3 mb-3">
             <div class="card shadow border-0 bg-light h-100">
                 <div class="card-body">
-                    <h2 class="text-success">👤</h2>
+                    <i class="bi bi-people-fill fs-2 text-success mb-2"></i>
                     <h5 class="text-muted">Players</h5>
                     <h3 class="fw-bold text-success">@ViewBag.TotalPlayers</h3>
                 </div>
@@ -59,7 +61,7 @@
         <div class="col-md-3 mb-3">
             <div class="card shadow border-0 bg-light h-100">
                 <div class="card-body">
-                    <h2 class="text-primary">🌍</h2>
+                    <i class="bi bi-flag-fill fs-2 text-primary mb-2"></i>
                     <h5 class="text-muted">Teams</h5>
                     <h3 class="fw-bold text-primary">@ViewBag.TotalTeams</h3>
                 </div>
@@ -68,7 +70,7 @@
         <div class="col-md-3 mb-3">
             <div class="card shadow border-0 bg-light h-100">
                 <div class="card-body">
-                    <h2 class="text-warning">🏟</h2>
+                    <i class="bi bi-calendar-event fs-2 text-warning mb-2"></i>
                     <h5 class="text-muted">Matches</h5>
                     <h3 class="fw-bold text-warning">@ViewBag.TotalMatches</h3>
                 </div>
@@ -77,7 +79,7 @@
         <div class="col-md-3 mb-3">
             <div class="card shadow border-0 bg-light h-100">
                 <div class="card-body">
-                    <h2 class="text-danger">📋</h2>
+                    <i class="bi bi-file-earmark-text fs-2 text-danger mb-2"></i>
                     <h5 class="text-muted">Scorecards</h5>
                     <h3 class="fw-bold text-danger">@ViewBag.TotalScorecards</h3>
                 </div>
@@ -87,13 +89,13 @@
 
     <!-- Row 3: Highlights -->
     <div class="mt-5">
-        <h2 class="fw-bold text-dark mb-4">🔥 Highlights</h2>
+        <h2 class="fw-bold text-dark mb-4">Highlights</h2>
         <div class="row">
             <!-- Top Batsman -->
             <div class="col-md-4 mb-3">
                 <div class="card border-0 shadow-lg rounded-3 bg-success bg-opacity-10 text-center h-100">
                     <div class="card-body">
-                        <h4 class="text-success">🏆 Top Batsman</h4>
+                        <h4 class="text-success"><i class="bi bi-trophy-fill"></i> Top Batsman</h4>
                         @if (ViewBag.TopBatsman != null)
                         {
                             <p class="fw-bold fs-5">@ViewBag.TopBatsman.Player?.FullName</p>
@@ -111,7 +113,7 @@
             <div class="col-md-4 mb-3">
                 <div class="card border-0 shadow-lg rounded-3 bg-primary bg-opacity-10 text-center h-100">
                     <div class="card-body">
-                        <h4 class="text-primary">🎯 Top Bowler</h4>
+                        <h4 class="text-primary"><i class="bi bi-target"></i> Top Bowler</h4>
                         @if (ViewBag.TopBowler != null)
                         {
                             <p class="fw-bold fs-5">@ViewBag.TopBowler.Player?.FullName</p>
@@ -129,11 +131,24 @@
             <div class="col-md-4 mb-3">
                 <div class="card border-0 shadow-lg rounded-3 bg-warning bg-opacity-10 text-center h-100">
                     <div class="card-body">
-                        <h4 class="text-warning">🌍 Top Team</h4>
+                        <h4 class="text-warning fw-bold">Top Team</h4>
                         @if (ViewBag.TopTeam != null)
                         {
                             <p class="fw-bold fs-5">@ViewBag.TopTeam.TeamName</p>
-                            <p class="text-muted">Country: @ViewBag.TopTeam.Country</p>
+                            <p class="text-muted mb-2">Country: @ViewBag.TopTeam.Country</p>
+
+                            <!-- Format-wise Wins -->
+                            <div class="d-flex justify-content-center gap-2 mt-2">
+                                <span class="badge text-white" style="background: linear-gradient(135deg, #4CAF50, #81C784);">
+                                    Test: @ViewBag.TopTeamTestWins
+                                </span>
+                                <span class="badge text-white" style="background: linear-gradient(135deg, #2196F3, #64B5F6);">
+                                    ODI: @ViewBag.TopTeamODIWins
+                                </span>
+                                <span class="badge text-white" style="background: linear-gradient(135deg, #FFC107, #FFD54F); color:#000;">
+                                    T20: @ViewBag.TopTeamT20Wins
+                                </span>
+                            </div>
                         }
                         else
                         {
@@ -142,8 +157,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+
+
 
     <!-- Row 4: Recent Matches -->
     <div class="mt-5">
@@ -194,8 +209,6 @@
             </table>
         </div>
     </div>
-
-
 
     <!-- Footer -->
     <footer class="mt-5 text-muted text-center">
