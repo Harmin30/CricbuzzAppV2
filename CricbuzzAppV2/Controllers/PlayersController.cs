@@ -94,6 +94,7 @@ namespace CricbuzzAppV2.Controllers
                 {
                     _context.Entry(player).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "✅ Player updated successfully!";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
@@ -135,6 +136,7 @@ namespace CricbuzzAppV2.Controllers
             {
                 _context.Players.Remove(player);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "✅ Player deleted successfully!";
             }
 
             return RedirectToAction(nameof(Index));

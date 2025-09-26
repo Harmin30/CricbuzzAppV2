@@ -100,18 +100,39 @@ namespace CricbuzzAppV2.Controllers
             return View(team);
         }
 
-        // POST: Teams/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var team = await _context.Teams.FindAsync(id);
-            if (team != null)
+            if (team == null)
+                return NotFound();
+
+            // ✅ Check if team has matches before deleting
+            bool hasMatches = await _context.Matches.AnyAsync(m =>
+                m.TeamAId == id || m.TeamBId == id || m.WinnerTeamId == id);
+
+            if (hasMatches)
+            {
+                AppHelper.SetError(this, "🚫 Cannot delete this team. Matches are already scheduled or completed with this team.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
             {
                 _context.Teams.Remove(team);
                 await _context.SaveChangesAsync();
+                AppHelper.SetSuccess(this, "✅ Team deleted successfully!");
             }
+            catch (Exception ex)
+            {
+                // Just in case something unexpected still happens
+                AppHelper.SetError(this, $"⚠️ Error while deleting team: {ex.Message}");
+            }
+
             return RedirectToAction(nameof(Index));
         }
+
+
     }
 }
