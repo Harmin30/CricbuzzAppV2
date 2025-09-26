@@ -28,11 +28,21 @@ namespace CricbuzzAppV2.Helpers
                 .Include(m => m.TeamA)
                 .Include(m => m.TeamB)
                 .ToList();
-            return new SelectList(matches, "MatchId", "DisplayName", selectedId);
+
+            var items = matches.Select(m => new
+            {
+                m.MatchId,
+                Display = $"{m.TeamA?.TeamName ?? "TBD"} vs {m.TeamB?.TeamName ?? "TBD"} " +
+                          $"({m.MatchType}) | {m.Date:yyyy-MM-dd} | {m.Venue}"
+            }).ToList();
+
+            return new SelectList(items, "MatchId", "Display", selectedId);
         }
+
 
         public static SelectList CricketFormatSelectList(PlayerStats.CricketFormat? selectedFormat = null)
         {
+
             return new SelectList(Enum.GetValues(typeof(PlayerStats.CricketFormat)), selectedFormat);
         }
 

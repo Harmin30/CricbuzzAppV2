@@ -12,6 +12,7 @@ namespace CricbuzzAppV2.Controllers
     {
         private readonly ApplicationDbContext _context;
 
+
         public ScorecardsController(ApplicationDbContext context)
         {
             _context = context;

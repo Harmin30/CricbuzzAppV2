@@ -33,6 +33,6 @@ namespace CricbuzzAppV2.Models
 
         public string DisplayName => $"{TeamA?.TeamName} vs {TeamB?.TeamName}";
 //       Include MatchType in dropdowns
-        public string DisplayNameWithType => $"{TeamA?.TeamName} vs {TeamB?.TeamName} ({MatchType})";
+        public string DisplayNameWithType => $"{TeamA?.TeamName} vs {TeamB?.TeamName} ( {MatchType}  | {Date:dd MMM yyyy}  | {Venue} )";
     }
 }
