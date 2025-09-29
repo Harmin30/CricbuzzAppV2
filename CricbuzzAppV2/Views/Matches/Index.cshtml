@@ -6,40 +6,79 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">Matches</h2>
+    <h2 class="d-inline">Matches</h2>
     <a asp-action="Create" class="btn btn-success">➕ Add Match</a>
 </div>
 
-<table class="table table-striped table-bordered shadow-sm">
-    <thead class="table-dark">
-        <tr>
-            <th>Team A</th>
-            <th>Team B</th>
-            <th>Match Type</th>
-            <th>Date</th>
-            <th>Venue</th>
-            <th>Winner</th>
-            <th style="width: 220px;">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var match in Model)
-        {
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+@if (TempData["ErrorMessages"] is List<string> messages)
+{
+    <div class="alert alert-info">
+        <ul class="mb-0">
+            @foreach (var msg in messages)
+            {
+                <li>@msg</li>
+            }
+        </ul>
+    </div>
+}
+
+<form asp-action="DeleteSelected" method="post">
+    <table class="table table-striped table-bordered shadow-sm">
+        <thead class="table-dark">
             <tr>
-                <td>@match.TeamA?.TeamName</td>
-                <td>@match.TeamB?.TeamName</td>
-                <td>@match.MatchType</td>
-                <td>@match.Date.ToShortDateString()</td>
-                <td>@match.Venue</td>
-                <td>@(match.WinnerTeam?.TeamName ?? "")</td>   <!-- ✅ No "N/A" -->
-                <td>
-                    <div class="d-flex gap-2">
-                        <a asp-action="Details" asp-route-id="@match.MatchId" class="btn btn-info btn-sm"> View</a>
-                        <a asp-action="Edit" asp-route-id="@match.MatchId" class="btn btn-warning btn-sm"> Edit</a>
-                        <a asp-action="Delete" asp-route-id="@match.MatchId" class="btn btn-danger btn-sm"> Delete</a>
-                    </div>
-                </td>
+                <th><input type="checkbox" id="selectAll" /></th> <!-- Master Checkbox -->
+                <th>Team A</th>
+                <th>Team B</th>
+                <th>Match Type</th>
+                <th>Date</th>
+                <th>Venue</th>
+                <th>Winner</th>
+                <th style="width: 220px;">Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var match in Model)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" name="selectedIds" value="@match.MatchId" />
+                    </td>
+                    <td>@match.TeamA?.TeamName</td>
+                    <td>@match.TeamB?.TeamName</td>
+                    <td>@match.MatchType</td>
+                    <td>@match.Date.ToShortDateString()</td>
+                    <td>@match.Venue</td>
+                    <td>@(match.WinnerTeam?.TeamName ?? "")</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a asp-action="Details" asp-route-id="@match.MatchId" class="btn btn-info btn-sm"> View</a>
+                            <a asp-action="Edit" asp-route-id="@match.MatchId" class="btn btn-warning btn-sm"> Edit</a>
+                            <a asp-action="Delete" asp-route-id="@match.MatchId" class="btn btn-danger btn-sm"> Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-danger mt-2">🗑 Delete Selected</button>
+</form>
+
+@section Scripts {
+    <script>
+        // Master checkbox toggle
+        document.getElementById("selectAll").addEventListener("change", function () {
+            const checkboxes = document.querySelectorAll("input[name='selectedIds']");
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+    </script>
+}

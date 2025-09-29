@@ -4,55 +4,85 @@
     ViewData["Title"] = "Players List";
 }
 
-
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-4">🏏 Players</h2>
     <a asp-action="Create" class="btn btn-success mb-3">➕ Add New Player</a>
 </div>
 
-
-
-@if (TempData["SuccessMessage"] != null)
+<!-- ✅ Alerts for Success + Error messages -->
+@if (TempData["Success"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
+        @TempData["Success"]
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
 
-<table class="table table-bordered table-striped">
-    <thead class="table-dark">
-        <tr>
-            <th>Image</th>
-            <th>Full Name</th>
-            <th>Role</th>
-            <th>Team</th>
-            <th class="text-center">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var player in Model)
-        {
+
+@if (TempData["ErrorMessages"] is List<string> messages)
+{
+    <div class="alert alert-info">
+        <ul class="mb-0">
+            @foreach (var msg in messages)
+            {
+                <li>@msg</li>
+            }
+        </ul>
+    </div>
+}
+
+<form asp-action="DeleteSelected" method="post">
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
             <tr>
-                <td>
-                    @if (!string.IsNullOrEmpty(player.ImageUrl))
-                    {
-                        <img src="@player.ImageUrl" alt="@player.FullName" width="60" />
-                    }
-                    else
-                    {
-                        <span class="text-muted">No image</span>
-                    }
-                </td>
-                <td>@player.FullName</td>
-                <td>@player.Role</td>
-                <td>@player.Team?.TeamName</td>
-                <td class="text-center">
-                    <a asp-action="Details" asp-route-id="@player.PlayerId" class="btn btn-sm btn-info"> View</a>
-                    <a asp-action="Edit" asp-route-id="@player.PlayerId" class="btn btn-sm btn-warning"> Edit</a>
-                    <a asp-action="Delete" asp-route-id="@player.PlayerId" class="btn btn-danger btn-sm"> Delete</a>
-                </td>
+                <th>
+                    <input type="checkbox" id="selectAll" /> <!-- Master Checkbox -->
+                </th>
+                <th>Image</th>
+                <th>Full Name</th>
+                <th>Role</th>
+                <th>Team</th>
+                <th class="text-center">Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var player in Model)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" name="selectedIds" value="@player.PlayerId" />
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(player.ImageUrl))
+                        {
+                            <img src="@player.ImageUrl" alt="@player.FullName" width="60" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">No image</span>
+                        }
+                    </td>
+                    <td>@player.FullName</td>
+                    <td>@player.Role</td>
+                    <td>@player.Team?.TeamName</td>
+                    <td class="text-center">
+                        <a asp-action="Details" asp-route-id="@player.PlayerId" class="btn btn-sm btn-info">View</a>
+                        <a asp-action="Edit" asp-route-id="@player.PlayerId" class="btn btn-sm btn-warning">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@player.PlayerId" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-danger mt-2">🗑 Delete Selected</button>
+</form>
+
+@section Scripts {
+    <script>
+        // Master checkbox toggle
+        document.getElementById("selectAll").addEventListener("change", function () {
+            document.querySelectorAll("input[name='selectedIds']").forEach(cb => cb.checked = this.checked);
+        });
+    </script>
+}

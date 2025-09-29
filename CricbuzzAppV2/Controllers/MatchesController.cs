@@ -138,5 +138,53 @@ namespace CricbuzzAppV2.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteSelected(List<int> selectedIds)
+        {
+            if (selectedIds == null || !selectedIds.Any())
+            {
+                AppHelper.SetError(this, "No matches selected for deletion.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var matches = await _context.Matches
+                .Where(m => selectedIds.Contains(m.MatchId))
+                .Include(m => m.TeamA)
+                .Include(m => m.TeamB)
+                .ToListAsync();
+
+            var deletedMatches = new List<string>();
+            var skippedMatches = new List<string>();
+
+            foreach (var match in matches)
+            {
+                bool hasScorecards = await _context.Scorecards
+                    .AnyAsync(s => s.MatchId == match.MatchId);
+
+                if (hasScorecards)
+                {
+                    skippedMatches.Add($"❌ Match '{match.DisplayNameWithType}' cannot be deleted because it has scorecards.");
+                    continue; // skip deletion
+                }
+
+                _context.Matches.Remove(match);
+                deletedMatches.Add(match.DisplayNameWithType);
+            }
+
+            await _context.SaveChangesAsync();
+
+            // ✅ Success messages
+            if (deletedMatches.Any())
+                AppHelper.SetSuccess(this, $"🗑 Deleted matches: {string.Join(", ", deletedMatches)}");
+
+            // ✅ Error messages
+            if (skippedMatches.Any())
+                AppHelper.SetError(this, string.Join("<br/>", skippedMatches));
+
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }

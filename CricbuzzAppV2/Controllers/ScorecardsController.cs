@@ -83,60 +83,6 @@ namespace CricbuzzAppV2.Controllers
         }
 
 
-        // GET: Scorecards/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var scorecard = await _context.Scorecards.FindAsync(id);
-            if (scorecard == null) return NotFound();
-
-            PopulateDropdowns(scorecard);
-            return View(scorecard);
-        }
-
-        // POST: Scorecards/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Scorecard scorecard)
-        {
-            if (id != scorecard.ScorecardId) return NotFound();
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    // Fetch old scorecard without tracking
-                    var oldScorecard = await _context.Scorecards.AsNoTracking()
-                                                 .FirstOrDefaultAsync(s => s.ScorecardId == id);
-
-                    // Update MatchType in case match changed
-                    var match = await _context.Matches.FindAsync(scorecard.MatchId);
-                    scorecard.MatchType = match?.MatchType;
-
-                    _context.Update(scorecard);
-                    await _context.SaveChangesAsync();
-
-                    // Update stats
-                    await AppHelper.UpdatePlayerStats(_context, scorecard, oldScorecard);
-
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.Scorecards.Any(e => e.ScorecardId == id))
-                        return NotFound();
-                    else
-                        throw;
-                }
-            }
-
-            PopulateDropdowns(scorecard);
-            return View(scorecard);
-        }
-
-
-
         // GET: Scorecards/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -153,15 +99,20 @@ namespace CricbuzzAppV2.Controllers
             return View(scorecard);
         }
 
-        // POST: Scorecards/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: Scorecards/DeleteConfirmed/5
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var scorecard = await _context.Scorecards.FindAsync(id);
+            var scorecard = await _context.Scorecards
+                .Include(s => s.Player)
+                .Include(s => s.Match).ThenInclude(m => m.TeamA)
+                .Include(s => s.Match).ThenInclude(m => m.TeamB)
+                .FirstOrDefaultAsync(s => s.ScorecardId == id);
+
             if (scorecard != null)
             {
-                // Reverse the stats before deletion
+                // Reverse stats
                 var reverseScorecard = new Scorecard
                 {
                     PlayerId = scorecard.PlayerId,
@@ -177,9 +128,64 @@ namespace CricbuzzAppV2.Controllers
 
                 _context.Scorecards.Remove(scorecard);
                 await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = $"🗑 Deleted scorecard: {scorecard.Player?.FullName} ({scorecard.Match?.TeamA?.TeamName} vs {scorecard.Match?.TeamB?.TeamName})";
             }
+
             return RedirectToAction(nameof(Index));
         }
+
+        // POST: Scorecards/DeleteSelected
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteSelected(List<int> selectedIds)
+        {
+            if (selectedIds == null || !selectedIds.Any())
+            {
+                TempData["ErrorMessages"] = new List<string> { "No scorecards selected for deletion." };
+                return RedirectToAction(nameof(Index));
+            }
+
+            var scorecards = await _context.Scorecards
+                .Include(s => s.Player)
+                .Include(s => s.Match).ThenInclude(m => m.TeamA)
+                .Include(s => s.Match).ThenInclude(m => m.TeamB)
+                .Where(s => selectedIds.Contains(s.ScorecardId))
+                .ToListAsync();
+
+            var deletedScores = new List<string>();
+
+            foreach (var score in scorecards)
+            {
+                var reverseScorecard = new Scorecard
+                {
+                    PlayerId = score.PlayerId,
+                    RunsScored = -(score.RunsScored ?? 0),
+                    BallsFaced = -(score.BallsFaced ?? 0),
+                    WicketsTaken = -(score.WicketsTaken ?? 0),
+                    RunsConceded = -(score.RunsConceded ?? 0),
+                    OversBowled = -(score.OversBowled ?? 0),
+                    MatchId = score.MatchId
+                };
+                await AppHelper.UpdatePlayerStats(_context, reverseScorecard);
+
+                deletedScores.Add($"{score.Player?.FullName} ({score.Match?.TeamA?.TeamName} vs {score.Match?.TeamB?.TeamName})");
+
+                _context.Scorecards.Remove(score);
+            }
+
+            await _context.SaveChangesAsync();
+
+            if (deletedScores.Any())
+                TempData["SuccessMessage"] = $"🗑 Deleted scorecards: {string.Join(", ", deletedScores)}";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
+
+
+
 
 
         #region Helper Methods

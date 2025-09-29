@@ -141,5 +141,37 @@ namespace CricbuzzAppV2.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteSelected(List<int> selectedIds)
+        {
+            if (selectedIds == null || !selectedIds.Any())
+            {
+                AppHelper.SetError(this, "No players selected for deletion.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var players = await _context.Players
+                .Where(p => selectedIds.Contains(p.PlayerId))
+                .ToListAsync();
+
+            var deletedPlayers = new List<string>();
+
+            foreach (var player in players)
+            {
+                _context.Players.Remove(player);
+                deletedPlayers.Add(player.FullName);
+            }
+
+            await _context.SaveChangesAsync();
+
+            // ✅ Show success message for deleted players
+            if (deletedPlayers.Any())
+                AppHelper.SetSuccess(this, $"🗑 Deleted players: {string.Join(", ", deletedPlayers)}");
+
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }
