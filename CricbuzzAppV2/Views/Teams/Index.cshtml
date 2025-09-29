@@ -10,46 +10,71 @@
     <a asp-action="Create" class="btn btn-success">➕ Add Team</a>
 </div>
 
-<!-- TempData Alerts -->
+<!-- ✅ Alerts for Success + Error messages -->
 @if (TempData["Success"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["Success"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData["Error"]
+        @Html.Raw(TempData["Success"])
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
 
-<table class="table table-striped table-bordered shadow-sm">
-    <thead class="table-dark">
-        <tr>
-            <th>Name</th>
-            <th>Country</th>
-            <th>Coach</th>
-            <th style="width: 220px;">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var team in Model)
-        {
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @Html.Raw(TempData["Error"])
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+
+
+
+<form asp-action="DeleteSelected" method="post">
+    <table class="table table-striped table-bordered shadow-sm">
+        <thead class="table-dark">
             <tr>
-                <td>@team.TeamName</td>
-                <td>@team.Country</td>
-                <td>@team.Coach</td>
-                <td>
-                    <div class="d-flex gap-2">
-                        <a asp-action="Details" asp-route-id="@team.TeamId" class="btn btn-info btn-sm"> View</a>
-                        <a asp-action="Edit" asp-route-id="@team.TeamId" class="btn btn-warning btn-sm"> Edit</a>
-                        <a asp-action="Delete" asp-route-id="@team.TeamId" class="btn btn-danger btn-sm"> Delete</a>
-                    </div>
-                </td>
+                <th>
+                    <input type="checkbox" id="selectAll" /> <!-- Master Checkbox -->
+                </th>
+                <th>Name</th>
+                <th>Country</th>
+                <th>Coach</th>
+                <th style="width: 220px;">Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var team in Model)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" name="selectedIds" value="@team.TeamId" />
+                    </td>
+                    <td>@team.TeamName</td>
+                    <td>@team.Country</td>
+                    <td>@team.Coach</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a asp-action="Details" asp-route-id="@team.TeamId" class="btn btn-info btn-sm">View</a>
+                            <a asp-action="Edit" asp-route-id="@team.TeamId" class="btn btn-warning btn-sm">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@team.TeamId" class="btn btn-danger btn-sm">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-danger mt-2">🗑 Delete Selected</button>
+</form>
+
+@section Scripts {
+    <script>
+        // Master checkbox toggle
+        document.getElementById("selectAll").addEventListener("change", function () {
+            const checkboxes = document.querySelectorAll("input[name='selectedIds']");
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+    </script>
+}
