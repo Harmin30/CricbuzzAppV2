@@ -120,8 +120,8 @@ namespace CricbuzzAppV2.Controllers
             return View(info);
         }
 
-        // POST: PlayerPersonalInfo/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: PlayerPersonalInfo/DeleteConfirmed/5
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -130,10 +130,43 @@ namespace CricbuzzAppV2.Controllers
             {
                 _context.PlayerPersonalInfos.Remove(info);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Player personal info deleted successfully!";
+                TempData["SuccessMessage"] = $"🗑 Deleted player info: {info.Player?.FullName}";
             }
 
             return RedirectToAction(nameof(Index));
         }
+
+        // POST: PlayerPersonalInfo/DeleteSelected
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteSelected(List<int> selectedIds)
+        {
+            if (selectedIds == null || !selectedIds.Any())
+            {
+                TempData["ErrorMessages"] = new List<string> { "No player info selected for deletion." };
+                return RedirectToAction(nameof(Index));
+            }
+
+            var infos = await _context.PlayerPersonalInfos
+                .Include(p => p.Player)
+                .Where(p => selectedIds.Contains(p.PlayerPersonalInfoId))
+                .ToListAsync();
+
+            var deletedNames = new List<string>();
+
+            foreach (var info in infos)
+            {
+                deletedNames.Add(info.Player?.FullName ?? "Unknown");
+                _context.PlayerPersonalInfos.Remove(info);
+            }
+
+            await _context.SaveChangesAsync();
+
+            if (deletedNames.Any())
+                TempData["SuccessMessage"] = $"🗑 Deleted player info: {string.Join(", ", deletedNames)}";
+
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }

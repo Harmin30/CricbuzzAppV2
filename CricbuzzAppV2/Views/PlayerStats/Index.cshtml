@@ -3,118 +3,147 @@
 @{
     ViewData["Title"] = "Player Stats";
 }
+
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-4">📊 Player Career Stats</h2>
     <a asp-action="Create" class="btn btn-success mt-3">➕ Add New Stats</a>
 </div>
 
-@if (TempData["Success"] != null)
+<!-- ✅ Alerts -->
+@if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success">@TempData["Success"]</div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 }
 
-<table class="table table-striped table-hover table-bordered table-sm text-center align-middle">
-    <thead class="table-dark">
-        <tr>
-            <th rowspan="2">Player Name</th>
-            <th rowspan="2">Format</th>
-            <th colspan="10">Batting Stats</th>
-            <th colspan="6">Bowling Stats</th>
-            <th rowspan="2">Actions</th>
-        </tr>
-        <tr>
-            @* Batting *@
-            <th>M</th>
-            <th>Inn</th>
-            <th>Runs</th>
-            <th>BF</th>
-            <th>HS</th>
-            <th>100s</th>
-            <th>50s</th>
-            <th>200s</th>
-            <th>Bat Avg</th>
-            <th>SR</th>
-            @* Bowling *@
-            <th >Balls</th>
-            <th>Runs Conceded</th>
-            <th>Wickets</th>
-            <th>BB</th>
-            <th>Bowl Avg</th>
-            <th>Eco</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var playerGroup in Model.GroupBy(s => s.PlayerId))
-        {
-            var statsList = playerGroup.ToList();
-            var playerName = statsList.FirstOrDefault()?.Player?.FullName ?? "Unknown Player";
-
-            var formats = new[] {
-                PlayerStats.CricketFormat.Test,
-                PlayerStats.CricketFormat.ODI,
-                PlayerStats.CricketFormat.T20
-                };
-
-            for (int i = 0; i < formats.Length; i++)
+@if (TempData["ErrorMessages"] is List<string> errors)
+{
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach (var e in errors)
             {
-                var fmt = formats[i];
-                var stat = statsList.FirstOrDefault(s => s.Format == fmt);
-
-                <tr>
-                    @if (i == 0)
-                    {
-                        <td rowspan="3" class="align-middle text-start fw-bold">@playerName</td>
-                    }
-
-                    <td class="fw-semibold">@fmt</td>
-
-                    @* Batting stats *@
-                    <td>@(stat?.MatchesPlayed?.ToString() ?? "-")</td>
-                    <td>@(stat?.Innings?.ToString() ?? "-")</td>
-                    <td>@(stat?.Runs?.ToString() ?? "-")</td>
-                    <td>@(stat?.BallsFaced?.ToString() ?? "-")</td>
-                    <td>@(stat?.HighestScore?.ToString() ?? "-")</td>
-                    <td>@(stat?.Hundreds?.ToString() ?? "-")</td>
-                    <td>@(stat?.Fifties?.ToString() ?? "-")</td>
-                    <td>@(stat?.DoubleHundreds?.ToString() ?? "-")</td>
-                    <td>@(stat != null ? stat.BattingAverage.ToString("0.00") : "-")</td>
-                    <td>@(stat != null ? stat.StrikeRate.ToString("0.00") : "-")</td>
-
-                    @* Bowling stats *@
-                    <td>@(stat?.BallsBowled?.ToString() ?? "-")</td>
-                    <td>@(stat?.RunsConceded?.ToString() ?? "-")</td>
-                    <td>@(stat?.Wickets?.ToString() ?? "-")</td>
-                    <td>@(stat?.BestBowling ?? "-")</td>
-                    <td>@(stat != null ? stat.BowlingAverage.ToString("0.00") : "-")</td>
-                    <td>@(stat != null ? stat.Economy.ToString("0.00") : "-")</td>
-
-                    @if (i == 0)
-                    {
-                        <td rowspan="3" class="align-middle">
-                            <div class="d-flex flex-column">
-                                @foreach (var f in formats)
-                                {
-                                    var s = statsList.FirstOrDefault(x => x.Format == f);
-                                    if (s != null)
-                                    {
-                                        <div class="d-flex gap-2 mb-2">
-                                            <a asp-action="Details" asp-route-id="@s.PlayerStatsId" class="btn btn-sm btn-info">View</a>
-                                            <a asp-action="Edit" asp-route-id="@s.PlayerStatsId" class="btn btn-sm btn-warning">Edit</a>
-                                            <a asp-action="Delete" asp-route-id="@s.PlayerStatsId" class="btn btn-sm btn-danger">Delete</a>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <div class="text-muted small mb-2">No @f</div>
-                                    }
-                                }
-                            </div>
-                        </td>
-                    }
-                </tr>
+                <li>@e</li>
             }
-        }
-    </tbody>
-</table>
+        </ul>
+    </div>
+}
 
+<form asp-action="DeleteSelected" method="post">
+    <table class="table table-striped table-hover table-bordered table-sm text-center align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th><input type="checkbox" id="selectAll" /></th>
+                <th rowspan="2">Player Name</th>
+                <th rowspan="2">Format</th>
+                <th colspan="10">Batting Stats</th>
+                <th colspan="6">Bowling Stats</th>
+                <th rowspan="2">Actions</th>
+            </tr>
+            <tr>
+                <th>M</th>
+                <th>Inn</th>
+                <th>Runs</th>
+                <th>BF</th>
+                <th>HS</th>
+                <th>100s</th>
+                <th>50s</th>
+                <th>200s</th>
+                <th>Bat Avg</th>
+                <th>SR</th>
+                <th>Balls</th>
+                <th>Runs Conceded</th>
+                <th>Wickets</th>
+                <th>BB</th>
+                <th>Bowl Avg</th>
+                <th>Eco</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var playerGroup in Model.GroupBy(s => s.PlayerId))
+            {
+                var statsList = playerGroup.ToList();
+                var playerName = statsList.FirstOrDefault()?.Player?.FullName ?? "Unknown Player";
 
+                var formats = new[] { PlayerStats.CricketFormat.Test, PlayerStats.CricketFormat.ODI, PlayerStats.CricketFormat.T20 };
+
+                for (int i = 0; i < formats.Length; i++)
+                {
+                    var fmt = formats[i];
+                    var stat = statsList.FirstOrDefault(s => s.Format == fmt);
+
+                    <tr>
+                        <td>
+                            @if (stat != null)
+                            {
+                                <input type="checkbox" name="selectedIds" value="@stat.PlayerStatsId" />
+                            }
+                        </td>
+
+                        @if (i == 0)
+                        {
+                            <td rowspan="3" class="align-middle text-start fw-bold">@playerName</td>
+                        }
+
+                        <td class="fw-semibold">@fmt</td>
+
+                        <td>@(stat?.MatchesPlayed?.ToString() ?? "-")</td>
+                        <td>@(stat?.Innings?.ToString() ?? "-")</td>
+                        <td>@(stat?.Runs?.ToString() ?? "-")</td>
+                        <td>@(stat?.BallsFaced?.ToString() ?? "-")</td>
+                        <td>@(stat?.HighestScore?.ToString() ?? "-")</td>
+                        <td>@(stat?.Hundreds?.ToString() ?? "-")</td>
+                        <td>@(stat?.Fifties?.ToString() ?? "-")</td>
+                        <td>@(stat?.DoubleHundreds?.ToString() ?? "-")</td>
+                        <td>@(stat != null ? stat.BattingAverage.ToString("0.00") : "-")</td>
+                        <td>@(stat != null ? stat.StrikeRate.ToString("0.00") : "-")</td>
+
+                        <td>@(stat?.BallsBowled?.ToString() ?? "-")</td>
+                        <td>@(stat?.RunsConceded?.ToString() ?? "-")</td>
+                        <td>@(stat?.Wickets?.ToString() ?? "-")</td>
+                        <td>@(stat?.BestBowling ?? "-")</td>
+                        <td>@(stat != null ? stat.BowlingAverage.ToString("0.00") : "-")</td>
+                        <td>@(stat != null ? stat.Economy.ToString("0.00") : "-")</td>
+
+                        @if (i == 0)
+                        {
+                            <td rowspan="3" class="align-middle">
+                                <div class="d-flex flex-column">
+                                    @foreach (var f in formats)
+                                    {
+                                        var s = statsList.FirstOrDefault(x => x.Format == f);
+                                        if (s != null)
+                                        {
+                                            <div class="d-flex gap-2 mb-2">
+                                                <a asp-action="Details" asp-route-id="@s.PlayerStatsId" class="btn btn-sm btn-info">View</a>
+                                                <a asp-action="Edit" asp-route-id="@s.PlayerStatsId" class="btn btn-sm btn-warning">Edit</a>
+                                                <a asp-action="Delete" asp-route-id="@s.PlayerStatsId" class="btn btn-sm btn-danger">Delete</a>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted small mb-2">No @f</div>
+                                        }
+                                    }
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-danger mt-2">🗑 Delete Selected</button>
+</form>
+
+@section Scripts {
+    <script>
+        // Master checkbox toggle
+        document.getElementById("selectAll").addEventListener("change", function () {
+            const checkboxes = document.querySelectorAll("input[name='selectedIds']");
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+    </script>
+}

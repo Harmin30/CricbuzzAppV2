@@ -19,6 +19,7 @@
         <li><b>Wickets:</b> @Model.Wickets</li>
     </ul>
 </div>
+
 <form asp-action="DeleteConfirmed" asp-route-id="@Model.PlayerStatsId" method="post" class="mt-3">
     @Html.AntiForgeryToken()
     <button type="submit" class="btn btn-danger me-2">🗑 Confirm Delete</button>

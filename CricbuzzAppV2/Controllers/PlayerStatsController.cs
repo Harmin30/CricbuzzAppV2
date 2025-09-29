@@ -112,40 +112,74 @@ namespace CricbuzzAppV2.Controllers
             ViewData["Formats"] = new SelectList(Enum.GetValues(typeof(PlayerStats.CricketFormat)), stats.Format);
             return View(stats);
         }
-
         // GET: PlayerStats/Delete/5
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int? id)
         {
-            if (id <= 0)
-                return BadRequest();
+            if (id == null) return NotFound();
 
             var stats = await _context.PlayerStats
                 .Include(p => p.Player)
                 .FirstOrDefaultAsync(p => p.PlayerStatsId == id);
 
-            if (stats == null)
-                return NotFound();
+            if (stats == null) return NotFound();
 
-            return View(stats); // Opens Delete.cshtml for confirmation
+            return View(stats);
         }
 
-        // POST: PlayerStats/Delete/5
-        [HttpPost]
+        // POST: PlayerStats/DeleteConfirmed/5
+        [HttpPost, ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var stats = await _context.PlayerStats.FindAsync(id);
+            var stats = await _context.PlayerStats
+                .Include(p => p.Player)
+                .FirstOrDefaultAsync(p => p.PlayerStatsId == id);
+
             if (stats != null)
             {
                 _context.PlayerStats.Remove(stats);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Player stats deleted successfully!";
+                TempData["SuccessMessage"] = $"🗑 Deleted stats for player: {stats.Player?.FullName} ({stats.Format})";
             }
 
             return RedirectToAction(nameof(Index));
         }
 
+        // POST: PlayerStats/DeleteSelected
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteSelected(List<int> selectedIds)
+        {
+            if (selectedIds == null || !selectedIds.Any())
+            {
+                TempData["ErrorMessages"] = new List<string> { "No player stats selected for deletion." };
+                return RedirectToAction(nameof(Index));
+            }
 
+            var statsList = await _context.PlayerStats
+                .Include(p => p.Player)
+                .Where(p => selectedIds.Contains(p.PlayerStatsId))
+                .ToListAsync();
+
+            var deletedPlayers = new List<string>();
+
+            foreach (var stat in statsList)
+            {
+                deletedPlayers.Add($"{stat.Player?.FullName} ({stat.Format})");
+                _context.PlayerStats.Remove(stat);
+            }
+
+            await _context.SaveChangesAsync();
+
+            if (deletedPlayers.Any())
+                TempData["SuccessMessage"] = $"🗑 Deleted stats for: {string.Join(", ", deletedPlayers)}";
+
+            return RedirectToAction(nameof(Index));
+        }
 
     }
+
+
+
 }
+

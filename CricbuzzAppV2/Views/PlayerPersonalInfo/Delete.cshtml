@@ -1,29 +1,61 @@
 ﻿@model CricbuzzAppV2.Models.PlayerPersonalInfo
+
 @{
     ViewData["Title"] = "Delete Player Personal Info";
 }
 
-<h2>🗑️ Delete Player Personal Info</h2>
+<h2 class="mb-4">🗑 Delete Player Personal Info</h2>
 
-<div class="alert alert-danger">
-    Are you sure you want to delete this player info?
-</div>
+<!-- ✅ Alerts -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
-<div class="card p-3">
-    <dl class="row">
+@if (TempData["ErrorMessages"] is List<string> errorMessages)
+{
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach (var msg in errorMessages)
+            {
+                <li>@msg</li>
+            }
+        </ul>
+    </div>
+}
+
+<div class="card shadow-sm p-4">
+    <h5>Are you sure you want to delete this player info?</h5>
+
+    <dl class="row mt-3">
         <dt class="col-sm-3">Player</dt>
         <dd class="col-sm-9">@Model.Player.FullName</dd>
 
         <dt class="col-sm-3">Date of Birth</dt>
         <dd class="col-sm-9">@Model.DateOfBirth.ToShortDateString()</dd>
 
+        <dt class="col-sm-3">Birth Place</dt>
+        <dd class="col-sm-9">@Model.BirthPlace</dd>
+
+        <dt class="col-sm-3">Height</dt>
+        <dd class="col-sm-9">@Model.Height</dd>
+
+        <dt class="col-sm-3">Batting Style</dt>
+        <dd class="col-sm-9">@Model.BattingStyle</dd>
+
+        <dt class="col-sm-3">Bowling Style</dt>
+        <dd class="col-sm-9">@Model.BowlingStyle</dd>
+
         <dt class="col-sm-3">Role</dt>
         <dd class="col-sm-9">@Model.Role</dd>
     </dl>
-</div>
 
-<form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="PlayerPersonalInfoId" />
-    <button type="submit" class="btn btn-danger">Yes, Delete</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
+    <form asp-action="DeleteConfirmed" method="post">
+        <input type="hidden" asp-for="PlayerPersonalInfoId" />
+        <button type="submit" class="btn btn-danger">🗑 Yes, Delete</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
