@@ -34,7 +34,9 @@
     <table class="table table-striped table-hover table-bordered table-sm text-center align-middle">
         <thead class="table-dark">
             <tr>
-                <th><input type="checkbox" id="selectAll" /></th>
+                <th rowspan="2">
+                    <input type="checkbox" id="selectAll" />
+                </th>
                 <th rowspan="2">Player Name</th>
                 <th rowspan="2">Format</th>
                 <th colspan="10">Batting Stats</th>
@@ -60,12 +62,12 @@
                 <th>Eco</th>
             </tr>
         </thead>
+
         <tbody>
             @foreach (var playerGroup in Model.GroupBy(s => s.PlayerId))
             {
                 var statsList = playerGroup.ToList();
                 var playerName = statsList.FirstOrDefault()?.Player?.FullName ?? "Unknown Player";
-
                 var formats = new[] { PlayerStats.CricketFormat.Test, PlayerStats.CricketFormat.ODI, PlayerStats.CricketFormat.T20 };
 
                 for (int i = 0; i < formats.Length; i++)
@@ -87,7 +89,6 @@
                         }
 
                         <td class="fw-semibold">@fmt</td>
-
                         <td>@(stat?.MatchesPlayed?.ToString() ?? "-")</td>
                         <td>@(stat?.Innings?.ToString() ?? "-")</td>
                         <td>@(stat?.Runs?.ToString() ?? "-")</td>
