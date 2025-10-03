@@ -18,8 +18,10 @@ namespace CricbuzzAppV2.Controllers
             _context = context;
         }
 
+
         public IActionResult Index()
         {
+
             // Summary stats
             ViewBag.TotalPlayers = _context.Players.Count();
             ViewBag.TotalTeams = _context.Teams.Count();

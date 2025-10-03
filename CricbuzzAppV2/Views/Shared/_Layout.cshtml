@@ -16,35 +16,70 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Players" asp-action="Index">Players</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Teams" asp-action="Index">Teams</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Matches" asp-action="Index">Matches</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Scorecards" asp-action="Index">Scorecards</a>
-                    </li>
+                @if (Context.Session.GetString("Username") != null)
+                {
+                    <!-- Main links visible only to logged-in users -->
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Players" asp-action="Index">Players</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Teams" asp-action="Index">Teams</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Matches" asp-action="Index">Matches</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Scorecards" asp-action="Index">Scorecards</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="PlayerStats" asp-action="Index">Player Stats</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="PlayerPersonalInfo" asp-action="Index">Player Personal Info</a>
+                        </li>
+                        @if (Context.Session.GetString("Username") == "admin")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Users" asp-action="Index">Manage Users</a>
+                            </li>
+                        }
 
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="PlayerStats" asp-action="Index">Player Stats</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="PlayerPersonalInfo" asp-action="Index">Player Personal Info</a>
-                    </li>
+                    </ul>
 
-                </ul>
+                    <!-- Right side: show username and logout -->
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        <li class="nav-item">
+                            <span class="navbar-text me-2 fw-bold text-light">
+                                Hello, @Context.Session.GetString("Username")
+                            </span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Logout">Logout</a>
+                        </li>
+                    </ul>
+
+
+
+                }
+                else
+                {
+                    <!-- Only login/register links for guests -->
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+                        </li>
+
+                    </ul>
+                }
             </div>
         </div>
     </nav>
-
-
-
 
     <!-- Main Content -->
     <div class="container mt-4">

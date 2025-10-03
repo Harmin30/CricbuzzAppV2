@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 
+
 namespace CricbuzzAppV2.Data
 {
     public class ApplicationDbContext : DbContext
@@ -20,6 +21,8 @@ namespace CricbuzzAppV2.Data
         public DbSet<Match> Matches { get; set; }
         public DbSet<Scorecard> Scorecards { get; set; }
         public DbSet<PlayerPersonalInfo> PlayerPersonalInfos { get; set; }
+        public DbSet<User> Users { get; set; }
+
 
 
 
