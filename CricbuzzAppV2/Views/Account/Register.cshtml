@@ -1,30 +1,142 @@
 ﻿@model CricbuzzAppV2.Models.LoginViewModel
 @{
     ViewData["Title"] = "Register";
+    Layout = "_AuthLayout";
 }
 
-<h2>Register</h2>
+<style>
+    .auth-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background-color: #f7f8fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-<div class="row justify-content-center">
-    <div class="col-md-4">
-        <form asp-action="Register" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    .auth-card {
+        display: flex;
+        background-color: #fff;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        max-width: 850px;
+        width: 100%;
+    }
 
-            <div class="mb-3">
-                <label asp-for="Username" class="form-label"></label>
-                <input asp-for="Username" class="form-control" />
-                <span asp-validation-for="Username" class="text-danger"></span>
-            </div>
+    .auth-info {
+        background-color: #f4f6f9;
+        color: #2c3e50;
+        padding: 60px 40px;
+        width: 45%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
 
-            <div class="mb-3">
-                <label asp-for="Password" class="form-label"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
+        .auth-info h2 {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
 
-            <button type="submit" class="btn btn-success">Register</button>
-            <a asp-action="Login" class="btn btn-link">Login</a>
-        </form>
+        .auth-info p {
+            font-size: 15px;
+            color: #6c757d;
+        }
+
+    .auth-form {
+        padding: 50px 40px;
+        width: 55%;
+    }
+
+        .auth-form h3 {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+    .form-control {
+        border-radius: 10px;
+        padding: 10px 15px;
+        border: 1px solid #ced4da;
+    }
+
+        .form-control:focus {
+            border-color: #0078d7;
+            box-shadow: 0 0 0 0.15rem rgba(0, 120, 215, 0.25);
+        }
+
+    .btn-success {
+        width: 100%;
+        border-radius: 10px;
+        padding: 10px;
+        font-weight: 600;
+        background-color: #28a745;
+        border: none;
+    }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+    .btn-link {
+        display: block;
+        text-align: center;
+        margin-top: 12px;
+        color: #0078d7;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+        .btn-link:hover {
+            text-decoration: underline;
+        }
+
+    @@media (max-width: 768px) {
+        .auth-card
+
+    {
+        flex-direction: column;
+        max-width: 95%;
+    }
+
+    .auth-info, .auth-form {
+        width: 100%;
+        padding: 40px 25px;
+    }
+
+    }
+</style>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-info">
+            <h2>Join CricbuzzAppV2 🏏</h2>
+            <p>Create an account to manage player stats, explore teams, and track matches in one place.</p>
+        </div>
+
+        <div class="auth-form">
+            <h3>Create Your Account</h3>
+            <form asp-action="Register" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Username" class="form-label fw-semibold">Username</label>
+                    <input asp-for="Username" class="form-control" placeholder="Choose a username" />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label fw-semibold">Password</label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="Create a password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-success mt-2">Register</button>
+                <a asp-action="Login" class="btn-link">Already have an account? Login</a>
+            </form>
+        </div>
     </div>
 </div>
 
