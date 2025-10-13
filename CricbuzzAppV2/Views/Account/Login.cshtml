@@ -109,6 +109,8 @@
     }
 </style>
 
+
+
 <div class="auth-container">
     <div class="auth-card">
         <div class="auth-info">
@@ -118,6 +120,13 @@
 
         <div class="auth-form">
             <h3>Login to Your Account</h3>
+            <!-- Display Registration Success Message -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success text-center">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
             <form asp-action="Login" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 

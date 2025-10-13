@@ -1,0 +1,74 @@
+﻿@model IEnumerable<CricbuzzAppV2.Models.Team>
+
+@{
+    Layout = "_UserLayout";
+    ViewData["Title"] = "Teams";
+}
+
+<style>
+    .team-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+        margin-bottom: 20px;
+    }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+    .team-card-header {
+        background: linear-gradient(135deg, #00a651, #007e3e);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.3rem;
+    }
+
+    .team-card-body {
+        padding: 15px 20px;
+    }
+
+    .stat-item {
+        display: inline-block;
+        margin-right: 15px;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    @@media (max-width: 768px) {
+        .stat-item
+
+    {
+        display: block;
+        margin: 5px 0;
+    }
+
+    }
+</style>
+<a href="@Url.Action("Index", "UserPortal")" class="btn btn-success mb-4">← Back to Home</a>
+
+<h1 class="mb-4 text-success text-center">🏆 Teams</h1>
+
+<div class="row">
+    @foreach (var team in Model)
+    {
+        <div class="col-md-4">
+            <div class="team-card" onclick="location.href='@Url.Action("TeamDetails", "UserPortal", new { id = team.TeamId })'">
+                <div class="team-card-header">
+                    @team.TeamName
+                </div>
+                <div class="team-card-body">
+                    <p><strong>Country:</strong> @team.Country</p>
+                    <p><strong>Coach:</strong> @team.Coach</p>
+                    <p><strong>Players:</strong> @team.Players.Count()</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>

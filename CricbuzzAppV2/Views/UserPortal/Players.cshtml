@@ -1,0 +1,148 @@
+﻿@model IEnumerable<CricbuzzAppV2.Models.Player>
+
+@{
+    Layout = "_UserLayout";
+    ViewData["Title"] = "Players";
+}
+
+<style>
+    /* Section Header */
+    .section-header {
+        color: #00a651;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        border-bottom: 3px solid #00a651;
+        display: inline-block;
+        padding-bottom: 5px;
+    }
+
+    /* Player Card */
+    .player-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .player-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .player-card img {
+            height: 260px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        .player-card .card-body {
+            background-color: #f8fff9;
+            padding: 1.2rem;
+        }
+
+        .player-card .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00a651;
+        }
+
+    .player-role {
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    .team-badge {
+        display: inline-block;
+        background-color: #00a651;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .btn-cricbuzz {
+        background-color: #00a651;
+        color: white;
+        border: none;
+        font-size: 0.9rem;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-cricbuzz:hover {
+            background-color: #007e3e;
+            color: white;
+        }
+
+    /* Search Bar */
+    .search-bar {
+        max-width: 400px;
+        margin: 0 auto 2rem;
+    }
+
+        .search-bar input {
+            border-radius: 25px;
+            padding: 0.6rem 1rem;
+            border: 1px solid #ccc;
+        }
+
+        .search-bar button {
+            border-radius: 25px;
+            background-color: #00a651;
+            color: white;
+            border: none;
+        }
+
+            .search-bar button:hover {
+                background-color: #007e3e;
+            }
+</style>
+
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h2 class="section-header">🏏 Player Profiles</h2>
+        <p class="text-muted mt-2">Discover your favorite cricketers, their teams, and detailed stats</p>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-bar d-flex justify-content-center mb-4">
+        <form asp-action="Players" method="get" class="d-flex w-100" role="search">
+            <input type="text" name="searchQuery" class="form-control me-2" placeholder="Search player by name..." />
+            <button type="submit" class="btn btn-cricbuzz px-4">Search</button>
+        </form>
+    </div>
+
+    <!-- Player Cards -->
+    <div class="row">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var player in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card player-card shadow-sm">
+                        <img src="@(string.IsNullOrEmpty(player.ImageUrl) ? "/images/default-player.png" : player.ImageUrl)"
+                             alt="@player.FullName" />
+
+                        <div class="card-body text-center">
+                            <h5 class="card-title">@player.FullName</h5>
+                            <p class="player-role mb-1">@player.Role</p>
+                            <p>
+                                <span class="team-badge">@player.Team?.TeamName</span>
+                            </p>
+                            <a href="@Url.Action("PlayerDetails", "UserPortal", new { id = player.PlayerId })"
+                               class="btn btn-cricbuzz btn-sm mt-2 px-3">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center">
+                <p class="text-muted fs-5">No players available at the moment.</p>
+            </div>
+        }
+    </div>
+</div>

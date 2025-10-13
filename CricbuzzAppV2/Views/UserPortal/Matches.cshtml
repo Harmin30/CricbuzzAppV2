@@ -1,0 +1,31 @@
+﻿@model IEnumerable<CricbuzzAppV2.Models.Match>
+
+@{
+    Layout = "_UserLayout";
+    ViewData["Title"] = "Matches";
+}
+
+<h2 class="text-center mb-4 text-success">📅 Recent Matches</h2>
+
+<div class="row">
+    @foreach (var match in Model)
+    {
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">
+                        @match.TeamA?.TeamName vs @match.TeamB?.TeamName
+                    </h5>
+                    <p class="mb-1"><strong>Type:</strong> @match.MatchType</p>
+                    <p class="mb-1"><strong>Date:</strong> @match.Date.ToString("dd MMM yyyy")</p>
+                    <p class="mb-1"><strong>Venue:</strong> @match.Venue</p>
+                    @if (match.WinnerTeamId.HasValue)
+                    {
+                        <p class="text-success fw-bold">Winner: @match.WinnerTeam?.TeamName</p>
+                    }
+                    <a href="@Url.Action("MatchDetails", "UserPortal", new { id = match.MatchId })" class="btn btn-success btn-sm mt-2">View Details</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

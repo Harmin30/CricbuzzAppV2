@@ -4,6 +4,7 @@ using CricbuzzAppV2.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CricbuzzAppV2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251008055338_AddRoleToUser")]
+    partial class AddRoleToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -130,8 +133,7 @@ namespace CricbuzzAppV2.Migrations
 
                     b.HasKey("PlayerPersonalInfoId");
 
-                    b.HasIndex("PlayerId")
-                        .IsUnique();
+                    b.HasIndex("PlayerId");
 
                     b.ToTable("PlayerPersonalInfos");
                 });
@@ -177,9 +179,6 @@ namespace CricbuzzAppV2.Migrations
                     b.Property<int>("PlayerId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PlayerId1")
-                        .HasColumnType("int");
-
                     b.Property<int?>("Runs")
                         .HasColumnType("int");
 
@@ -192,8 +191,6 @@ namespace CricbuzzAppV2.Migrations
                     b.HasKey("PlayerStatsId");
 
                     b.HasIndex("PlayerId");
-
-                    b.HasIndex("PlayerId1");
 
                     b.ToTable("PlayerStats");
                 });
@@ -354,8 +351,8 @@ namespace CricbuzzAppV2.Migrations
             modelBuilder.Entity("CricbuzzAppV2.Models.PlayerPersonalInfo", b =>
                 {
                     b.HasOne("CricbuzzAppV2.Models.Player", "Player")
-                        .WithOne("PlayerPersonalInfo")
-                        .HasForeignKey("CricbuzzAppV2.Models.PlayerPersonalInfo", "PlayerId")
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -369,10 +366,6 @@ namespace CricbuzzAppV2.Migrations
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("CricbuzzAppV2.Models.Player", null)
-                        .WithMany("PlayerStats")
-                        .HasForeignKey("PlayerId1");
 
                     b.Navigation("Player");
                 });
@@ -399,13 +392,6 @@ namespace CricbuzzAppV2.Migrations
             modelBuilder.Entity("CricbuzzAppV2.Models.Match", b =>
                 {
                     b.Navigation("Scorecards");
-                });
-
-            modelBuilder.Entity("CricbuzzAppV2.Models.Player", b =>
-                {
-                    b.Navigation("PlayerPersonalInfo");
-
-                    b.Navigation("PlayerStats");
                 });
 
             modelBuilder.Entity("CricbuzzAppV2.Models.Team", b =>

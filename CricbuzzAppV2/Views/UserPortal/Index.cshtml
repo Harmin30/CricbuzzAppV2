@@ -1,0 +1,187 @@
+﻿@{
+    Layout = "_UserLayout";
+    ViewData["Title"] = "Home";
+}
+
+<style>
+    /* Hero Section */
+    .hero-section {
+        background: url('/images/cricket-bg.jpg') center/cover no-repeat;
+        color: white;
+        padding: 120px 0;
+        position: relative;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+        .hero-content h1, .hero-content p {
+            text-shadow: 1px 1px 8px rgba(0,0,0,0.6);
+        }
+
+    /* Buttons */
+    .btn-cricbuzz {
+        background-color: #00a651;
+        color: white;
+        border: none;
+        transition: 0.3s ease;
+        font-weight: 600;
+    }
+
+        .btn-cricbuzz:hover {
+            background-color: #007e3e;
+            color: white;
+        }
+
+    /* Feature Cards */
+    .feature-card {
+        border-radius: 15px;
+        overflow: hidden;
+        background: #ffffff;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+    }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #e8f5e9, #ffffff);
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .feature-card .card-body {
+            position: relative;
+            z-index: 2;
+        }
+
+    .feature-icon {
+        font-size: 50px;
+        color: #00a651;
+    }
+
+    .feature-card h4 {
+        font-weight: 700;
+        margin-top: 15px;
+        color: #333;
+    }
+
+    .feature-card p {
+        color: #555;
+        margin-bottom: 15px;
+    }
+
+    /* Section Titles */
+    .section-title {
+        color: #00a651;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 40px;
+        font-size: 2rem;
+    }
+
+    /* Footer */
+    footer {
+        background-color: #f8f9fa;
+        color: #555;
+        font-size: 0.9rem;
+    }
+
+    /* Responsive Adjustments */
+    @@media (max-width: 768px) {
+        .hero-section
+
+    {
+        padding: 80px 0;
+    }
+
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+
+    .feature-icon {
+        font-size: 40px;
+    }
+
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="hero-section text-center">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+        <h1 class="display-4 fw-bold mb-3">Welcome to Cricbuzz App 🏏</h1>
+        <p class="lead fs-5 mb-4">
+            Your all-in-one hub for player stats, match insights, and cricket analytics.
+        </p>
+        <a href="@Url.Action("Players", "UserPortal")" class="btn btn-cricbuzz btn-lg px-4">Explore Players</a>
+    </div>
+</section>
+
+<!-- Feature Cards Section -->
+<section class="container my-5">
+    <h2 class="text-center mb-5 section-title">Explore Cricket Insights</h2>
+
+    <div class="row g-4 text-center">
+        <!-- Players Card -->
+        <div class="col-md-4">
+            <div class="card feature-card shadow-sm p-4 h-100">
+                <div class="feature-icon mb-3">
+                    <i class="bi bi-person-lines-fill"></i>
+                </div>
+                <div class="card-body">
+                    <h4>Players</h4>
+                    <p>Discover profiles, teams, and stats of all top cricket players.</p>
+                    <a class="btn btn-cricbuzz" href="@Url.Action("Players", "UserPortal")">View Players</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Batsmen Card -->
+        <div class="col-md-4">
+            <div class="card feature-card shadow-sm p-4 h-100">
+                <div class="feature-icon mb-3">
+                    <i class="bi bi-trophy-fill"></i>
+                </div>
+                <div class="card-body">
+                    <h4>Top Batsmen</h4>
+                    <p>Track the leading run scorers and their record-breaking innings.</p>
+                    <a class="btn btn-cricbuzz" href="#">View Top Batsmen</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Bowlers Card -->
+        <div class="col-md-4">
+            <div class="card feature-card shadow-sm p-4 h-100">
+                <div class="feature-icon mb-3">
+                    <i class="bi bi-bullseye"></i>
+                </div>
+                <div class="card-body">
+                    <h4>Top Bowlers</h4>
+                    <p>Explore top wicket-takers and their best bowling performances.</p>
+                    <a class="btn btn-cricbuzz" href="#">View Top Bowlers</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer Section -->
+<footer class="text-center py-4 mt-5 border-top">
+    <p class="mb-0 text-muted">© @DateTime.Now.Year Cricbuzz App — Built for Cricket Lovers 🏏</p>
+</footer>

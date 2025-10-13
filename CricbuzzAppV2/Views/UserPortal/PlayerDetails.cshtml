@@ -1,0 +1,223 @@
+﻿@model CricbuzzAppV2.Models.Player
+
+@{
+    Layout = "_UserLayout";
+    ViewData["Title"] = "Player Details";
+}
+
+<style>
+    body {
+        background-color: #f4f5f7;
+    }
+
+    .player-details-container {
+        max-width: 1100px;
+        margin: 40px auto;
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .player-header {
+        background: #00a651;
+        color: #fff;
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+        .player-header img {
+            width: 160px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #ffffff;
+            margin-bottom: 15px;
+        }
+
+        .player-header h2 {
+            font-weight: 700;
+        }
+
+        .player-header p {
+            color: #f0f0f0;
+        }
+
+    .stats-section, .personal-info {
+        padding: 30px;
+    }
+
+    .section-title {
+        color: #00a651;
+        font-weight: bold;
+        border-left: 5px solid #00a651;
+        padding-left: 10px;
+        margin-top: 30px;
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+    }
+
+    .stats-table th, .stats-table td, .info-table th, .info-table td {
+        text-align: center;
+        padding: 10px;
+        vertical-align: middle;
+    }
+
+    .stats-table th, .info-table th {
+        background-color: #e8f5e9;
+        color: #006622;
+        font-weight: 600;
+    }
+
+    .stats-table td, .info-table td {
+        background-color: #ffffff;
+        color: #333;
+    }
+
+    .stats-table tr:nth-child(even) td,
+    .info-table tr:nth-child(even) td {
+        background-color: #f9f9f9;
+    }
+
+    .back-btn {
+        display: inline-block;
+        margin-bottom: 20px;
+        background-color: #00a651;
+        color: white;
+        border-radius: 25px;
+        padding: 10px 20px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+        .back-btn:hover {
+            background-color: #007e3e;
+            color: white;
+        }
+
+    .format-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #333;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="player-details-container">
+
+    <!-- Player Header -->
+    <div class="player-header">
+        <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/default-player.png" : Model.ImageUrl)" alt="@Model.FullName" />
+        <h2>@Model.FullName</h2>
+        <p>@Model.Role • @Model.Team?.TeamName</p>
+    </div>
+
+    <!-- Personal Info -->
+    @if (Model.PlayerPersonalInfo != null)
+    {
+        <div class="personal-info">
+            <h3 class="section-title">Personal Info</h3>
+            <table class="table info-table table-bordered">
+                <tbody>
+                    <tr>
+                        <th>Date of Birth</th>
+                        <td>@Model.PlayerPersonalInfo.DateOfBirth.ToString("dd MMM yyyy")</td>
+                    </tr>
+                    <tr>
+                        <th>Birth Place</th>
+                        <td>@Model.PlayerPersonalInfo.BirthPlace</td>
+                    </tr>
+                    <tr>
+                        <th>Height</th>
+                        <td>@Model.PlayerPersonalInfo.Height</td>
+                    </tr>
+                    <tr>
+                        <th>Batting Style</th>
+                        <td>@Model.PlayerPersonalInfo.BattingStyle</td>
+                    </tr>
+                    <tr>
+                        <th>Bowling Style</th>
+                        <td>@Model.PlayerPersonalInfo.BowlingStyle</td>
+                    </tr>
+                    <tr>
+                        <th>Role</th>
+                        <td>@Model.PlayerPersonalInfo.Role</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <!-- Stats Section -->
+    <div class="stats-section">
+        <a href="@Url.Action("Players", "UserPortal")" class="back-btn">← Back to Players</a>
+
+        @if (Model.PlayerStats != null && Model.PlayerStats.Any())
+        {
+            foreach (var stats in Model.PlayerStats)
+            {
+                <div class="format-title">@stats.Format Format</div>
+
+                <!-- Batting Stats -->
+                <h4 class="section-title">Batting Stats</h4>
+                <table class="table table-bordered stats-table">
+                    <thead>
+                        <tr>
+                            <th>Matches</th>
+                            <th>Innings</th>
+                            <th>Runs</th>
+                            <th>Highest</th>
+                            <th>100s</th>
+                            <th>50s</th>
+                            <th>Double 100s</th>
+                            <th>Average</th>
+                            <th>Strike Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@stats.MatchesPlayed</td>
+                            <td>@stats.Innings</td>
+                            <td>@stats.Runs</td>
+                            <td>@stats.HighestScore</td>
+                            <td>@stats.Hundreds</td>
+                            <td>@stats.Fifties</td>
+                            <td>@stats.DoubleHundreds</td>
+                            <td>@stats.BattingAverage</td>
+                            <td>@stats.StrikeRate</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Bowling Stats -->
+                <h4 class="section-title">Bowling Stats</h4>
+                <table class="table table-bordered stats-table">
+                    <thead>
+                        <tr>
+                            <th>Balls Bowled</th>
+                            <th>Runs Conceded</th>
+                            <th>Wickets</th>
+                            <th>Best Bowling</th>
+                            <th>Average</th>
+                            <th>Economy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@stats.BallsBowled</td>
+                            <td>@stats.RunsConceded</td>
+                            <td>@stats.Wickets</td>
+                            <td>@stats.BestBowling</td>
+                            <td>@stats.BowlingAverage</td>
+                            <td>@stats.Economy</td>
+                        </tr>
+                    </tbody>
+                </table>
+            }
+        }
+        else
+        {
+            <p class="text-muted">No stats available for this player yet.</p>
+        }
+    </div>
+</div>

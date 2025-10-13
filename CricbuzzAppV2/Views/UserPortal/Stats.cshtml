@@ -1,0 +1,151 @@
+﻿@model IEnumerable<CricbuzzAppV2.Models.PlayerStats>
+
+@{
+    Layout = "_UserLayout";
+    ViewData["Title"] = "Player Stats";
+}
+
+<style>
+    /* Hero Section */
+    .stats-hero {
+        background: linear-gradient(135deg, #00a651, #007e3e);
+        color: white;
+        padding: 40px 20px;
+        text-align: center;
+        border-radius: 12px;
+        margin-bottom: 30px;
+    }
+
+        .stats-hero h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+    /* Filter Section */
+    .filter-section {
+        margin-bottom: 25px;
+        text-align: right;
+    }
+
+    /* Player Table */
+    .stats-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+    }
+
+        .stats-table th, .stats-table td {
+            text-align: center;
+            padding: 10px;
+            vertical-align: middle;
+        }
+
+        .stats-table thead {
+            background-color: #e8f5e9;
+            font-weight: 600;
+        }
+
+        .stats-table tbody tr:hover {
+            background-color: #f1f9f1;
+            cursor: pointer;
+        }
+
+    .player-img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+
+    /* Badge for top players */
+    .badge-top {
+        background-color: #007e3e;
+        color: white;
+        padding: 3px 7px;
+        border-radius: 5px;
+        font-size: 0.8rem;
+    }
+</style>
+
+<div class="stats-hero">
+    <h1>📊 Player Stats Overview</h1>
+    <p>Click on a player to view full career stats and details</p>
+</div>
+
+<div class="filter-section">
+    <form method="get" class="d-inline">
+        <label for="format" class="me-2 fw-bold">Filter by Format:</label>
+        <select id="format" name="format" class="form-select d-inline-block w-auto">
+            <option value="">All</option>
+            <option value="Test">Test</option>
+            <option value="ODI">ODI</option>
+            <option value="T20">T20</option>
+        </select>
+        <button type="submit" class="btn btn-success ms-2">Filter</button>
+    </form>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table stats-table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Total Matches</th>
+                    <th>Total Runs</th>
+                    <th>Batting Avg</th>
+                    <th>Strike Rate</th>
+                    <th>Wickets</th>
+                    <th>Economy</th>
+                    <th>100s</th>
+                    <th>50s</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var playerGroup in Model.GroupBy(ps => ps.PlayerId))
+                {
+                    var player = playerGroup.First().Player;
+                    var totalMatches = playerGroup.Sum(ps => ps.MatchesPlayed ?? 0);
+                    var totalRuns = playerGroup.Sum(ps => ps.Runs ?? 0);
+                    var totalInnings = playerGroup.Sum(ps => ps.Innings ?? 1); // prevent divide by zero
+                    var battingAvg = totalInnings > 0 ? Math.Round((double)totalRuns / totalInnings, 2) : 0;
+                    var totalBalls = playerGroup.Sum(ps => ps.BallsFaced ?? 0);
+                    var strikeRate = totalBalls > 0 ? Math.Round((double)totalRuns / totalBalls * 100, 2) : 0;
+                    var totalWickets = playerGroup.Sum(ps => ps.Wickets ?? 0);
+                    var totalEconomy = playerGroup.Sum(ps => ps.RunsConceded ?? 0);
+                    var totalOvers = playerGroup.Sum(ps => ps.BallsBowled ?? 0) / 6.0;
+                    var economyRate = totalOvers > 0 ? Math.Round(totalEconomy / totalOvers, 2) : 0;
+                    var hundreds = playerGroup.Sum(ps => ps.Hundreds ?? 0);
+                    var fifties = playerGroup.Sum(ps => ps.Fifties ?? 0);
+                    <tr onclick="location.href='@Url.Action("PlayerDetails", "UserPortal", new { id = player.PlayerId })'">
+                        <td>
+                            @if (!string.IsNullOrEmpty(player?.ImageUrl))
+                            {
+                                <img src="@player.ImageUrl" class="player-img" />
+                            }
+                            @player.FullName
+                        </td>
+                        <td>@totalMatches</td>
+                        <td>@totalRuns</td>
+                        <td>@battingAvg</td>
+                        <td>@strikeRate</td>
+                        <td>@totalWickets</td>
+                        <td>@economyRate</td>
+                        <td>@hundreds @if(hundreds>=2){
+                        <span class="badge-top">🏆</span>
+                    }
+    </td>
+                    <td>@fifties</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+}
+else
+{
+    <p class="text-center fw-bold">No stats available yet.</p>
+}

@@ -28,12 +28,14 @@ namespace CricbuzzAppV2.Controllers
             if (user != null && VerifyPassword(model.Password, user.PasswordHash, user.PasswordSalt))
             {
                 HttpContext.Session.SetString("Username", user.Username);
+                HttpContext.Session.SetString("Role", user.Role); // store role in session
                 return RedirectToAction("Index", "Home");
             }
 
             ViewBag.Error = "Invalid username or password";
             return View(model);
         }
+
 
         [HttpGet]
         public IActionResult Register() => View();
@@ -57,15 +59,18 @@ namespace CricbuzzAppV2.Controllers
             {
                 Username = model.Username,
                 PasswordHash = hashedPassword,
-                PasswordSalt = salt
+                PasswordSalt = salt,
+                Role = "Editor" // Default role for new users
             };
 
             _context.Users.Add(user);
             _context.SaveChanges();
 
-            HttpContext.Session.SetString("Username", user.Username);
-            return RedirectToAction("Index", "Home");
+            TempData["SuccessMessage"] = "Registration successful! Please login.";
+            return RedirectToAction("Login");
         }
+
+
 
         public IActionResult Logout()
         {

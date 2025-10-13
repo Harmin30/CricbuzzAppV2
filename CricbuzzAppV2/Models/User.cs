@@ -8,5 +8,7 @@
 
         // Store the salt separately
         public string PasswordSalt { get; set; }
+        // Add role
+        public string Role { get; set; } = "Viewer"; // default role
     }
 }

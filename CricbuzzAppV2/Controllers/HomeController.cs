@@ -38,7 +38,10 @@ namespace CricbuzzAppV2.Controllers
             var topBowler = _context.PlayerStats
                 .Include(ps => ps.Player)
                 .OrderByDescending(ps => ps.Wickets)
-                .FirstOrDefault();
+                .FirstOrDefault();  
+
+
+
 
             // Top Team logic
             var teamWins = _context.Matches

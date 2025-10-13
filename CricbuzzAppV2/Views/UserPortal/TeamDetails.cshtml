@@ -1,0 +1,33 @@
+﻿@model CricbuzzAppV2.Models.Team
+
+@{
+    Layout = "_UserLayout";
+    ViewData["Title"] = @Model.TeamName;
+}
+<a href="@Url.Action("Teams", "UserPortal")" class="btn btn-success mb-3">← Back to Teams</a>
+
+<h1 class="text-success mb-4">@Model.TeamName 🏏</h1>
+
+<div class="mb-3">
+    <p><strong>Country:</strong> @Model.Country</p>
+    <p><strong>Coach:</strong> @Model.Coach</p>
+</div>
+
+<h3 class="mb-3">Players</h3>
+<div class="row">
+    @foreach (var player in Model.Players)
+    {
+        <div class="col-md-3">
+            <div class="card mb-3" onclick="location.href='@Url.Action("PlayerDetails", "UserPortal", new { id = player.PlayerId })'" style="cursor:pointer;">
+                @if (!string.IsNullOrEmpty(player.ImageUrl))
+                {
+                    <img src="@player.ImageUrl" class="card-img-top" style="height:200px;object-fit:cover;" />
+                }
+                <div class="card-body text-center">
+                    <h5 class="card-title">@player.FullName</h5>
+                    <p class="card-text">@player.Role</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>

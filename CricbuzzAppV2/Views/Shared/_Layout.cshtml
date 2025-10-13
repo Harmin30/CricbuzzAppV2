@@ -20,7 +20,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 @if (Context.Session.GetString("Username") != null)
                 {
-                    <!-- Main links visible only to logged-in users -->
+                    var username = Context.Session.GetString("Username");
+                    var role = Context.Session.GetString("Role");
+
+                    <!-- Main links visible to all logged-in users -->
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Players" asp-action="Index">Players</a>
@@ -40,33 +43,31 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="PlayerPersonalInfo" asp-action="Index">Player Personal Info</a>
                         </li>
-                        @if (Context.Session.GetString("Username") == "admin")
+
+                        <!-- SuperAdmin-only link -->
+                        @if (role == "SuperAdmin")
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Users" asp-action="Index">Manage Users</a>
                             </li>
                         }
-
                     </ul>
 
-                    <!-- Right side: show username and logout -->
+                    <!-- Right side: username + logout -->
                     <ul class="navbar-nav ms-auto align-items-center">
                         <li class="nav-item">
                             <span class="navbar-text me-2 fw-bold text-light">
-                                Hello, @Context.Session.GetString("Username")
+                                Hello, @username (@role)
                             </span>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Account" asp-action="Logout">Logout</a>
                         </li>
                     </ul>
-
-
-
                 }
                 else
                 {
-                    <!-- Only login/register links for guests -->
+                    <!-- Links for guests -->
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
@@ -74,7 +75,6 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
                         </li>
-
                     </ul>
                 }
             </div>

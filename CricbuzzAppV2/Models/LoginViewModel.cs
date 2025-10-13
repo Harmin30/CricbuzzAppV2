@@ -6,7 +6,10 @@ namespace CricbuzzAppV2.Models
     {
         [Required(ErrorMessage = "Username is required")]
         [Display(Name = "Username")]
-        public string Username { get; set; }
+        public string 
+
+            
+            Username { get; set; }
 
         [Required(ErrorMessage = "Password is required")]
         [DataType(DataType.Password)]

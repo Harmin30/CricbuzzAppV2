@@ -1,0 +1,232 @@
+﻿@model CricbuzzAppV2.Models.Match
+
+@{
+    Layout = "_UserLayout";
+    ViewData["Title"] = "Match Details";
+}
+
+<style>
+    .back-btn {
+        background-color: #00a651;
+        color: white;
+        border-radius: 25px;
+        padding: 8px 20px;
+        text-decoration: none;
+        display: inline-block;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+        .back-btn:hover {
+            background-color: #007e3e;
+        }
+
+    .match-card {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        margin-bottom: 30px;
+    }
+
+    .match-header {
+        background: linear-gradient(135deg, #00a651, #007e3e);
+        color: white;
+        text-align: center;
+        padding: 25px 15px;
+    }
+
+        .match-header h3 {
+            margin-bottom: 5px;
+        }
+
+        .match-header p {
+            margin: 0;
+            font-weight: 500;
+        }
+
+    .stats-container {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .stats-card {
+        flex: 1;
+        min-width: 300px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        overflow: hidden;
+        background-color: #fff;
+    }
+
+        .stats-card h5 {
+            background-color: #00a651;
+            color: white;
+            padding: 12px 15px;
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .stats-card table {
+            margin: 0;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .stats-card th, .stats-card td {
+            text-align: center;
+            padding: 8px 5px;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        .stats-card thead {
+            background-color: #e8f5e9;
+        }
+
+        .stats-card tbody tr:hover {
+            background-color: #f1f9f1;
+        }
+
+    .player-img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-right: 5px;
+        vertical-align: middle;
+    }
+
+    .badge-score {
+        background-color: #007e3e;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 5px;
+        font-size: 0.8rem;
+    }
+
+    @@media (max-width: 768px) {
+        .stats-container
+
+    {
+        flex-direction: column;
+    }
+
+    }
+</style>
+
+<a href="@Url.Action("Matches", "UserPortal")" class="back-btn">← Back to Matches</a>
+
+<div class="card match-card">
+    <div class="match-header">
+        <h3>@Model.TeamA?.TeamName vs @Model.TeamB?.TeamName</h3>
+        <p><strong>Type:</strong> @Model.MatchType | <strong>Date:</strong> @Model.Date.ToString("dd MMM yyyy") | <strong>Venue:</strong> @Model.Venue</p>
+        @if (Model.WinnerTeamId.HasValue)
+        {
+            <p class="fw-bold">Winner: @Model.WinnerTeam?.TeamName</p>
+        }
+    </div>
+</div>
+
+@if (Model.Scorecards != null && Model.Scorecards.Any())
+{
+    <div class="stats-container">
+        <!-- Batting Stats -->
+        <div class="stats-card">
+            <h5>Batting Stats</h5>
+            <div class="table-responsive">
+                <table class="table table-borderless">
+                    <thead>
+                        <tr>
+                            <th>Player</th>
+                            <th>Runs</th>
+                            <th>Balls</th>
+                            <th>4s</th>
+                            <th>6s</th>
+                            <th>SR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in Model.Scorecards.Where(sc => sc.RunsScored.HasValue))
+                        {
+                            <tr>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(s.Player?.ImageUrl))
+                                    {
+                                        <img src="@s.Player.ImageUrl" class="player-img" />
+                                    }
+                                    @s.Player?.FullName
+                                </td>
+                                <td>
+                                    @s.RunsScored
+                                    @if (s.RunsScored >= 50)
+                                    {
+                                        <span class="badge-score">⭐</span>
+                                    }
+                                </td>
+                                <td>@s.BallsFaced</td>
+                                <td>@s.Fours</td>
+                                <td>@s.Sixes</td>
+                                <td>
+                                    @{
+                                        double? sr = null;
+                                        if (s.RunsScored.HasValue && s.BallsFaced.HasValue && s.BallsFaced.Value > 0)
+                                            sr = (double)s.RunsScored.Value / s.BallsFaced.Value * 100;
+                                    }
+                                    @(sr.HasValue? sr.Value.ToString("0.0") : "-")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bowling Stats -->
+        <div class="stats-card">
+            <h5>Bowling Stats</h5>
+            <div class="table-responsive">
+                <table class="table table-borderless">
+                    <thead>
+                        <tr>
+                            <th>Player</th>
+                            <th>Overs</th>
+                            <th>Runs</th>
+                            <th>Wkts</th>
+                            <th>Mdn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in Model.Scorecards.Where(sc => sc.OversBowled.HasValue))
+                        {
+                            <tr>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(s.Player?.ImageUrl))
+                                    {
+                                        <img src="@s.Player.ImageUrl" class="player-img" />
+                                    }
+                                    @s.Player?.FullName
+                                </td>
+                                <td>@s.OversBowled</td>
+                                <td>@s.RunsConceded</td>
+                                <td>
+                                    @s.WicketsTaken
+                                    @if (s.WicketsTaken >= 3)
+                                    {
+                                        <span class="badge-score">🎯</span>
+                                    }
+                                </td>
+                                <td>@s.Maidens</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <p class="text-center fw-bold">No scorecards added for this match yet.</p>
+}

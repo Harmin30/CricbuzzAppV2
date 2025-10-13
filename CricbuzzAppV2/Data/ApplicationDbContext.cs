@@ -78,6 +78,15 @@ namespace CricbuzzAppV2.Data
                 .WithMany()
                 .HasForeignKey(ps => ps.PlayerId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Player ↔ PlayerPersonalInfo one-to-one
+            modelBuilder.Entity<PlayerStats>()
+    .HasOne(ps => ps.Player)
+    .WithMany(p => p.PlayerStats)
+    .HasForeignKey(ps => ps.PlayerId)
+    .OnDelete(DeleteBehavior.Cascade);
+
+
         }
 
     }

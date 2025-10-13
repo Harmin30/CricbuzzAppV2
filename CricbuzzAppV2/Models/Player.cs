@@ -18,7 +18,13 @@ namespace CricbuzzAppV2.Models
         [Required]
         public int TeamId { get; set; }
 
-        [ValidateNever] // 🚀 Prevents MVC from requiring this during form validation
+        [ValidateNever]
         public Team Team { get; set; } = null!;
+
+        [ValidateNever]
+        public ICollection<PlayerStats> PlayerStats { get; set; } = new List<PlayerStats>();
+
+        [ValidateNever]
+        public PlayerPersonalInfo? PlayerPersonalInfo { get; set; } // ✅ added link
     }
 }
