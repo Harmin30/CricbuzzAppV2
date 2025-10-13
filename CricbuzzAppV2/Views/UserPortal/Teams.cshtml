@@ -93,7 +93,8 @@
     @foreach (var team in Model.Select((value, index) => new { value, index }))
     {
         <div class="team-card" onclick="location.href='@Url.Action("TeamDetails", "UserPortal", new { id = team.value.TeamId })'">
-            <img src="@(string.IsNullOrEmpty(team.ImageUrl) ? "/images/default-team.png" : team.ImageUrl)" class="team-logo" alt="@team.TeamName Logo" />
+            <img src="@(string.IsNullOrEmpty(team.value.ImageUrl) ? "/images/default-team.png" : team.value.ImageUrl)" class="team-logo" alt="@team.value.TeamName Logo" />
+
             <div class="team-info">
                 <h5>@team.value.TeamName</h5>
                 <p>@team.value.Country • Coach: @team.value.Coach</p>

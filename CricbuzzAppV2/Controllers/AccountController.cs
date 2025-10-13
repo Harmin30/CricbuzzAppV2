@@ -28,13 +28,20 @@ namespace CricbuzzAppV2.Controllers
             if (user != null && VerifyPassword(model.Password, user.PasswordHash, user.PasswordSalt))
             {
                 HttpContext.Session.SetString("Username", user.Username);
-                HttpContext.Session.SetString("Role", user.Role); // store role in session
-                return RedirectToAction("Index", "Home");
+                HttpContext.Session.SetString("Role", user.Role);
+
+                // Role-based redirect
+                if (user.Role == "Admin" || user.Role == "SuperAdmin")
+                    return RedirectToAction("Dashboard", "Home"); // admin dashboard
+                else
+                    return RedirectToAction("Index", "UserPortal"); // normal users
             }
 
             ViewBag.Error = "Invalid username or password";
             return View(model);
         }
+
+
 
 
         [HttpGet]

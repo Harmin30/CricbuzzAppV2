@@ -7,22 +7,32 @@ namespace CricbuzzAppV2.Filters
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            // Skip check for Login and Register actions
             var controller = context.RouteData.Values["controller"]?.ToString();
             var action = context.RouteData.Values["action"]?.ToString();
 
-            if (controller == "Account" && (action == "Login" || action == "Register"))
+            // Publicly accessible pages
+            if (controller == "UserPortal" ||
+                (controller == "Account" && (action == "Login" || action == "Register")))
             {
                 base.OnActionExecuting(context);
                 return;
             }
 
-            // Check if session exists
             var username = context.HttpContext.Session.GetString("Username");
+            var role = context.HttpContext.Session.GetString("Role");
+
+            // Redirect to login if no session
             if (string.IsNullOrEmpty(username))
             {
-                // Redirect to login if not logged in
                 context.Result = new RedirectToActionResult("Login", "Account", null);
+                return;
+            }
+
+            // Only Admins can access Home (admin dashboard)
+            if (controller == "Home" && role != "Admin" && role != "SuperAdmin")
+            {
+                context.Result = new RedirectToActionResult("Index", "UserPortal", null);
+                return;
             }
 
             base.OnActionExecuting(context);

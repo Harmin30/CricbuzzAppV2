@@ -18,10 +18,25 @@ namespace CricbuzzAppV2.Controllers
             _context = context;
         }
 
-
+        // Default route → check session and role
         public IActionResult Index()
         {
+            var username = HttpContext.Session.GetString("Username");
+            var role = HttpContext.Session.GetString("Role");
 
+            // If Admin/SuperAdmin → show dashboard
+            if (!string.IsNullOrEmpty(username) && (role == "Admin" || role == "SuperAdmin"))
+            {
+                return RedirectToAction("Dashboard");
+            }
+
+            // Else → redirect to public UserPortal
+            return RedirectToAction("Index", "UserPortal");
+        }
+
+        // Admin Dashboard → existing logic kept intact
+        public IActionResult Dashboard()
+        {
             // Summary stats
             ViewBag.TotalPlayers = _context.Players.Count();
             ViewBag.TotalTeams = _context.Teams.Count();
@@ -38,10 +53,7 @@ namespace CricbuzzAppV2.Controllers
             var topBowler = _context.PlayerStats
                 .Include(ps => ps.Player)
                 .OrderByDescending(ps => ps.Wickets)
-                .FirstOrDefault();  
-
-
-
+                .FirstOrDefault();
 
             // Top Team logic
             var teamWins = _context.Matches
@@ -57,14 +69,10 @@ namespace CricbuzzAppV2.Controllers
                 })
                 .ToList();
 
-            // Get max total wins
             var maxWins = teamWins.Max(t => t.TotalWins);
             var topTeams = teamWins.Where(t => t.TotalWins == maxWins).ToList();
-
-            // If tie, select team with more Test wins
             var topTeamData = topTeams.OrderByDescending(t => t.TestWins).FirstOrDefault();
 
-            // Get team details from Teams table
             Team topTeam = null;
             int topTeamTestWins = 0, topTeamODIWins = 0, topTeamT20Wins = 0;
             if (topTeamData != null)
@@ -84,7 +92,7 @@ namespace CricbuzzAppV2.Controllers
             var recentMatches = _context.Matches
                 .Include(m => m.TeamA)
                 .Include(m => m.TeamB)
-                .Include(m => m.WinnerTeam) // Make sure WinnerTeam navigation exists
+                .Include(m => m.WinnerTeam)
                 .OrderByDescending(m => m.Date)
                 .Take(5)
                 .ToList();
@@ -93,7 +101,7 @@ namespace CricbuzzAppV2.Controllers
             ViewBag.TopBatsman = topBatsman;
             ViewBag.TopBowler = topBowler;
 
-            return View();
+            return View("Index"); // <--- use your existing Index.cshtml
         }
 
 
