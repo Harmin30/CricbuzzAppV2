@@ -22,15 +22,29 @@ namespace CricbuzzAppV2.Controllers
         }
 
         // 👥 Players List
-        public IActionResult Players()
+        public IActionResult Players(string? searchQuery)
         {
-            var players = _context.Players
+            var playersQuery = _context.Players
                 .Include(p => p.Team)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                // Case-insensitive search by FullName
+                playersQuery = playersQuery
+                    .Where(p => p.FullName.Contains(searchQuery));
+            }
+
+            var players = playersQuery
                 .OrderBy(p => p.FullName)
                 .ToList();
 
+            // Pass the search query back to the view to persist the input
+            ViewBag.SearchQuery = searchQuery;
+
             return View(players); // Views/UserPortal/Players.cshtml
         }
+
 
         // 📋 Player Details
         public IActionResult PlayerDetails(int id)

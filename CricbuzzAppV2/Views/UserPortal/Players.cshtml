@@ -107,7 +107,9 @@
     <!-- Search Bar -->
     <div class="search-bar d-flex justify-content-center mb-4">
         <form asp-action="Players" method="get" class="d-flex w-100" role="search">
-            <input type="text" name="searchQuery" class="form-control me-2" placeholder="Search player by name..." />
+            <input type="text" name="searchQuery" class="form-control me-2" placeholder="Search player by name..."
+                   value="@ViewBag.SearchQuery" />
+
             <button type="submit" class="btn btn-cricbuzz px-4">Search</button>
         </form>
     </div>

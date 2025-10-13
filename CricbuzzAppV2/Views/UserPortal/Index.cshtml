@@ -10,6 +10,7 @@
         color: white;
         padding: 120px 0;
         position: relative;
+        overflow: hidden;
     }
 
     .hero-overlay {
@@ -21,9 +22,12 @@
     .hero-content {
         position: relative;
         z-index: 2;
+        max-width: 800px;
+        margin: 0 auto;
     }
 
-        .hero-content h1, .hero-content p {
+        .hero-content h1,
+        .hero-content p {
             text-shadow: 1px 1px 8px rgba(0,0,0,0.6);
         }
 
@@ -41,7 +45,98 @@
             color: white;
         }
 
-    /* Feature Cards */
+    /* Cricket Ball Animations */
+    .cricket-ball {
+        width: 50px;
+        height: 50px;
+        background: url('/images/cricket-ball.png') no-repeat center/cover;
+        position: absolute;
+        bottom: 20px;
+        z-index: 1;
+    }
+
+    .ball1 {
+        animation: ball-move1 6s linear infinite;
+    }
+
+    .ball2 {
+        animation: ball-move2 8s linear infinite;
+    }
+
+    .ball3 {
+        animation: ball-move3 10s linear infinite;
+    }
+
+    keyframes ball-move1 {
+        0%
+
+    {
+        left: -60px;
+        transform: rotate(0deg);
+        bottom: 20px;
+    }
+
+    50% {
+        left: 50%;
+        transform: rotate(360deg);
+        bottom: 100px;
+    }
+
+    100% {
+        left: 100%;
+        transform: rotate(720deg);
+        bottom: 20px;
+    }
+
+    }
+
+    keyframes ball-move2 {
+        0%
+
+    {
+        left: -80px;
+        transform: rotate(0deg);
+        bottom: 40px;
+    }
+
+    50% {
+        left: 50%;
+        transform: rotate(360deg);
+        bottom: 140px;
+    }
+
+    100% {
+        left: 100%;
+        transform: rotate(720deg);
+        bottom: 40px;
+    }
+
+    }
+
+    keyframes ball-move3 {
+        0%
+
+    {
+        left: -100px;
+        transform: rotate(0deg);
+        bottom: 10px;
+    }
+
+    50% {
+        left: 50%;
+        transform: rotate(360deg);
+        bottom: 80px;
+    }
+
+    100% {
+        left: 100%;
+        transform: rotate(720deg);
+        bottom: 10px;
+    }
+
+    }
+
+    /* Feature Cards Section */
     .feature-card {
         border-radius: 15px;
         overflow: hidden;
@@ -102,7 +197,7 @@
     }
 
     /* Responsive Adjustments */
-    @@media (max-width: 768px) {
+    media (max-width: 768px) {
         .hero-section
 
     {
@@ -117,18 +212,30 @@
         font-size: 40px;
     }
 
+    .cricket-ball {
+        width: 35px;
+        height: 35px;
+    }
+
     }
 </style>
 
 <!-- Hero Section -->
-<section class="hero-section text-center">
+<section class="hero-section text-center position-relative">
     <div class="hero-overlay"></div>
-    <div class="container hero-content">
+
+    <!-- Animated Cricket Balls -->
+    <div class="cricket-ball ball1"></div>
+    <div class="cricket-ball ball2"></div>
+    <div class="cricket-ball ball3"></div>
+
+    <div class="container hero-content position-relative">
         <h1 class="display-4 fw-bold mb-3">Welcome to Cricbuzz App 🏏</h1>
         <p class="lead fs-5 mb-4">
-            Your all-in-one hub for player stats, match insights, and cricket analytics.
+            Your all-in-one hub for cricket stats, match insights, and top performances.
         </p>
-        <a href="@Url.Action("Players", "UserPortal")" class="btn btn-cricbuzz btn-lg px-4">Explore Players</a>
+        <a href="@Url.Action("TopBatsmen", "UserPortal")" class="btn btn-cricbuzz btn-lg px-4 me-2">Explore Top Batsmen</a>
+        <a href="@Url.Action("TopBowlers", "UserPortal")" class="btn btn-cricbuzz btn-lg px-4">Explore Top Bowlers</a>
     </div>
 </section>
 
@@ -137,20 +244,6 @@
     <h2 class="text-center mb-5 section-title">Explore Cricket Insights</h2>
 
     <div class="row g-4 text-center">
-        <!-- Players Card -->
-        <div class="col-md-4">
-            <div class="card feature-card shadow-sm p-4 h-100">
-                <div class="feature-icon mb-3">
-                    <i class="bi bi-person-lines-fill"></i>
-                </div>
-                <div class="card-body">
-                    <h4>Players</h4>
-                    <p>Discover profiles, teams, and stats of all top cricket players.</p>
-                    <a class="btn btn-cricbuzz" href="@Url.Action("Players", "UserPortal")">View Players</a>
-                </div>
-            </div>
-        </div>
-
         <!-- Top Batsmen Card -->
         <div class="col-md-4">
             <div class="card feature-card shadow-sm p-4 h-100">
@@ -164,7 +257,6 @@
                 </div>
             </div>
         </div>
-
 
         <!-- Top Bowlers Card -->
         <div class="col-md-4">
