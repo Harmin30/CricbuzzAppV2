@@ -1,0 +1,72 @@
+﻿@model IEnumerable<CricbuzzAppV2.Models.Team>
+@{
+    Layout = "_UserLayout";
+    ViewData["Title"] = "Top Teams";
+    var formats = Enum.GetValues(typeof(CricbuzzAppV2.Models.PlayerStats.CricketFormat));
+    var selectedFormat = ViewBag.SelectedFormat as string;
+}
+
+<style>
+.btn-back { display:inline-block;margin-bottom:20px;background-color:#00a651;color:white;border-radius:25px;padding:10px 20px;text-decoration:none;transition:0.3s; }
+.btn-back:hover { background-color:#007e3e;color:white; }
+
+.filter-form { margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+
+/* Team Cards */
+.top-list-container { margin-top:10px; }
+.team-card { display:flex; align-items:center; padding:15px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05); margin-bottom:15px; transition:0.3s; background:#fff; cursor:pointer;}
+.team-card:hover { transform: translateY(-5px); box-shadow:0 8px 25px rgba(0,0,0,0.15);}
+.team-logo { width:60px; height:60px; object-fit:cover; margin-right:15px; border-radius:50%; border:2px solid #ffc107; }
+.team-info h5 { margin:0; font-weight:600; }
+.team-info p { margin:0; color:#666; font-size:0.9rem; }
+.team-badge { margin-left:auto; text-align:right; }
+.team-badge span { display:inline-block; background-color:#ffc107; color:#fff; padding:5px 10px; border-radius:25px; font-weight:600; font-size:0.9rem; }
+</style>
+
+<a href="@Url.Action("Index","UserPortal")" class="btn-back">← Back to Home</a>
+
+<h2 class="text-warning mb-3">🏆 Top Teams</h2>
+
+<form method="get" class="filter-form">
+    <label for="format">Filter by Format:</label>
+    <select id="format" name="format" class="form-select" style="width:150px;">
+        <option value="">All</option>
+        @foreach(var f in formats)
+        {
+            <option value="@f" selected="@(selectedFormat == f.ToString() ? "selected" : null)">@f</option>
+
+        }
+    </select>
+    <button class="btn btn-warning">Filter</button>
+</form>
+
+<div class="top-list-container">
+    @foreach(var team in Model.Select((value,index)=> new {value,index}))
+    {
+        <div class="team-card" onclick="location.href='@Url.Action("TeamDetails", "UserPortal", new { id = team.value.TeamId })'">
+            <img src="@(string.IsNullOrEmpty(team.value.ImageUrl) ? "/images/default-team.png" : team.value.ImageUrl)" class="team-logo" />
+            <div class="team-info">
+                <h5>@team.value.TeamName</h5>
+                <p>@team.value.Country • Coach: @team.value.Coach</p>
+            </div>
+            <div class="team-badge">
+                <span>@team.value.Players.Count Players</span>
+                @if (team.index == 0)
+                {
+                    <span class="ms-2">🥇</span>
+                }
+                else if (team.index == 1)
+                {
+
+                    <span class="ms-2">🥈</span>
+                }
+                else if (team.index == 2)
+                {
+
+                    <span class="ms-2">🥉</span>
+                }
+            </div>
+        </div>
+
+    }
+</div>

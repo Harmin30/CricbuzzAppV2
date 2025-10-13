@@ -160,10 +160,11 @@
                 <div class="card-body">
                     <h4>Top Batsmen</h4>
                     <p>Track the leading run scorers and their record-breaking innings.</p>
-                    <a class="btn btn-cricbuzz" href="#">View Top Batsmen</a>
+                    <a class="btn btn-cricbuzz" href="@Url.Action("TopBatsmen", "UserPortal")">View Top Batsmen</a>
                 </div>
             </div>
         </div>
+
 
         <!-- Top Bowlers Card -->
         <div class="col-md-4">
@@ -174,7 +175,21 @@
                 <div class="card-body">
                     <h4>Top Bowlers</h4>
                     <p>Explore top wicket-takers and their best bowling performances.</p>
-                    <a class="btn btn-cricbuzz" href="#">View Top Bowlers</a>
+                    <a class="btn btn-cricbuzz" href="@Url.Action("TopBowlers", "UserPortal")">View Top Bowlers</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Teams Card -->
+        <div class="col-md-4">
+            <div class="card feature-card shadow-sm p-4 h-100">
+                <div class="feature-icon mb-3">
+                    <i class="bi bi-flag-fill"></i>
+                </div>
+                <div class="card-body">
+                    <h4>Top Teams</h4>
+                    <p>Check out the strongest teams and their player lineups.</p>
+                    <a class="btn btn-cricbuzz" href="@Url.Action("TopTeams", "UserPortal")">View Top Teams</a>
                 </div>
             </div>
         </div>

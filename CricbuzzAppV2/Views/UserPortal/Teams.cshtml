@@ -6,68 +6,114 @@
 }
 
 <style>
-    .team-card {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-        overflow: hidden;
-        transition: transform 0.3s, box-shadow 0.3s;
-        cursor: pointer;
+    /* Back button */
+    .btn-back {
+        display: inline-block;
         margin-bottom: 20px;
+        background-color: #00a651;
+        color: white;
+        border-radius: 25px;
+        padding: 10px 20px;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+        .btn-back:hover {
+            background-color: #007e3e;
+            color: white;
+        }
+
+    /* Team Cards Container */
+    .top-list-container {
+        margin-top: 10px;
+    }
+
+    /* Team Card */
+    .team-card {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin-bottom: 15px;
+        transition: 0.3s;
+        background: #fff;
+        cursor: pointer;
     }
 
         .team-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
 
-    .team-card-header {
-        background: linear-gradient(135deg, #00a651, #007e3e);
-        color: white;
-        padding: 20px;
-        text-align: center;
-        font-weight: 700;
-        font-size: 1.3rem;
-    }
-
-    .team-card-body {
-        padding: 15px 20px;
-    }
-
-    .stat-item {
-        display: inline-block;
+    /* Team Logo */
+    .team-logo {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
         margin-right: 15px;
-        font-size: 0.95rem;
+        border-radius: 50%;
+        border: 2px solid #ffc107;
+    }
+
+    /* Team Info */
+    .team-info h5 {
+        margin: 0;
         font-weight: 600;
     }
 
-    @@media (max-width: 768px) {
-        .stat-item
-
-    {
-        display: block;
-        margin: 5px 0;
+    .team-info p {
+        margin: 0;
+        color: #666;
+        font-size: 0.9rem;
     }
 
+    /* Ranking Badge */
+    .team-badge {
+        margin-left: auto;
+        text-align: right;
     }
+
+        .team-badge span {
+            display: inline-block;
+            background-color: #ffc107;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
 </style>
-<a href="@Url.Action("Index", "UserPortal")" class="btn btn-success mb-4">← Back to Home</a>
 
-<h1 class="mb-4 text-success text-center">🏆 Teams</h1>
+<a href="@Url.Action("Index", "UserPortal")" class="btn-back">← Back to Home</a>
 
-<div class="row">
-    @foreach (var team in Model)
+<h2 class="text-warning mb-3">🏆 Teams</h2>
+
+<div class="top-list-container">
+    @foreach (var team in Model.Select((value, index) => new { value, index }))
     {
-        <div class="col-md-4">
-            <div class="team-card" onclick="location.href='@Url.Action("TeamDetails", "UserPortal", new { id = team.TeamId })'">
-                <div class="team-card-header">
-                    @team.TeamName
-                </div>
-                <div class="team-card-body">
-                    <p><strong>Country:</strong> @team.Country</p>
-                    <p><strong>Coach:</strong> @team.Coach</p>
-                    <p><strong>Players:</strong> @team.Players.Count()</p>
-                </div>
+        <div class="team-card" onclick="location.href='@Url.Action("TeamDetails", "UserPortal", new { id = team.value.TeamId })'">
+            <img src="@(string.IsNullOrEmpty(team.ImageUrl) ? "/images/default-team.png" : team.ImageUrl)" class="team-logo" alt="@team.TeamName Logo" />
+            <div class="team-info">
+                <h5>@team.value.TeamName</h5>
+                <p>@team.value.Country • Coach: @team.value.Coach</p>
+            </div>
+            <div class="team-badge">
+                <span>@team.value.Players.Count Players</span>
+                @if (team.index == 0)
+                {
+                    <span class="ms-2">🥇</span>
+                }
+                else if (team.index == 1)
+                {
+
+                    <span class="ms-2">🥈</span>
+                }
+                else if (team.index == 2)
+                {
+
+                    <span class="ms-2">🥉</span>
+                }
             </div>
         </div>
     }

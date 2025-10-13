@@ -144,6 +144,72 @@ namespace CricbuzzAppV2.Controllers
             return View(team); // Views/UserPortal/TeamDetails.cshtml
         }
 
+        // Top Batsmen
+        public IActionResult TopBatsmen(string? format)
+        {
+            var batsmen = _context.PlayerStats
+                .Include(ps => ps.Player)
+                .ThenInclude(p => p.Team)
+                .Where(ps => ps.Runs > 0) // only players who batted
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(format) && Enum.TryParse<PlayerStats.CricketFormat>(format, out var selectedFormat))
+            {
+                batsmen = batsmen.Where(ps => ps.Format == selectedFormat);
+            }
+
+            var result = batsmen.OrderByDescending(ps => ps.Runs).ToList();
+            ViewBag.SelectedFormat = format;
+            return View(result);
+        }
+
+        // Top Bowlers
+        public IActionResult TopBowlers(string? format)
+        {
+            var bowlers = _context.PlayerStats
+                .Include(ps => ps.Player)
+                .ThenInclude(p => p.Team)
+                .Where(ps => ps.Wickets > 0) // only players who bowled
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(format) && Enum.TryParse<PlayerStats.CricketFormat>(format, out var selectedFormat))
+            {
+                bowlers = bowlers.Where(ps => ps.Format == selectedFormat);
+            }
+
+            var result = bowlers.OrderByDescending(ps => ps.Wickets).ToList();
+            ViewBag.SelectedFormat = format;
+            return View(result);
+        }
+
+        // Top Teams
+        public IActionResult TopTeams(string? format)
+        {
+            // Teams ranked by total runs or wins (example: total runs in selected format)
+            var teams = _context.Teams
+                .Include(t => t.Players)
+                    .ThenInclude(p => p.PlayerStats)
+                .ToList();
+
+            if (!string.IsNullOrEmpty(format) && Enum.TryParse<PlayerStats.CricketFormat>(format, out var selectedFormat))
+            {
+                teams = teams
+                    .OrderByDescending(t => t.Players
+                        .SelectMany(p => p.PlayerStats)
+                        .Where(ps => ps.Format == selectedFormat)
+                        .Sum(ps => ps.Runs)) // total team runs in format
+                    .ToList();
+            }
+            else
+            {
+                teams = teams
+                    .OrderByDescending(t => t.Players.Sum(p => p.PlayerStats.Sum(ps => ps.Runs)))
+                    .ToList();
+            }
+
+            ViewBag.SelectedFormat = format;
+            return View(teams);
+        }
 
 
         // ✏️ Player CRUD - Edit
