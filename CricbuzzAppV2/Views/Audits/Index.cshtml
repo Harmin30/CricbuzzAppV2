@@ -4,90 +4,102 @@
     ViewData["Title"] = "Activity Logs";
 }
 
-<div class="container">
-    <h2 class="mb-4">?? Activity Logs</h2>
 
-    <!-- Filters -->
-    <div class="card shadow-sm mb-4">
         <div class="card-body">
-          <form method="get" class="row g-3">
+            <form method="get" class="row g-3">
                 <!-- Search -->
-     <div class="col-md-4">
-    <label class="form-label">Search</label>
-            <input type="text" name="searchString" class="form-control" placeholder="Search users, entities, or details..." value="@Context.Request.Query["searchString"]">
-         </div>
+                <div class="col-md-4">
+                </div>
 
- <!-- Action Filter -->
-    <div class="col-md-3">
-        <label class="form-label">Action</label>
- <select name="filterAction" class="form-select">
-     <option value="">All Actions</option>
-      @foreach (var action in ViewBag.Actions)
-       {
-   <option value="@action" selected="@(Context.Request.Query["filterAction"] == action)">@action</option>
-         }
-      </select>
-      </div>
-
-             <!-- Entity Filter -->
+                <!-- Action Filter -->
                 <div class="col-md-3">
-            <label class="form-label">Entity</label>
-             <select name="filterEntity" class="form-select">
-        <option value="">All Entities</option>
-     @foreach (var entity in ViewBag.Entities)
-     {
-      <option value="@entity" selected="@(Context.Request.Query["filterEntity"] == entity)">@entity</option>
-        }
-                 </select>
-       </div>
+                        <option value="">All Actions</option>
+                        @foreach (var action in ViewBag.Actions)
+                        {
+                        }
+                    </select>
+                </div>
 
-         <!-- Apply Filters Button -->
-        <div class="col-md-2 d-flex align-items-end">
-       <button type="submit" class="btn btn-primary w-100">
-     <i class="bi bi-funnel-fill"></i> Apply Filters
-           </button>
-    </div>
+                <!-- Entity Filter -->
+                <div class="col-md-3">
+                        <option value="">All Entities</option>
+                        @foreach (var entity in ViewBag.Entities)
+                        {
+                        }
+                    </select>
+                </div>
+
+                <!-- Apply Filters Button -->
+                <div class="col-md-2 d-flex align-items-end">
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 
     <!-- Logs Table -->
-    <div class="card shadow-sm">
-    <div class="card-body">
-         <div class="table-responsive">
-          <table class="table table-hover">
-    <thead>
-            <tr>
-      <th>Timestamp</th>
-      <th>User</th>
-        <th>Action</th>
-           <th>Entity</th>
-       <th>Entity ID</th>
-         <th>Details</th>
-       </tr>
-       </thead>
-              <tbody>
-     @foreach (var item in Model)
-         {
-   <tr>
-     <td>@item.Timestamp.ToString("MM/dd/yyyy HH:mm:ss")</td>
-          <td>@item.UserName</td>
-  <td>
- <span class="badge rounded-pill @(item.Action switch {
-               "Created" => "bg-success",
-       "Updated" => "bg-primary",
-         "Deleted" => "bg-danger",
-    _ => "bg-secondary"
-     })">@item.Action</span>
-    </td>
-        <td>@item.EntityName</td>
-            <td>@item.EntityId</td>
-          <td>@item.Details</td>
-          </tr>
-      }
-         </tbody>
-         </table>
+        <div class="card-body">
+            <div class="table-responsive">
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Entity</th>
+                            <th>Entity ID</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                    No activity logs found.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                    </td>
+                                    <td>@item.EntityName</td>
+                                    <td>@item.EntityId</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Optional Custom CSS -->
+<style>
+    .card {
+        border-radius: 1rem;
+    }
+
+    .table thead th {
+        background-color: #eaf3ff;
+        font-weight: 600;
+        vertical-align: middle;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8faff;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    .form-label {
+        font-size: 0.9rem;
+    }
+
+    input.form-control, select.form-select {
+        border-radius: 0.5rem;
+    }
+</style>

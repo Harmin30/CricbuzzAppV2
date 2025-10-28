@@ -7,9 +7,7 @@
 <h2 class="mb-4">➕ Add New Player</h2>
 
 <div class="card shadow-sm p-4">
-    <form asp-action="Create" method="post">
-        @Html.AntiForgeryToken()
-
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
         <!-- Full Name -->
         <div class="mb-3">
             <label asp-for="FullName" class="form-label"></label>
@@ -34,27 +32,110 @@
         <div class="mb-3">
             <label asp-for="TeamId" class="form-label">Team</label>
             <select asp-for="TeamId" class="form-select"
-                    asp-items="@(new SelectList(ViewData["Teams"] as List<CricbuzzAppV2.Models.Team>, "TeamId", "TeamName"))">
+                    asp-items="@(new SelectList(ViewBag.Teams, "TeamId", "TeamName"))">
                 <option value="">-- Select Team --</option>
             </select>
             <span asp-validation-for="TeamId" class="text-danger"></span>
         </div>
 
-        <!-- Image URL -->
-        <div class="mb-3">
-            <label asp-for="ImageUrl" class="form-label">Image URL</label>
-            <input asp-for="ImageUrl" class="form-control" placeholder="Enter image URL or leave blank" />
-            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+        <!-- Image Upload Section -->
+        <div class="mb-4">
+            <label class="form-label">Player Image</label>
+
+            <!-- Image Preview -->
+            <div class="mb-3">
+                <img id="imagePreview" 
+                     src="/images/default-player.png"
+                     class="rounded-circle border"
+                     style="width: 100px; height: 100px; object-fit: cover;"
+                     onerror="this.src='/images/default-player.png'; showImageError();" />
+            </div>
+
+            <!-- Image Upload Options -->
+            <div class="row g-3">
+                <!-- File Upload Option -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title mb-3">Option 1: Upload Image</h6>
+                            <div class="d-flex gap-2 align-items-center">
+                                <input type="file" name="ImageFile" id="imageFile" class="form-control" 
+                                       accept="image/*" onchange="previewImage(this)" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- URL Option -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title mb-3">Option 2: Image URL</h6>
+                            <input type="url" name="ImageUrlInput" id="imageUrl" class="form-control" 
+                                   placeholder="Enter image URL (e.g., https://...)" 
+                                   onchange="previewImageUrl(this)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="imageError" class="text-danger mt-2" style="display: none;">
+                ⚠️ Unable to load image. Please check the file or URL and try again.
+            </div>
         </div>
 
-        <!-- Buttons -->
+        <!-- Submit Buttons -->
         <div class="d-flex gap-2">
             <button type="submit" class="btn btn-success">💾 Save</button>
-            <a asp-action="Index" class="btn btn-secondary">↩ Back</a>
+            <a asp-action="Index" class="btn btn-secondary">↩ Back to List</a>
         </div>
     </form>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        // Preview image from file upload
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').src = e.target.result;
+                    document.getElementById('imageUrl').value = ''; // Clear URL input
+                    document.getElementById('imageError').style.display = 'none';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Preview image from URL
+        function previewImageUrl(input) {
+            if (input.value) {
+                document.getElementById('imagePreview').src = input.value;
+                document.getElementById('imageFile').value = ''; // Clear file input
+                document.getElementById('imageError').style.display = 'none';
+            }
+        }
+
+        // Show error message when image fails to load
+        function showImageError() {
+            document.getElementById('imageError').style.display = 'block';
+        }
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const imageUrl = document.getElementById('imageUrl').value;
+            const imageFile = document.getElementById('imageFile').files[0];
+            
+            // If URL is provided but invalid
+            if (imageUrl && !imageFile) {
+                if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+                    e.preventDefault();
+                    alert('Please enter a valid image URL starting with http:// or https://');
+                }
+            }
+        });
+    </script>
 }
