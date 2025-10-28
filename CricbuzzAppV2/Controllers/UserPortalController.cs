@@ -15,9 +15,40 @@ namespace CricbuzzAppV2.Controllers
         }
 
         // 🏠 Home Page
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            // Optionally fetch top players or recent matches here
+            // Get statistics
+            ViewBag.ActivePlayers = await _context.Players.CountAsync();
+            ViewBag.TotalMatches = await _context.Matches.CountAsync();
+            ViewBag.TotalTeams = await _context.Teams.CountAsync();
+            ViewBag.TotalStats = await _context.PlayerStats.CountAsync();
+
+            // Get top performing players
+            ViewBag.TopBatsman = await _context.PlayerStats
+                .Include(ps => ps.Player)
+                .OrderByDescending(ps => ps.Runs)
+                .FirstOrDefaultAsync();
+
+            ViewBag.TopBowler = await _context.PlayerStats
+                .Include(ps => ps.Player)
+                .OrderByDescending(ps => ps.Wickets)
+                .FirstOrDefaultAsync();
+
+            // Get top team (team with most players)
+            ViewBag.TopTeam = await _context.Teams
+                .Include(t => t.Players)
+                .OrderByDescending(t => t.Players.Count)
+                .FirstOrDefaultAsync();
+
+            // Get recent matches
+            ViewBag.RecentMatches = await _context.Matches
+                .Include(m => m.TeamA)
+                .Include(m => m.TeamB)
+                .Include(m => m.WinnerTeam)
+                .OrderByDescending(m => m.Date)
+                .Take(5)
+                .ToListAsync();
+
             return View();
         }
 

@@ -2,30 +2,214 @@
 
 @{
     Layout = "_UserLayout";
-    ViewData["Title"] = "Matches";
+    ViewData["Title"] = "Cricket Matches";
+    var matchType = Context.Request.Query["matchType"].ToString();
+    var searchQuery = Context.Request.Query["search"].ToString();
+    var dateFilter = Context.Request.Query["dateFilter"].ToString();
 }
 
-<h2 class="text-center mb-4 text-success">📅 Recent Matches</h2>
-
-<div class="row">
-    @foreach (var match in Model)
-    {
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title">
-                        @match.TeamA?.TeamName vs @match.TeamB?.TeamName
-                    </h5>
-                    <p class="mb-1"><strong>Type:</strong> @match.MatchType</p>
-                    <p class="mb-1"><strong>Date:</strong> @match.Date.ToString("dd MMM yyyy")</p>
-                    <p class="mb-1"><strong>Venue:</strong> @match.Venue</p>
-                    @if (match.WinnerTeamId.HasValue)
-                    {
-                        <p class="text-success fw-bold">Winner: @match.WinnerTeam?.TeamName</p>
-                    }
-                    <a href="@Url.Action("MatchDetails", "UserPortal", new { id = match.MatchId })" class="btn btn-success btn-sm mt-2">View Details</a>
-                </div>
-            </div>
-        </div>
-    }
+<!-- Page Header -->
+<div class="matches-header">
+    <div class="container text-center">
+   <h1 class="h2 mb-2">Cricket Matches</h1>
+        <p class="mb-0">Stay updated with all cricket matches and scores</p>
+ </div>
 </div>
+
+<div class="container">
+    <!-- Search and Filters -->
+    <div class="match-filters">
+        <!-- Search Bar -->
+        <div class="search-container mb-3">
+  <form method="get" class="search-form">
+         <div class="input-group">
+     <input type="text" name="search" class="form-control" 
+       placeholder="Search matches by team name or venue..." 
+    value="@searchQuery">
+           <button class="btn btn-success" type="submit">
+        <i class="bi bi-search"></i> Search
+       </button>
+          </div>
+            </form>
+        </div>
+
+        <!-- Filter Pills -->
+  <div class="filter-pills">
+       <a href="@Url.Action("Matches", "UserPortal")" 
+      class="filter-pill @(string.IsNullOrEmpty(matchType) && string.IsNullOrEmpty(dateFilter) ? "active" : "")">
+                All Matches
+            </a>
+    <a href="@Url.Action("Matches", "UserPortal", new { dateFilter = "upcoming" })" 
+         class="filter-pill @(dateFilter == "upcoming" ? "active" : "")">
+         Upcoming
+</a>
+      <a href="@Url.Action("Matches", "UserPortal", new { dateFilter = "completed" })" 
+       class="filter-pill @(dateFilter == "completed" ? "active" : "")">
+      Completed
+  </a>
+   <a href="@Url.Action("Matches", "UserPortal", new { matchType = "Test" })" 
+    class="filter-pill @(matchType == "Test" ? "active" : "")">
+        Test
+            </a>
+ <a href="@Url.Action("Matches", "UserPortal", new { matchType = "ODI" })" 
+           class="filter-pill @(matchType == "ODI" ? "active" : "")">
+   ODI
+            </a>
+     <a href="@Url.Action("Matches", "UserPortal", new { matchType = "T20" })" 
+               class="filter-pill @(matchType == "T20" ? "active" : "")">
+          T20
+            </a>
+  </div>
+    </div>
+
+    <!-- Matches List -->
+    <div class="matches-container">
+        @{
+    var filteredMatches = Model.AsEnumerable();
+
+            // Apply search filter
+            if (!string.IsNullOrEmpty(searchQuery))
+    {
+        filteredMatches = filteredMatches.Where(m =>
+             (m.TeamA?.TeamName?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+           (m.TeamB?.TeamName?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+           (m.Venue?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false));
+            }
+
+            // Apply match type filter
+ if (!string.IsNullOrEmpty(matchType))
+     {
+                filteredMatches = filteredMatches.Where(m => m.MatchType == matchType);
+        }
+
+            // Apply date filter
+      if (!string.IsNullOrEmpty(dateFilter))
+   {
+        filteredMatches = dateFilter switch
+  {
+        "upcoming" => filteredMatches.Where(m => m.Date > DateTime.Now),
+         "completed" => filteredMatches.Where(m => m.Date < DateTime.Now),
+  _ => filteredMatches
+    };
+    }
+
+          foreach (var match in filteredMatches)
+            {
+    <div class="match-card-new">
+    <!-- Match Status Bar -->
+          <div class="match-status-bar">
+                 <span class="match-status">
+                @{
+             var status = match.Date.Date > DateTime.Today.Date ? "Upcoming" : "Completed";
+           var statusIcon = status == "Upcoming" ? "bi-calendar-event" : "bi-calendar-check";
+  }
+    <i class="bi @statusIcon"></i>
+      @status
+       </span>
+      <span class="match-type">@match.MatchType</span>
+         </div>
+
+                    <!-- Teams Section -->
+         <div class="match-teams-section">
+                 <div class="team-vs-container">
+     <!-- Team A -->
+      <div class="team-block">
+     <img src="@(string.IsNullOrEmpty(match.TeamA?.ImageUrl) ? "/images/default-team.png" : match.TeamA.ImageUrl)" 
+      alt="@match.TeamA?.TeamName" class="team-flag" />
+                 <div class="team-info">
+  <div class="team-name">@match.TeamA?.TeamName</div>
+@if (match.WinnerTeamId == match.TeamAId)
+          {
+          <div class="winner-tag">Winner</div>
+   }
+     </div>
+   </div>
+
+    <div class="vs-text">VS</div>
+
+    <!-- Team B -->
+             <div class="team-block">
+           <img src="@(string.IsNullOrEmpty(match.TeamB?.ImageUrl) ? "/images/default-team.png" : match.TeamB.ImageUrl)" 
+             alt="@match.TeamB?.TeamName" class="team-flag" />
+         <div class="team-info">
+  <div class="team-name">@match.TeamB?.TeamName</div>
+           @if (match.WinnerTeamId == match.TeamBId)
+        {
+    <div class="winner-tag">Winner</div>
+              }
+     </div>
+     </div>
+   </div>
+
+  <!-- Match Information -->
+      <div class="match-info-bar">
+  <div class="info-item">
+       <i class="bi bi-geo-alt"></i>
+              <span>@match.Venue</span>
+        </div>
+ <div class="info-item">
+            <i class="bi bi-calendar-event"></i>
+      <span>@match.Date.ToString("dd MMM yyyy")</span>
+              </div>
+               <div class="info-item">
+          <i class="bi bi-clock"></i>
+       <span>@match.Date.ToString("hh:mm tt")</span>
+ </div>
+     </div>
+
+       @if (match.Scorecards != null && match.Scorecards.Any())
+   {
+         <div class="match-stats-bar">
+  <div class="stat-block">
+     <div class="stat-number">@match.Scorecards.Sum(s => s.RunsScored ?? 0)</div>
+           <div class="stat-label">Total Runs</div>
+          </div>
+        <div class="stat-block">
+        <div class="stat-number">@match.Scorecards.Sum(s => s.WicketsTaken ?? 0)</div>
+  <div class="stat-label">Wickets</div>
+        </div>
+ <div class="stat-block">
+      <div class="stat-number">@match.Scorecards.Count()</div>
+    <div class="stat-label">Players</div>
+            </div>
+       </div>
+                }
+           </div>
+
+            <!-- View Details Link -->
+         <a href="@Url.Action("MatchDetails", "UserPortal", new { id = match.MatchId })" 
+              class="view-details-btn">
+     View Full Scorecard <i class="bi bi-arrow-right"></i>
+    </a>
+      </div>
+   }
+        }
+
+    @if (!filteredMatches.Any())
+        {
+            <div class="text-center my-5">
+       <div class="mb-4">
+         <i class="bi bi-calendar-x display-1 text-muted"></i>
+    </div>
+  <h3 class="text-muted">No matches found</h3>
+ <p class="text-muted">
+                    @if (!string.IsNullOrEmpty(searchQuery))
+           {
+        <span>No matches found for "@searchQuery". Try different search terms or </span>
+         <a href="@Url.Action("Matches", "UserPortal")" class="text-success">view all matches</a>
+   }
+  else
+             {
+              <span>Check back later for upcoming matches!</span>
+         }
+    </p>
+     </div>
+      }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Client-side filtering and search script can be added here if needed
+    </script>
+}

@@ -182,6 +182,50 @@ namespace CricbuzzAppV2.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: Scorecards/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var scorecard = await _context.Scorecards.FindAsync(id);
+            if (scorecard == null) return NotFound();
+
+            PopulateDropdowns(scorecard);
+            return View(scorecard);
+        }
+
+        // POST: Scorecards/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Scorecard scorecard)
+        {
+            if (id != scorecard.ScorecardId) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(scorecard);
+                    await _context.SaveChangesAsync();
+
+                    // Update player stats after editing
+                    await AppHelper.UpdatePlayerStats(_context, scorecard);
+
+                    TempData["SuccessMessage"] = "✅ Scorecard updated successfully!";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Scorecards.Any(e => e.ScorecardId == scorecard.ScorecardId))
+                        return NotFound();
+                    else
+                        throw;
+                }
+            }
+
+            PopulateDropdowns(scorecard);
+            return View(scorecard);
+        }
 
 
 

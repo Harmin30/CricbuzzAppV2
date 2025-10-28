@@ -10,15 +10,54 @@
     <!-- Animated Cricket Balls -->
     <div class="cricket-ball ball1"></div>
     <div class="cricket-ball ball2"></div>
-    <div class="cricket-ball ball3"></div>
+  <div class="cricket-ball ball3"></div>
 
-    <div class="container hero-content">
-        <h1 class="display-4 fw-bold mb-3">Welcome to Cricbuzz App 🏏</h1>
-        <p class="lead fs-5 mb-4">
-            Your all-in-one hub for cricket stats, match insights, and top performances.
-        </p>
-        <a href="@Url.Action("TopBatsmen", "UserPortal")" class="btn btn-cricbuzz btn-lg px-4 me-2">Explore Top Batsmen</a>
-        <a href="@Url.Action("TopBowlers", "UserPortal")" class="btn btn-cricbuzz btn-lg px-4">Explore Top Bowlers</a>
+<div class="container hero-content text-center">
+        <h1 class="display-4 fw-bold mb-4">Welcome to Cricbuzz App 🏏</h1>
+<p class="lead fs-5 mb-5 mx-auto">
+            Your ultimate destination for live cricket scores, player statistics, and comprehensive match analysis. 
+ Experience cricket like never before!
+     </p>
+        <div class="d-flex justify-content-center gap-3">
+      <a href="@Url.Action("TopBatsmen", "UserPortal")" class="btn btn-cricbuzz btn-lg">
+       <i class="bi bi-trophy me-2"></i>Top Batsmen
+    </a>
+       <a href="@Url.Action("TopBowlers", "UserPortal")" class="btn btn-cricbuzz btn-lg">
+<i class="bi bi-bullseye me-2"></i>Top Bowlers
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Counter Section -->
+<section class="stats-counter">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 col-6">
+      <div class="stats-item">
+        <div class="number">@ViewBag.ActivePlayers</div>
+        <div class="label">Active Players</div>
+       </div>
+            </div>
+  <div class="col-md-3 col-6">
+          <div class="stats-item">
+  <div class="number">@ViewBag.TotalMatches</div>
+          <div class="label">Matches</div>
+    </div>
+          </div>
+  <div class="col-md-3 col-6">
+          <div class="stats-item">
+      <div class="number">@ViewBag.TotalTeams</div>
+  <div class="label">Teams</div>
+  </div>
+       </div>
+  <div class="col-md-3 col-6">
+          <div class="stats-item">
+         <div class="number">@ViewBag.TotalStats</div>
+    <div class="label">Statistics</div>
+      </div>
+          </div>
+        </div>
     </div>
 </section>
 
@@ -26,46 +65,128 @@
 <section class="container my-5">
     <h2 class="text-center mb-5 section-title">Explore Cricket Insights</h2>
 
-    <div class="row g-4 text-center">
-        <!-- Top Batsmen Card -->
+    <div class="row g-4">
+<!-- Top Batsmen Card -->
         <div class="col-md-4">
-            <div class="card feature-card shadow-sm p-4 h-100">
-                <div class="feature-icon mb-3"><i class="bi bi-trophy-fill"></i></div>
-                <div class="card-body">
-                    <h4>Top Batsmen</h4>
-                    <p>Track the leading run scorers and their record-breaking innings.</p>
-                    <a class="btn btn-cricbuzz" href="@Url.Action("TopBatsmen", "UserPortal")">View Top Batsmen</a>
-                </div>
-            </div>
+            <div class="feature-card shadow-sm p-4 h-100 d-flex flex-column">
+       <div class="text-center">
+           <div class="feature-icon mb-3">
+  <i class="bi bi-trophy-fill"></i>
+    </div>
+   <h4 class="mb-3">Top Batsmen</h4>
+         <p class="mb-3">Discover cricket's finest batsmen, their records, and remarkable achievements.</p>
+         @if (ViewBag.TopBatsman != null)
+         {
+         <div class="mb-3">
+     <p class="mb-2">Current Leader: <strong>@ViewBag.TopBatsman.Player?.FullName</strong></p>
+              <p class="text-success mb-0">@ViewBag.TopBatsman.Runs Runs</p>
+     </div>
+        }
+   </div>
+         <div class="mt-auto text-center">
+         <a href="@Url.Action("TopBatsmen", "UserPortal")" class="btn btn-cricbuzz">
+      <i class="bi bi-arrow-right-circle me-2"></i>View Rankings
+        </a>
+         </div>
+       </div>
         </div>
 
         <!-- Top Bowlers Card -->
         <div class="col-md-4">
-            <div class="card feature-card shadow-sm p-4 h-100">
-                <div class="feature-icon mb-3"><i class="bi bi-bullseye"></i></div>
-                <div class="card-body">
-                    <h4>Top Bowlers</h4>
-                    <p>Explore top wicket-takers and their best bowling performances.</p>
-                    <a class="btn btn-cricbuzz" href="@Url.Action("TopBowlers", "UserPortal")">View Top Bowlers</a>
-                </div>
-            </div>
+     <div class="feature-card shadow-sm p-4 h-100 d-flex flex-column">
+      <div class="text-center">
+   <div class="feature-icon mb-3">
+   <i class="bi bi-bullseye"></i>
+    </div>
+                    <h4 class="mb-3">Top Bowlers</h4>
+    <p class="mb-3">Explore the world's leading bowlers, their wicket tallies, and bowling averages.</p>
+         @if (ViewBag.TopBowler != null)
+       {
+         <div class="mb-3">
+            <p class="mb-2">Current Leader: <strong>@ViewBag.TopBowler.Player?.FullName</strong></p>
+     <p class="text-success mb-0">@ViewBag.TopBowler.Wickets Wickets</p>
         </div>
+          }
+     </div>
+     <div class="mt-auto text-center">
+        <a href="@Url.Action("TopBowlers", "UserPortal")" class="btn btn-cricbuzz">
+              <i class="bi bi-arrow-right-circle me-2"></i>View Rankings
+     </a>
+     </div>
+   </div>
+  </div>
 
         <!-- Top Teams Card -->
         <div class="col-md-4">
-            <div class="card feature-card shadow-sm p-4 h-100">
-                <div class="feature-icon mb-3"><i class="bi bi-flag-fill"></i></div>
-                <div class="card-body">
-                    <h4>Top Teams</h4>
-                    <p>Check out the strongest teams and their player lineups.</p>
-                    <a class="btn btn-cricbuzz" href="@Url.Action("TopTeams", "UserPortal")">View Top Teams</a>
-                </div>
+            <div class="feature-card shadow-sm p-4 h-100 d-flex flex-column">
+  <div class="text-center">
+            <div class="feature-icon mb-3">
+         <i class="bi bi-flag-fill"></i>
+  </div>
+  <h4 class="mb-3">Top Teams</h4>
+    <p class="mb-3">Discover the leading cricket teams, their achievements, and player lineups.</p>
+     @if (ViewBag.TopTeam != null)
+        {
+  <div class="mb-3">
+        <p class="mb-2">Current Leader: <strong>@ViewBag.TopTeam?.TeamName</strong></p>
+         <p class="text-success mb-0">@ViewBag.TopTeam?.Players?.Count Players</p>
+               </div>
+        }
             </div>
-        </div>
+            <div class="mt-auto text-center">
+          <a href="@Url.Action("Teams", "UserPortal")" class="btn btn-cricbuzz">
+         <i class="bi bi-arrow-right-circle me-2"></i>View Rankings
+          </a>
+      </div>
+    </div>
+   </div>
     </div>
 </section>
 
-<!-- Footer Section -->
-<footer class="text-center py-4 mt-5 border-top">
-    <p class="mb-0 text-muted">© @DateTime.Now.Year Cricbuzz App — Built for Cricket Lovers 🏏</p>
+<!-- Recent Matches Section -->
+@if (ViewBag.RecentMatches != null && ViewBag.RecentMatches.Count > 0)
+{
+    <section class="container my-5">
+<h3 class="text-center mb-4">Recent Matches</h3>
+   <div class="row">
+            @foreach (var match in ViewBag.RecentMatches)
+            {
+         <div class="col-md-6 mb-3">
+        <div class="card shadow-sm">
+     <div class="card-body">
+           <h5 class="card-title">@match.TeamA?.TeamName vs @match.TeamB?.TeamName</h5>
+        <p class="card-text">
+    <small class="text-muted">
+           <i class="bi bi-calendar3"></i> @match.Date.ToString("dd MMM yyyy")
+      <br />
+       <i class="bi bi-geo-alt"></i> @match.Venue
+     </small>
+                 </p>
+         @if (match.WinnerTeam != null)
+      {
+     <p class="mb-0 text-success">
+    <i class="bi bi-trophy-fill"></i> Winner: @match.WinnerTeam.TeamName
+    </p>
+           }
+     <a href="@Url.Action("MatchDetails", "UserPortal", new { id = match.MatchId })" 
+ class="btn btn-sm btn-cricbuzz mt-2">View Details</a>
+      </div>
+    </div>
+        </div>
+  }
+        </div>
+    </section>
+}
+
+<!-- Enhanced Footer -->
+<footer class="custom-footer">
+    <div class="container">
+    <div class="text-center">
+ <p class="mb-0">© @DateTime.Now.Year Cricbuzz App — Your Ultimate Cricket Companion 🏏</p>
+        </div>
+    </div>
 </footer>
+
+
+
+

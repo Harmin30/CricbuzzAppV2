@@ -1,0 +1,93 @@
+@model IEnumerable<CricbuzzAppV2.Models.Audit>
+
+@{
+    ViewData["Title"] = "Activity Logs";
+}
+
+<div class="container">
+    <h2 class="mb-4">?? Activity Logs</h2>
+
+    <!-- Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <form method="get" class="row g-3">
+                <!-- Search -->
+     <div class="col-md-4">
+    <label class="form-label">Search</label>
+            <input type="text" name="searchString" class="form-control" placeholder="Search users, entities, or details..." value="@Context.Request.Query["searchString"]">
+         </div>
+
+ <!-- Action Filter -->
+    <div class="col-md-3">
+        <label class="form-label">Action</label>
+ <select name="filterAction" class="form-select">
+     <option value="">All Actions</option>
+      @foreach (var action in ViewBag.Actions)
+       {
+   <option value="@action" selected="@(Context.Request.Query["filterAction"] == action)">@action</option>
+         }
+      </select>
+      </div>
+
+             <!-- Entity Filter -->
+                <div class="col-md-3">
+            <label class="form-label">Entity</label>
+             <select name="filterEntity" class="form-select">
+        <option value="">All Entities</option>
+     @foreach (var entity in ViewBag.Entities)
+     {
+      <option value="@entity" selected="@(Context.Request.Query["filterEntity"] == entity)">@entity</option>
+        }
+                 </select>
+       </div>
+
+         <!-- Apply Filters Button -->
+        <div class="col-md-2 d-flex align-items-end">
+       <button type="submit" class="btn btn-primary w-100">
+     <i class="bi bi-funnel-fill"></i> Apply Filters
+           </button>
+    </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Logs Table -->
+    <div class="card shadow-sm">
+    <div class="card-body">
+         <div class="table-responsive">
+          <table class="table table-hover">
+    <thead>
+            <tr>
+      <th>Timestamp</th>
+      <th>User</th>
+        <th>Action</th>
+           <th>Entity</th>
+       <th>Entity ID</th>
+         <th>Details</th>
+       </tr>
+       </thead>
+              <tbody>
+     @foreach (var item in Model)
+         {
+   <tr>
+     <td>@item.Timestamp.ToString("MM/dd/yyyy HH:mm:ss")</td>
+          <td>@item.UserName</td>
+  <td>
+ <span class="badge rounded-pill @(item.Action switch {
+               "Created" => "bg-success",
+       "Updated" => "bg-primary",
+         "Deleted" => "bg-danger",
+    _ => "bg-secondary"
+     })">@item.Action</span>
+    </td>
+        <td>@item.EntityName</td>
+            <td>@item.EntityId</td>
+          <td>@item.Details</td>
+          </tr>
+      }
+         </tbody>
+         </table>
+            </div>
+        </div>
+    </div>
+</div>

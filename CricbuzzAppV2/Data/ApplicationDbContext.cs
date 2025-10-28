@@ -1,8 +1,5 @@
 ﻿using CricbuzzAppV2.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Reflection.Emit;
-
 
 namespace CricbuzzAppV2.Data
 {
@@ -22,9 +19,7 @@ namespace CricbuzzAppV2.Data
         public DbSet<Scorecard> Scorecards { get; set; }
         public DbSet<PlayerPersonalInfo> PlayerPersonalInfos { get; set; }
         public DbSet<User> Users { get; set; }
-
-
-
+        public DbSet<Audit> Audits { get; set; } // New Audit DbSet
 
         // Optional: configure relationships
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -75,19 +70,9 @@ namespace CricbuzzAppV2.Data
             // PlayerStats -> Player
             modelBuilder.Entity<PlayerStats>()
                 .HasOne(ps => ps.Player)
-                .WithMany()
+                .WithMany(p => p.PlayerStats)
                 .HasForeignKey(ps => ps.PlayerId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            // Player ↔ PlayerPersonalInfo one-to-one
-            modelBuilder.Entity<PlayerStats>()
-    .HasOne(ps => ps.Player)
-    .WithMany(p => p.PlayerStats)
-    .HasForeignKey(ps => ps.PlayerId)
-    .OnDelete(DeleteBehavior.Cascade);
-
-
         }
-
     }
 }
