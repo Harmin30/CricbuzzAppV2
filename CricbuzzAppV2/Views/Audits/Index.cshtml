@@ -4,33 +4,69 @@
     ViewData["Title"] = "Activity Logs";
 }
 
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-success mb-1">
+                <i class="bi bi-activity me-2"></i> Activity Logs
+            </h2>
+            <p class="text-muted mb-0">Track every change, update, and deletion across the system.</p>
+        </div>
+        <div>
+            <a href="@Url.Action("Index", "Audits")" class="btn btn-outline-success btn-refresh">
+                <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+            </a>
+        </div>
+    </div>
 
+    <!-- Filters -->
+    <div class="card shadow-lg border-0 mb-4 filter-card">
         <div class="card-body">
-            <form method="get" class="row g-3">
+            <form method="get" class="row g-3 align-items-end">
                 <!-- Search -->
                 <div class="col-md-4">
+                    <label class="form-label fw-semibold text-success">Search</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-success text-white"><i class="bi bi-search"></i></span>
+                        <input type="text" name="searchString" class="form-control"
+                               placeholder="Search by user, entity, or details..."
+                               value="@Context.Request.Query["searchString"]">
+                    </div>
                 </div>
 
                 <!-- Action Filter -->
                 <div class="col-md-3">
+                    <label class="form-label fw-semibold text-success">Action</label>
+                    <select name="filterAction" class="form-select">
                         <option value="">All Actions</option>
                         @foreach (var action in ViewBag.Actions)
                         {
+                            <option value="@action" selected="@(Context.Request.Query["filterAction"] == action)">
+                                @action
+                            </option>
                         }
                     </select>
                 </div>
 
                 <!-- Entity Filter -->
                 <div class="col-md-3">
+                    <label class="form-label fw-semibold text-success">Entity</label>
+                    <select name="filterEntity" class="form-select">
                         <option value="">All Entities</option>
                         @foreach (var entity in ViewBag.Entities)
                         {
+                            <option value="@entity" selected="@(Context.Request.Query["filterEntity"] == entity)">
+                                @entity
+                            </option>
                         }
                     </select>
                 </div>
 
-                <!-- Apply Filters Button -->
-                <div class="col-md-2 d-flex align-items-end">
+                <!-- Apply Filters -->
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-success fw-semibold">
+                        <i class="bi bi-funnel-fill me-1"></i> Apply
                     </button>
                 </div>
             </form>
@@ -38,22 +74,28 @@
     </div>
 
     <!-- Logs Table -->
-        <div class="card-body">
+    <div class="card shadow-lg border-0 logs-card">
+        <div class="card-header bg-success text-white fw-semibold d-flex align-items-center">
+            <i class="bi bi-list-check me-2"></i> Recent Activities
+        </div>
+        <div class="card-body p-0">
             <div class="table-responsive">
+                <table class="table align-middle table-hover mb-0">
+                    <thead class="table-success text-dark">
                         <tr>
-                            <th>Timestamp</th>
-                            <th>User</th>
-                            <th>Action</th>
-                            <th>Entity</th>
-                            <th>Entity ID</th>
-                            <th>Details</th>
+                            <th><i class="bi bi-calendar3"></i> Timestamp</th>
+                            <th><i class="bi bi-person"></i> User</th>
+                            <th><i class="bi bi-clipboard-check"></i> Action</th>
+                            <th><i class="bi bi-database"></i> Entity</th>
+                            <th><i class="bi bi-hash"></i> Entity ID</th>
+                            <th><i class="bi bi-info-circle"></i> Details</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if (!Model.Any())
                         {
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-4">
+                                <td colspan="6" class="text-center py-4 text-muted">
                                     <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                                     No activity logs found.
                                 </td>
@@ -63,11 +105,28 @@
                         {
                             @foreach (var item in Model)
                             {
-                                <tr>
+                                <tr class="log-row">
+                                    <td>@item.Timestamp.ToString("MM/dd/yyyy HH:mm:ss")</td>
+                                    <td class="fw-semibold">@item.UserName</td>
                                     <td>
+                                        <span class="badge rounded-pill px-3 py-2 fs-6 @(item.Action switch {
+                                            "Created" => "bg-success-subtle text-success border border-success",
+                                            "Updated" => "bg-primary-subtle text-primary border border-primary",
+                                            "Deleted" => "bg-danger-subtle text-danger border border-danger",
+                                            _ => "bg-secondary-subtle text-secondary border border-secondary"
+                                        })">
+                                            <i class="bi @(item.Action switch {
+                                                "Created" => "bi-plus-circle",
+                                                "Updated" => "bi-pencil-square",
+                                                "Deleted" => "bi-trash3",
+                                                _ => "bi-info-circle"
+                                            }) me-1"></i>
+                                            @item.Action
+                                        </span>
                                     </td>
                                     <td>@item.EntityName</td>
-                                    <td>@item.EntityId</td>
+                                    <td><code>@item.EntityId</code></td>
+                                    <td>@item.Details</td>
                                 </tr>
                             }
                         }
@@ -78,28 +137,77 @@
     </div>
 </div>
 
-<!-- Optional Custom CSS -->
+<!-- Custom Styling -->
 <style>
-    .card {
-        border-radius: 1rem;
+    /* Header and Button */
+    .btn-refresh {
+        border-width: 2px;
+        transition: 0.3s;
+    }
+    .btn-refresh:hover {
+        background-color: #198754;
+        color: white;
+        transform: rotate(5deg);
+    }
+
+    /* Filter Card */
+    .filter-card {
+        border-left: 5px solid #198754;
+        transition: all 0.3s ease;
+    }
+
+    .filter-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(25, 135, 84, 0.2);
+    }
+
+    /* Logs Card */
+    .logs-card {
+        overflow: hidden;
+        border-top: 4px solid #198754;
+    }
+
+    .logs-card .card-header {
+        font-size: 1.1rem;
+        letter-spacing: 0.5px;
     }
 
     .table thead th {
-        background-color: #eaf3ff;
+        background: linear-gradient(90deg, #198754, #2c9e67);
+        color: white !important;
         font-weight: 600;
-        vertical-align: middle;
+        text-transform: uppercase;
     }
 
     .table-hover tbody tr:hover {
-        background-color: #f8faff;
-        transition: background-color 0.2s ease-in-out;
+        background-color: rgba(25, 135, 84, 0.08);
+        transition: 0.3s ease;
     }
 
-    .form-label {
+    .log-row td {
+        vertical-align: middle;
+    }
+
+    /* Add animation to row hover */
+    .log-row {
+        transition: all 0.2s ease;
+    }
+
+    .log-row:hover {
+        transform: scale(1.01);
+        background-color: rgba(25, 135, 84, 0.05);
+    }
+
+    code {
+        background-color: rgba(0, 0, 0, 0.05);
+        padding: 3px 6px;
+        border-radius: 5px;
         font-size: 0.9rem;
     }
 
-    input.form-control, select.form-select {
-        border-radius: 0.5rem;
+    @@media (max-width: 768px) {
+        .filter-card form .col-md-2 {
+            margin-top: 1rem;
+        }
     }
 </style>
