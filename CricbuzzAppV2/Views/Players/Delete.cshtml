@@ -4,32 +4,50 @@
     ViewData["Title"] = "Delete Player";
 }
 
-<h2 class="mb-4">🗑️ Delete Player</h2>
+<h2 class="mb-4 text-center text-danger">
+    <i class="fa-solid fa-trash me-2"></i>Delete Player
+</h2>
 
-<div class="card shadow-sm p-4">
-    <h5>Are you sure you want to delete this player?</h5>
+<div class="card shadow-sm mx-auto p-4"
+     style="max-width:600px;border-radius:16px;">
 
+    <!-- Player Preview -->
+    <div class="text-center mb-3">
+        <img src="@(string.IsNullOrEmpty(Model.ImageUrl)
+                         ? "https://static.vecteezy.com/system/resources/previews/036/280/651/original/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg"
+                         : Model.ImageUrl)"
+             class="rounded-circle border"
+             style="width:120px;height:120px;object-fit:cover;" />
+    </div>
+
+    <!-- Warning -->
+    <div class="alert alert-danger text-center">
+        <strong>Are you sure?</strong><br />
+        This action will permanently delete the player.
+    </div>
+
+    <!-- Player Info -->
     <dl class="row mt-3">
-        <dt class="col-sm-3">Full Name</dt>
-        <dd class="col-sm-9">@Model.FullName</dd>
+        <dt class="col-sm-4">Full Name</dt>
+        <dd class="col-sm-8 fw-semibold">@Model.FullName</dd>
 
-        <dt class="col-sm-3">Role</dt>
-        <dd class="col-sm-9">@Model.Role</dd>
+        <dt class="col-sm-4">Role</dt>
+        <dd class="col-sm-8">@Model.Role</dd>
 
-        <dt class="col-sm-3">Team</dt>
-        <dd class="col-sm-9">@Model.Team?.TeamName</dd>
-
-        <dt class="col-sm-3">Image URL</dt>
-        <dd class="col-sm-9">@Model.ImageUrl</dd>
+        <dt class="col-sm-4">Team</dt>
+        <dd class="col-sm-8">@Model.Team?.TeamName</dd>
     </dl>
 
-    <form asp-action="Delete" method="post">
-        @Html.AntiForgeryToken()
+    <!-- Actions -->
+    <form asp-action="Delete" method="post" class="text-center mt-4">
         <input type="hidden" asp-for="PlayerId" />
 
-        <div class="d-flex gap-2 mt-3">
-            <button type="submit" class="btn btn-danger">🗑️ Confirm Delete</button>
-            <a asp-action="Index" class="btn btn-secondary">↩ Cancel</a>
-        </div>
+        <button type="submit" class="btn btn-danger px-4 me-2">
+            Delete Player
+        </button>
+
+        <a asp-action="Index" class="btn btn-outline-secondary px-4">
+            Cancel
+        </a>
     </form>
 </div>

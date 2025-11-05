@@ -52,7 +52,7 @@
 
             <div class="row align-items-center g-4 mt-2">
 
-                <!-- LEFT: Image Preview -->
+                <!-- Image Preview -->
                 <div class="col-md-4 text-center">
                     <img id="logoPreview"
                          src="https://th.bing.com/th/id/OIP.FuJz0KDQ05jfCqQmo1rypwAAAA?w=167&h=176&c=7&r=0&o=7&pid=1.7&rm=3"
@@ -60,38 +60,64 @@
                          style="width:140px;height:140px;object-fit:cover;" />
                 </div>
 
-                <!-- RIGHT: Options -->
+                <!-- Options -->
                 <div class="col-md-8">
-                    <div class="mb-3">
-                        <input asp-for="ImageFile"
-                               id="imageFile"
-                               class="form-control"
-                               type="file"
-                               accept="image/*"
-                               onchange="previewImage(this)" />
-                        <small class="text-muted">
+
+                    <!-- File + ❌ -->
+                    <div class="mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <input asp-for="ImageFile"
+                                   id="imageFile"
+                                   class="form-control"
+                                   type="file"
+                                   accept="image/*"
+                                   onchange="previewImage()" />
+
+                            <button type="button"
+                                    id="removeFileBtn"
+                                    class="btn btn-outline-danger btn-sm"
+                                    onclick="removeFile()"
+                                    style="display:none;">
+                                &times;
+                            </button>
+                        </div>
+
+                        <small class="text-muted d-block mt-1">
                             Upload an image from your device
                         </small>
                     </div>
 
                     <div class="text-center text-muted my-2">— OR —</div>
 
-                    <div>
-                        <input asp-for="ImageUrlInput"
-                               id="imageUrl"
-                               class="form-control"
-                               placeholder="Paste an image link"
-                               onchange="previewImageUrl(this)" />
-                        <small class="text-muted">
+                    <!-- URL + ❌ -->
+                    <div class="mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <input asp-for="ImageUrlInput"
+                                   id="imageUrl"
+                                   class="form-control"
+                                   placeholder="Paste an image link"
+                                   onchange="previewImageUrl()" />
+
+                            <button type="button"
+                                    id="removeUrlBtn"
+                                    class="btn btn-outline-danger btn-sm"
+                                    onclick="removeUrl()"
+                                    style="display:none;">
+                                &times;
+                            </button>
+                        </div>
+
+                        <small class="text-muted d-block mt-1">
                             Use an image link from the web
                         </small>
                     </div>
 
-                    <!-- Priority Info Message -->
+                    <!-- Priority Info -->
                     <div id="priorityInfo"
-                         class="text-info small mt-2"
-                         style="display:none;">
-                        ℹ️ If you use both options, the uploaded image will be used.
+                         class="alert alert-info py-2 small mt-2"
+                         style="opacity:0.9;display:none;">
+                        <i class="fa-solid fa-circle-info me-1"></i>
+                        If you use both options, the uploaded image will be used.
                     </div>
 
                     <div id="imageError"
@@ -100,9 +126,9 @@
                         Unable to load the image from the link.
                     </div>
                 </div>
-
             </div>
         </div>
+
 
 
         <div class="d-flex justify-content-center gap-3 mt-4">
@@ -121,55 +147,70 @@
 
     <script>
         const preview = document.getElementById("logoPreview");
-        const imageError = document.getElementById("imageError");
-        const priorityInfo = document.getElementById("priorityInfo");
         const imageFile = document.getElementById("imageFile");
         const imageUrl = document.getElementById("imageUrl");
 
-        function previewImage(input) {
-            if (!input.files || !input.files[0]) return;
+        const removeFileBtn = document.getElementById("removeFileBtn");
+        const removeUrlBtn = document.getElementById("removeUrlBtn");
 
-            const reader = new FileReader();
-            reader.onload = e => {
-                preview.src = e.target.result;
-                imageError.style.display = "none";
+        const priorityInfo = document.getElementById("priorityInfo");
+        const imageError = document.getElementById("imageError");
 
-                // If URL already exists → show info message
-                if (imageUrl.value.trim() !== "") {
-                    priorityInfo.style.display = "block";
-                } else {
-                    priorityInfo.style.display = "none";
-                }
-            };
-            reader.readAsDataURL(input.files[0]);
+        const defaultImage =
+            "https://th.bing.com/th/id/OIP.FuJz0KDQ05jfCqQmo1rypwAAAA?w=167&h=176&c=7&r=0&o=7&pid=1.7&rm=3";
+
+        function updatePreview() {
+            if (imageFile.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = e => preview.src = e.target.result;
+                reader.readAsDataURL(imageFile.files[0]);
+            }
+            else if (imageUrl.value.trim() !== "") {
+                preview.src = imageUrl.value;
+            }
+            else {
+                preview.src = defaultImage;
+            }
+
+            priorityInfo.style.display =
+                (imageFile.files.length > 0 && imageUrl.value.trim() !== "")
+                    ? "block"
+                    : "none";
         }
 
-        function previewImageUrl(input) {
-            if (!input.value) {
-                priorityInfo.style.display = "none";
-                return;
-            }
+        function previewImage() {
+            removeFileBtn.style.display = "inline-block";
+            imageError.style.display = "none";
+            updatePreview();
+        }
+
+        function previewImageUrl() {
+            if (!imageUrl.value) return;
 
             const img = new Image();
             img.onload = () => {
-                preview.src = input.value;
+                removeUrlBtn.style.display = "inline-block";
                 imageError.style.display = "none";
-
-                // If file already exists → show info message
-                if (imageFile.files.length > 0) {
-                    priorityInfo.style.display = "block";
-                } else {
-                    priorityInfo.style.display = "none";
-                }
+                updatePreview();
             };
+            img.onerror = () => imageError.style.display = "block";
+            img.src = imageUrl.value;
+        }
 
-            img.onerror = () => {
-                imageError.style.display = "block";
-            };
+        function removeFile() {
+            imageFile.value = "";
+            removeFileBtn.style.display = "none";
+            updatePreview();
+        }
 
-            img.src = input.value;
+        function removeUrl() {
+            imageUrl.value = "";
+            removeUrlBtn.style.display = "none";
+            imageError.style.display = "none";
+            updatePreview();
         }
     </script>
+
 }
 
 

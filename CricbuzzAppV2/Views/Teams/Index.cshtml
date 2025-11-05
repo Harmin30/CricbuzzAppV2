@@ -31,7 +31,8 @@
 }
 
 <!-- Bulk Delete Form -->
-<form asp-action="DeleteSelected" method="post">
+<form asp-action="DeleteSelected" method="post" id="bulkDeleteForm">
+
 
     <div class="table-responsive">
         <table class="table table-hover table-bordered align-middle shadow-sm">
@@ -106,18 +107,83 @@
     <div class="mt-3">
         <button type="submit"
                 class="btn btn-danger"
-                onclick="return confirm('Are you sure you want to delete the selected teams?');">
             <i class="fa-solid fa-trash me-1"></i> Delete Selected
         </button>
     </div>
+    <!-- Bulk Delete Confirmation Modal -->
+    <div class="modal fade" id="bulkDeleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                        Confirm Deletion
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p class="mb-1">
+                        Are you sure you want to delete the selected team(s)?
+                    </p>
+                    <p class="text-muted mb-0">
+                        This action <strong>cannot be undone</strong>.
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="button" id="confirmBulkDelete" class="btn btn-danger">
+                        <i class="fa-solid fa-trash me-1"></i> Delete
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 
 </form>
 
 @section Scripts {
     <script>
-        document.getElementById("selectAll").addEventListener("change", function () {
-            const checkboxes = document.querySelectorAll("input[name='selectedIds']");
-            checkboxes.forEach(cb => cb.checked = this.checked);
+        const bulkForm = document.getElementById("bulkDeleteForm");
+        const selectAll = document.getElementById("selectAll");
+        const modalElement = document.getElementById("bulkDeleteModal");
+        const confirmBtn = document.getElementById("confirmBulkDelete");
+
+        const modal = new bootstrap.Modal(modalElement);
+
+        // Select all logic
+        selectAll.addEventListener("change", function () {
+            document.querySelectorAll("input[name='selectedIds']")
+                .forEach(cb => cb.checked = this.checked);
+        });
+
+        // Intercept form submit
+        bulkForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const selected = document.querySelectorAll("input[name='selectedIds']:checked");
+
+            if (selected.length === 0) {
+                alert("⚠️ Please select at least one team to delete.");
+                return;
+            }
+
+            modal.show();
+        });
+
+        // Confirm delete
+        confirmBtn.addEventListener("click", function () {
+            modal.hide();
+            bulkForm.submit();
         });
     </script>
 }
+
+

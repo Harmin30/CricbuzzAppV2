@@ -1,141 +1,200 @@
-﻿@model CricbuzzAppV2.Models.Player
+﻿@model CricbuzzAppV2.ViewModels.PlayerCreateViewModel
 
-@{
-    ViewData["Title"] = "Add Player";
-}
+<h2 class="mb-4 text-center">
+    <i class="fa-solid fa-plus me-1"></i>Add New Player
+</h2>
 
-<h2 class="mb-4">➕ Add New Player</h2>
-
-<div class="card shadow-sm p-4">
+<div class="card shadow-sm mx-auto p-4" style="max-width:720px;border-radius:16px;">
     <form asp-action="Create" method="post" enctype="multipart/form-data">
-        <!-- Full Name -->
-        <div class="mb-3">
-            <label asp-for="FullName" class="form-label"></label>
-            <input asp-for="FullName" class="form-control" placeholder="Enter full name" />
-            <span asp-validation-for="FullName" class="text-danger"></span>
-        </div>
 
-        <!-- Role Dropdown -->
-        <div class="mb-3">
-            <label asp-for="Role" class="form-label">Role</label>
-            <select asp-for="Role" class="form-select">
-                <option value="">-- Select Role --</option>
-                <option value="Batsman">Batsman</option>
-                <option value="Bowler">Bowler</option>
-                <option value="All-rounder">All-rounder</option>
-                <option value="Wicket-Keeper">Wicket-Keeper</option>
-            </select>
-            <span asp-validation-for="Role" class="text-danger"></span>
-        </div>
-
-        <!-- Team Dropdown -->
-        <div class="mb-3">
-            <label asp-for="TeamId" class="form-label">Team</label>
-            <select asp-for="TeamId" class="form-select"
-                    asp-items="@(new SelectList(ViewBag.Teams, "TeamId", "TeamName"))">
-                <option value="">-- Select Team --</option>
-            </select>
-            <span asp-validation-for="TeamId" class="text-danger"></span>
-        </div>
-
-        <!-- Image Upload Section -->
-        <div class="mb-4">
-            <label class="form-label">Player Image</label>
-
-            <!-- Image Preview -->
-            <div class="mb-3">
-                <img id="imagePreview" 
-                     src="/images/default-player.png"
-                     class="rounded-circle border"
-                     style="width: 100px; height: 100px; object-fit: cover;"
-                     onerror="this.src='/images/default-player.png'; showImageError();" />
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Full Name *</label>
+                <input asp-for="FullName" class="form-control" placeholder="Enter player name" />
+                <span asp-validation-for="FullName" class="text-danger small"></span>
             </div>
 
-            <!-- Image Upload Options -->
-            <div class="row g-3">
-                <!-- File Upload Option -->
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h6 class="card-title mb-3">Option 1: Upload Image</h6>
-                            <div class="d-flex gap-2 align-items-center">
-                                <input type="file" name="ImageFile" id="imageFile" class="form-control" 
-                                       accept="image/*" onchange="previewImage(this)" />
-                            </div>
-                        </div>
-                    </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Role *</label>
+                <select asp-for="Role" class="form-select">
+                    <option value="">Select role</option>
+                    <option>Batsman</option>
+                    <option>Bowler</option>
+                    <option>All-rounder</option>
+                    <option>Wicket-Keeper</option>
+                </select>
+                <span asp-validation-for="Role" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label fw-semibold">Team *</label>
+                <select asp-for="TeamId" class="form-select"
+                        asp-items="@(new SelectList(ViewBag.Teams, "TeamId", "TeamName"))">
+                    <option value="">Select team</option>
+                </select>
+                <span asp-validation-for="TeamId" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <!-- Image -->
+        <!-- Image -->
+        <div class="mt-4">
+            <label class="form-label fw-semibold text-center d-block">
+                Player Image
+            </label>
+
+            <div class="row align-items-center g-4 mt-2">
+                <div class="col-md-4 text-center">
+                    <img id="imagePreview"
+                         src="https://static.vecteezy.com/system/resources/previews/036/280/651/original/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg"
+                         class="rounded-circle border shadow-sm"
+                         style="width:140px;height:140px;object-fit:cover;" />
                 </div>
 
-                <!-- URL Option -->
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h6 class="card-title mb-3">Option 2: Image URL</h6>
-                            <input type="url" name="ImageUrlInput" id="imageUrl" class="form-control" 
-                                   placeholder="Enter image URL (e.g., https://...)" 
-                                   onchange="previewImageUrl(this)" />
+                <div class="col-md-8">
+
+                    <!-- File + ❌ -->
+                    <div class="mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <input asp-for="ImageFile"
+                                   id="imageFile"
+                                   class="form-control"
+                                   type="file"
+                                   accept="image/*"
+                                   onchange="previewImage()" />
+
+                            <button type="button"
+                                    id="removeFileBtn"
+                                    class="btn btn-outline-danger btn-sm"
+                                    onclick="removeFile()"
+                                    style="display:none;">
+                                &times;
+                            </button>
                         </div>
+
+                        <small class="text-muted d-block mt-1">
+                            Upload an image from your device
+                        </small>
+                    </div>
+
+                    <div class="text-center text-muted my-2">— OR —</div>
+
+                    <!-- URL + ❌ -->
+                    <div class="mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <input asp-for="ImageUrlInput"
+                                   id="imageUrl"
+                                   class="form-control"
+                                   placeholder="Paste an image link"
+                                   onchange="previewImageUrl()" />
+
+                            <button type="button"
+                                    id="removeUrlBtn"
+                                    class="btn btn-outline-danger btn-sm"
+                                    onclick="removeUrl()"
+                                    style="display:none;">
+                                &times;
+                            </button>
+                        </div>
+
+                        <small class="text-muted d-block mt-1">
+                            Use an image link from the web
+                        </small>
+                    </div>
+
+
+                    <!-- Priority Info -->
+                    <div id="priorityInfo"
+                         class="alert alert-info py-2 small mt-2"
+                         style="opacity:0.9;display:none;">
+                        <i class="fa-solid fa-circle-info me-1"></i>
+                        If you use both options, the uploaded image will be used.
+                    </div>
+
+                    <div id="imageError"
+                         class="text-danger small mt-2"
+                         style="display:none;">
+                        Unable to load the image from the link.
                     </div>
                 </div>
             </div>
-
-            <!-- Error Message -->
-            <div id="imageError" class="text-danger mt-2" style="display: none;">
-                ⚠️ Unable to load image. Please check the file or URL and try again.
-            </div>
         </div>
 
-        <!-- Submit Buttons -->
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-success">💾 Save</button>
-            <a asp-action="Index" class="btn btn-secondary">↩ Back to List</a>
+
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <button type="submit" class="btn btn-success px-4">Save</button>
+            <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
         </div>
     </form>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    
+
     <script>
-        // Preview image from file upload
-        function previewImage(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('imagePreview').src = e.target.result;
-                    document.getElementById('imageUrl').value = ''; // Clear URL input
-                    document.getElementById('imageError').style.display = 'none';
-                }
-                reader.readAsDataURL(input.files[0]);
+        const preview = document.getElementById("imagePreview");
+        const imageFile = document.getElementById("imageFile");
+        const imageUrl = document.getElementById("imageUrl");
+
+        const removeFileBtn = document.getElementById("removeFileBtn");
+        const removeUrlBtn = document.getElementById("removeUrlBtn");
+
+        const priorityInfo = document.getElementById("priorityInfo");
+        const imageError = document.getElementById("imageError");
+
+        const defaultImage =
+            "https://static.vecteezy.com/system/resources/previews/036/280/651/original/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg";
+
+        function updatePreview() {
+            if (imageFile.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = e => preview.src = e.target.result;
+                reader.readAsDataURL(imageFile.files[0]);
             }
+            else if (imageUrl.value.trim() !== "") {
+                preview.src = imageUrl.value;
+            }
+            else {
+                preview.src = defaultImage;
+            }
+
+            priorityInfo.style.display =
+                (imageFile.files.length > 0 && imageUrl.value.trim() !== "")
+                    ? "block"
+                    : "none";
         }
 
-        // Preview image from URL
-        function previewImageUrl(input) {
-            if (input.value) {
-                document.getElementById('imagePreview').src = input.value;
-                document.getElementById('imageFile').value = ''; // Clear file input
-                document.getElementById('imageError').style.display = 'none';
-            }
+        function previewImage() {
+            removeFileBtn.style.display = "inline-block";
+            imageError.style.display = "none";
+            updatePreview();
         }
 
-        // Show error message when image fails to load
-        function showImageError() {
-            document.getElementById('imageError').style.display = 'block';
+        function previewImageUrl() {
+            if (!imageUrl.value) return;
+
+            const img = new Image();
+            img.onload = () => {
+                removeUrlBtn.style.display = "inline-block";
+                imageError.style.display = "none";
+                updatePreview();
+            };
+            img.onerror = () => imageError.style.display = "block";
+            img.src = imageUrl.value;
         }
 
-        // Form validation
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const imageUrl = document.getElementById('imageUrl').value;
-            const imageFile = document.getElementById('imageFile').files[0];
-            
-            // If URL is provided but invalid
-            if (imageUrl && !imageFile) {
-                if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
-                    e.preventDefault();
-                    alert('Please enter a valid image URL starting with http:// or https://');
-                }
-            }
-        });
+        function removeFile() {
+            imageFile.value = "";
+            removeFileBtn.style.display = "none";
+            updatePreview();
+        }
+
+        function removeUrl() {
+            imageUrl.value = "";
+            removeUrlBtn.style.display = "none";
+            imageError.style.display = "none";
+            updatePreview();
+        }
     </script>
+
 }

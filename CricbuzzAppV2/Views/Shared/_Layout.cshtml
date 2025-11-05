@@ -1,12 +1,11 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - CricbuzzAppV2</title>
 
-    <!-- CSS Dependencies -->
+    <!-- CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
     <link rel="stylesheet"
@@ -16,6 +15,9 @@
 
 
     <style>
+        /* =====================
+           NAVBAR BASE
+        ===================== */
         .navbar-custom {
             background: linear-gradient(135deg, #1a4731 0%, #2d6a4f 50%, #40916c 100%);
             padding: 1rem 0;
@@ -79,241 +81,307 @@
 
 
         .navbar-brand {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
-            color: white !important;
+            color: #fff !important;
             display: flex;
             align-items: center;
-            gap: 0.8rem;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            gap: 0.5rem;
         }
 
             .navbar-brand i {
-                font-size: 1.5rem;
                 color: #ffd700;
-                animation: bounce 2s infinite;
             }
 
-        @@keyframes bounce {
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-5px);
-            }
+        /* =====================
+           CENTER NAV (DESKTOP)
+        ===================== */
+        .navbar-center {
+            display: flex;
+            gap: 0.4rem;
         }
 
-        .nav-item {
-            margin: 0 0.2rem;
-        }
-
+        /* Nav links */
         .nav-link {
-            color: rgba(255, 255, 255, 0.9) !important;
+            color: rgba(255,255,255,0.9) !important;
             font-weight: 500;
-            padding: 0.7rem 1.2rem !important;
-            border-radius: 50px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            transition: background 0.25s ease;
         }
 
             .nav-link i {
-                margin-right: 0.5rem;
-                font-size: 1.1rem;
-                transition: transform 0.3s ease;
+                margin-right: 0.4rem;
             }
 
-            .nav-link:hover {
-                color: white !important;
-                transform: translateY(-2px);
-                background: rgba(255, 255, 255, 0.1);
-            }
-
-                .nav-link:hover i {
-                    transform: scale(1.2);
-                }
-
+            .nav-link:hover,
             .nav-link.active {
-                background: rgba(255, 255, 255, 0.15);
-                color: white !important;
-                font-weight: 600;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                background: rgba(255,255,255,0.2);
             }
+
+        /* =====================
+           USER AREA
+        ===================== */
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
         .user-profile {
             display: flex;
             align-items: center;
-            padding: 0.5rem 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50px;
-            margin-right: 1rem;
-            color: white;
+            gap: 0.4rem;
+            background: rgba(255,255,255,0.15);
+            padding: 0.4rem 0.8rem;
+            border-radius: 30px;
+            color: #fff;
+            white-space: nowrap;
         }
 
-            .user-profile i {
-                margin-right: 0.5rem;
-                font-size: 1.2rem;
-            }
-
-        .navbar-toggler {
-            border: none;
-            padding: 0.5rem 1rem;
-            transition: all 0.3s ease;
+        /* =====================
+           DROPDOWN
+        ===================== */
+        .dropdown-menu {
+            border-radius: 12px;
+            padding: 0.4rem;
         }
 
-            .navbar-toggler:focus {
-                box-shadow: none;
+        .dropdown-item {
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+            .dropdown-item.active {
+                background: rgba(255,255,255,0.2);
             }
 
-        /* Mobile Navigation */
+        /* =====================
+           COLLAPSE (TABLET + MOBILE ≤ 991px)
+        ===================== */
         @@media (max-width: 991px) {
-            .navbar-collapse {
-                background: rgba(0, 0, 0, 0.2);
-                padding: 1rem;
-                border-radius: 15px;
-                margin-top: 1rem;
-                backdrop-filter: blur(10px);
-            }
+            .navbar-collapse
 
-            .nav-item {
-                margin: 0.5rem 0;
-            }
+        {
+            background: linear-gradient(135deg, #1a4731, #2d6a4f, #40916c);
+            padding: 0.75rem;
+        }
 
-            .nav-link {
-                text-align: center;
-            }
+        /* Stack center nav */
+        .navbar-center {
+            flex-direction: column;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
 
-            .user-profile {
-                text-align: center;
-                margin: 0.5rem 0;
+        .navbar-nav .nav-link {
+            width: 100%;
+            justify-content: flex-start;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* Dropdown behaves like list */
+        .dropdown-menu {
+            position: static;
+            width: 100%;
+            background: rgba(0,0,0,0.15);
+            box-shadow: none;
+            margin-top: 0.25rem;
+        }
+
+        /* User section separation */
+        .navbar-user {
+            flex-direction: column;
+            width: 100%;
+            margin-top: 0.75rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(255,255,255,0.25);
+        }
+
+        .user-profile {
+            width: 100%;
+            border-radius: 8px;
+            justify-content: flex-start;
+        }
+
+        }
+
+        /* =====================
+           DESKTOP HOVER DROPDOWN (≥ 992px)
+        ===================== */
+        @@media (min-width: 992px) {
+            .navbar-nav .dropdown:hover > .dropdown-menu
+
+        {
+            display: block;
+            margin-top: 0;
+        }
+
+        .navbar-nav .dropdown-toggle::after {
+            transition: transform 0.2s ease;
+        }
+
+        .navbar-nav .dropdown:hover .dropdown-toggle::after {
+            transform: rotate(180deg);
+        }
+
+            .navbar-center {
                 justify-content: center;
+                flex-grow: 1;
             }
+
+
         }
     </style>
 </head>
 
 <body>
-    <!-- Enhanced Navigation Bar -->
+    @{
+        var username = Context.Session.GetString("Username");
+        var role = Context.Session.GetString("Role");
+        bool isLoggedIn = !string.IsNullOrEmpty(username);
+
+        string controller = ViewContext.RouteData.Values["Controller"]?.ToString() ?? "";
+    }
+
+    <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="bi bi-cricket"></i>
-                CricbuzzAppV2
+        <div class="container-fluid px-lg-4">
+
+            <!-- BRAND (LEFT) -->
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-cricket"></i> CricbuzzAppV2
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+
+            <!-- TOGGLER (MOBILE) -->
+            <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                    aria-controls="navbarNav"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
+            <!-- COLLAPSE -->
             <div class="collapse navbar-collapse" id="navbarNav">
-                @if (Context.Session.GetString("Username") != null)
+
+                @if (isLoggedIn)
                 {
-                    var username = Context.Session.GetString("Username");
-                    var role = Context.Session.GetString("Role");
+                    <!-- CENTER NAV -->
+                    <ul class="navbar-nav navbar-user ms-lg-auto">
 
-                    <!-- Main Navigation -->
-                    <ul class="navbar-nav me-auto">
+
                         <li class="nav-item">
-                            <a class="nav-link @((ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" &&
-                                   (ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ||
-                                    ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard")) ? "active" : "")"
-                           href="@Url.Action("Index", "Home")">
-                            <i class="bi bi-speedometer2"></i> Dashboard
+                            <a class="nav-link @(controller == "Home" ? "active" : "")"
+                               asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link @(controller == "Players" ? "active" : "")"
+                               asp-controller="Players" asp-action="Index">
+                                <i class="bi bi-person-fill"></i> Players
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link @(controller == "Teams" ? "active" : "")"
+                               asp-controller="Teams" asp-action="Index">
+                                <i class="bi bi-people-fill"></i> Teams
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link @(controller == "Matches" ? "active" : "")"
+                               asp-controller="Matches" asp-action="Index">
+                                <i class="bi bi-trophy-fill"></i> Matches
+                            </a>
+                        </li>
+
+                        <!-- MORE -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle
+                               @(controller == "Scorecards"
+                                                            || controller == "PlayerStats"
+                                                            || controller == "Users"
+                                                            ? "active" : "")"
+                           role="button"
+                           data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots"></i> More
                         </a>
 
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Players" ? "active" : "")"
-                           asp-controller="Players" asp-action="Index">
-                            <i class="bi bi-person-fill"></i>Players
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Teams" ? "active" : "")"
-                           asp-controller="Teams" asp-action="Index">
-                            <i class="bi bi-people-fill"></i>Teams
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Matches" ? "active" : "")"
-                           asp-controller="Matches" asp-action="Index">
-                            <i class="bi bi-trophy-fill"></i>Matches
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Scorecards" ? "active" : "")"
-                           asp-controller="Scorecards" asp-action="Index">
-                            <i class="bi bi-clipboard2-data-fill"></i>Scorecards
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "PlayerStats" ? "active" : "")"
-                           asp-controller="PlayerStats" asp-action="Index">
-                            <i class="bi bi-graph-up"></i>Stats
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Audits" ? "active" : "")"
-                           asp-controller="Audits" asp-action="Index">
-                            <i class="bi bi-clock-history"></i>Logs
-                        </a>
-                    </li>
-                    @if (role == "SuperAdmin")
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Users" ? "active" : "")"
-                                   asp-controller="Users" asp-action="Index">
-                                    <i class="bi bi-people-fill"></i>Users
-                                </a>
-                            </li>
-                        }
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                <li>
+                                    <a class="dropdown-item @(controller == "Scorecards" ? "active" : "")"
+                                       asp-controller="Scorecards" asp-action="Index">
+                                        <i class="bi bi-clipboard2-data-fill me-2"></i> Scorecards
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item @(controller == "PlayerStats" ? "active" : "")"
+                                       asp-controller="PlayerStats" asp-action="Index">
+                                        <i class="bi bi-graph-up me-2"></i> Stats
+                                    </a>
+                                </li>
+
+                            @if (role == "SuperAdmin")
+                                {
+                                    <li>
+                                        <a class="dropdown-item @(controller == "Users" ? "active" : "")"
+                                           asp-controller="Users" asp-action="Index">
+                                            <i class="bi bi-people-fill me-2"></i> Users
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
                     </ul>
 
-                    <!-- User Profile & Logout -->
-                    <ul class="navbar-nav align-items-center">
+                    <!-- USER (RIGHT) -->
+                    <ul class="navbar-nav navbar-user ms-lg-auto">
                         <li class="nav-item">
                             <div class="user-profile">
                                 <i class="bi bi-person-circle"></i>
-                                <span class="fw-bold">@username (@role)</span>
+                                @username (@role)
                             </div>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Account" asp-action="Logout">
-                                <i class="bi bi-box-arrow-right"></i>Logout
+                                <i class="bi bi-box-arrow-right"></i> Logout
                             </a>
                         </li>
                     </ul>
                 }
                 else
                 {
-                    <ul class="navbar-nav ms-auto">
+                    <ul class="navbar-nav ms-lg-auto">
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Account" asp-action="Login">
-                                <i class="bi bi-box-arrow-in-right"></i>Login
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Account" asp-action="Register">
-                                <i class="bi bi-person-plus"></i>Register
+                                Login
                             </a>
                         </li>
                     </ul>
                 }
+
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
+
     <div class="container mt-4">
         @RenderBody()
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
-</body>
 
+</body>
 </html>
