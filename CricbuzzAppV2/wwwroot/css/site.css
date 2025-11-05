@@ -226,3 +226,33 @@ footer {
         height: 35px;
     }
 }
+
+
+.selectable {
+    cursor: pointer;
+}
+
+    .selectable.table-active {
+        background-color: rgba(13,110,253,.08);
+    }
+
+
+
+/* Desktop checkbox subtle UX */
+.table tbody tr .row-checkbox {
+    opacity: 0.4;
+}
+
+.table tbody tr:hover .row-checkbox,
+.table tbody tr.table-active .row-checkbox {
+    opacity: 1;
+}
+
+
+.offcanvas-bottom {
+    height: auto !important;
+}
+
+    .offcanvas-bottom .offcanvas-body {
+        overflow: hidden;
+    }

@@ -1,12 +1,48 @@
 ﻿@model IEnumerable<CricbuzzAppV2.Models.Player>
 
+@{
+    ViewData["Title"] = "Players";
+    Layout = "_Layout";
+}
+
+<!-- Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="fw-semibold">Players</h2>
+
     <a asp-action="Create" class="btn btn-success">
-        <i class="fa-solid fa-plus me-1"></i>Add Player
+        <i class="fa-solid fa-plus me-1"></i> Add Player
     </a>
 </div>
 
+<!-- Search Bar -->
+<!-- Search + Mobile Filter Button -->
+<div class="d-flex align-items-center gap-2 mb-2">
+
+    <!-- Search -->
+    <div class="flex-grow-1">
+        <div class="input-group shadow-sm">
+            <span class="input-group-text bg-white">
+                <i class="fa-solid fa-magnifying-glass text-muted"></i>
+            </span>
+            <input type="text"
+                   id="searchInput"
+                   class="form-control"
+                   placeholder="Search players..." />
+        </div>
+    </div>
+
+    <!-- Mobile Filter Button -->
+    <button class="btn btn-outline-secondary shadow-sm d-md-none"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#filterCanvas">
+        <i class="fa-solid fa-filter"></i>
+    </button>
+
+</div>
+
+
+<!-- Alerts -->
 @if (TempData["Success"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show">
@@ -15,145 +51,444 @@
     </div>
 }
 
-<form asp-action="DeleteSelected" method="post" id="bulkDeleteForm">
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @Html.Raw(TempData["Error"])
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
 
-    <div class="table-responsive">
-    <table class="table table-hover table-bordered align-middle shadow-sm">
-        <thead class="table-dark">
-            <tr>
-                <th style="width:40px;">
-                    <input type="checkbox" id="selectAll" />
-                </th>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Team</th>
-                <th class="text-center" style="width:160px;">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var p in Model)
+
+<!-- Desktop Filters -->
+<div class="d-none d-md-flex justify-content-end mb-3">
+    <div class="d-flex gap-2 align-items-center">
+
+        <span class="text-muted small">Filter:</span>
+
+        <select id="desktopRoleFilter"
+                class="form-select form-select-sm"
+                style="width:160px;">
+            <option value="">All Roles</option>
+            <option value="Batsman">Batsman</option>
+            <option value="Bowler">Bowler</option>
+            <option value="All-Rounder">All-Rounder</option>
+            <option value="Wicket-Keeper">Wicket-Keeper</option>
+        </select>
+
+        <select id="desktopTeamFilter"
+                class="form-select form-select-sm"
+                style="width:160px;">
+            <option value="">All Teams</option>
+            @foreach (var team in Model.Select(p => p.Team?.TeamName).Distinct())
             {
-                <tr>
-                    <td>
-                        <input type="checkbox" name="selectedIds" value="@p.PlayerId" />
-                    </td>
-                    <td>
-                        <img src="@(string.IsNullOrEmpty(p.ImageUrl)
-                                  ? "https://static.vecteezy.com/system/resources/previews/036/280/651/original/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg"
-                                  : p.ImageUrl)"
-                         class="rounded-circle border"
-                         style="width:45px;height:45px;object-fit:cover;" />
-
-                    </td>
-                    <td class="fw-semibold">@p.FullName</td>
-                    <td>@p.Role</td>
-                    <td>@p.Team?.TeamName</td>
-                    <td class="text-center">
-                        <div class="btn-group">
-                            <a asp-action="Details" asp-route-id="@p.PlayerId"
-                               class="btn btn-outline-info btn-sm">
-                                <i class="fa-solid fa-eye"></i>
-                            </a>
-                            <a asp-action="Edit" asp-route-id="@p.PlayerId"
-                               class="btn btn-outline-warning btn-sm">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </a>
-                            <a asp-action="Delete" asp-route-id="@p.PlayerId"
-                               class="btn btn-outline-danger btn-sm">
-                                <i class="fa-solid fa-trash"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
+                if (!string.IsNullOrEmpty(team))
+                {
+                    <option value="@team">@team</option>
+                }
             }
-        </tbody>
-    </table>
+        </select>
+
+        <button id="desktopClearFilters"
+                class="btn btn-outline-secondary btn-sm">
+            Clear
+        </button>
+
+    </div>
+</div>
+
+<!-- Unified Selection Bar -->
+<div id="selectionBar"
+     class="mb-2 d-flex justify-content-between align-items-center">
+
+    <div class="form-check">
+        <input class="form-check-input"
+               type="checkbox"
+               id="unifiedSelectAll">
+
+        <label class="form-check-label fw-semibold small">
+            Select all
+        </label>
     </div>
 
-    <button type="submit" class="btn btn-danger mt-2">
-        <i class="fa-solid fa-trash me-1"></i>Delete Selected
-    </button>
+    <span class="text-muted small">
+        Click rows or tap cards to select
+    </span>
+</div>
 
-    <!-- Bulk Delete Players Confirmation Modal -->
-    <div class="modal fade" id="bulkDeleteModal" tabindex="-1" aria-hidden="true">
+
+
+
+
+
+
+<!-- Bulk Delete Form -->
+<form asp-action="DeleteSelected" method="post" id="bulkDeleteForm">
+
+    <!-- Desktop Table -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-hover table-bordered align-middle shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th style="width:40px;"></th>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Team</th>
+                    <th class="text-center" style="width:160px;">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr class="player-row selectable"
+                        data-id="@p.PlayerId"
+                        data-name="@p.FullName"
+                        data-role="@p.Role"
+                        data-team="@p.Team?.TeamName">
+
+                        <td>
+                            <input type="checkbox"
+                                   class="form-check-input row-checkbox"
+                                   name="selectedIds"
+                                   value="@p.PlayerId"
+                                   onclick="event.stopPropagation()" />
+                        </td>
+
+                        <td>
+                            <img src="@(string.IsNullOrEmpty(p.ImageUrl)
+                                                                 ? "https://static.vecteezy.com/system/resources/previews/036/280/651/original/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg"
+                                                                 : p.ImageUrl)"
+                             class="rounded-circle border"
+                             style="width:45px;height:45px;object-fit:cover;" />
+                    </td>
+
+                        <td class="fw-semibold">@p.FullName</td>
+                        <td>@p.Role</td>
+                        <td>@p.Team?.TeamName</td>
+
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a asp-action="Details" asp-route-id="@p.PlayerId"
+                                   class="btn btn-outline-info btn-sm">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@p.PlayerId"
+                                   class="btn btn-outline-warning btn-sm">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@p.PlayerId"
+                                   class="btn btn-outline-danger btn-sm">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Mobile Cards -->
+    <div class="d-md-none">
+        @foreach (var p in Model)
+        {
+            <div class="card shadow-sm mb-3 player-card selectable"
+                 data-id="@p.PlayerId"
+                 data-name="@p.FullName"
+                 data-role="@p.Role"
+                 data-team="@p.Team?.TeamName">
+
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="fw-semibold d-flex align-items-center gap-2">
+                            <img src="@(string.IsNullOrEmpty(p.ImageUrl)
+                                                                 ? "https://static.vecteezy.com/system/resources/previews/036/280/651/original/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg"
+                                                                 : p.ImageUrl)"
+                             class="rounded-circle border"
+                             style="width:40px;height:40px;object-fit:cover;" />
+                        @p.FullName
+                    </div>
+
+                        <input type="checkbox"
+                               class="form-check-input row-checkbox"
+                               name="selectedIds"
+                               value="@p.PlayerId"
+                               onclick="event.stopPropagation()" />
+                    </div>
+
+                    <div class="small text-muted mb-1">
+                        <strong>Role:</strong> @p.Role
+                    </div>
+
+                    <div class="small text-muted mb-2">
+                        <strong>Team:</strong> @p.Team?.TeamName
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a asp-action="Details" asp-route-id="@p.PlayerId"
+                           class="btn btn-outline-info btn-sm w-100">
+                            View
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@p.PlayerId"
+                           class="btn btn-outline-warning btn-sm w-100">
+                            Edit
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@p.PlayerId"
+                           class="btn btn-outline-danger btn-sm w-100">
+                            Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+                }
+    </div>
+
+    <!-- Bulk Delete Modal -->
+    <div class="modal fade" id="bulkDeleteModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-
                 <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title">
-                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
                         Confirm Player Deletion
                     </h5>
-                    <button type="button"
-                            class="btn-close btn-close-white"
+                    <button class="btn-close btn-close-white"
                             data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
-                    <p class="mb-1">
-                        Are you sure you want to delete the selected player(s)?
-                    </p>
-                    <p class="text-muted mb-0">
-                        This action <strong>cannot be undone</strong>.
-                    </p>
+                    Are you sure you want to delete the selected player(s)?
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button"
-                            class="btn btn-secondary"
+                    <button class="btn btn-secondary"
                             data-bs-dismiss="modal">
                         Cancel
                     </button>
-
                     <button type="button"
                             id="confirmBulkDelete"
                             class="btn btn-danger">
-                        <i class="fa-solid fa-trash me-1"></i> Delete
+                        Delete
                     </button>
                 </div>
-
             </div>
         </div>
     </div>
 
+    <!-- Sticky Bulk Action Bar -->
+    <div id="bulkActionBar"
+         class="position-fixed bottom-0 start-0 w-100 bg-white border-top shadow-lg py-2 px-3"
+         style="display:none; z-index:1050;">
 
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <span class="fw-semibold text-muted">
+                <span id="selectedCount">0</span> player(s) selected
+            </span>
+
+            <button type="submit" class="btn btn-danger">
+                Delete Selected
+            </button>
+        </div>
+    </div>
 </form>
+
+
+<!-- Mobile Filter Offcanvas -->
+<div class="offcanvas offcanvas-bottom d-md-none"
+     tabindex="-1"
+     id="filterCanvas"
+     style="height:300px;">
+
+    <div class="offcanvas-header border-bottom">
+        <h6 class="offcanvas-title">
+            <i class="fa-solid fa-filter me-1"></i> Filters
+        </h6>
+        <button class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+
+    <div class="offcanvas-body overflow-hidden">
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold small">Role</label>
+            <select id="mobileRoleFilter" class="form-select">
+                <option value="">All Roles</option>
+                <option value="Batsman">Batsman</option>
+                <option value="Bowler">Bowler</option>
+                <option value="All-Rounder">All-Rounder</option>
+                <option value="Wicket-Keeper">Wicket-Keeper</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold small">Team</label>
+            <select id="mobileTeamFilter" class="form-select">
+                <option value="">All Teams</option>
+                @foreach (var team in Model.Select(p => p.Team?.TeamName).Distinct())
+                {
+                    if (!string.IsNullOrEmpty(team))
+                    {
+                        <option value="@team">@team</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button id="mobileClearFilters"
+                    class="btn btn-outline-secondary w-100">
+                Clear
+            </button>
+
+            <button class="btn btn-primary w-100"
+                    data-bs-dismiss="offcanvas">
+                Apply
+            </button>
+        </div>
+
+    </div>
+</div>
+
 
 @section Scripts {
     <script>
         const bulkForm = document.getElementById("bulkDeleteForm");
-        const selectAll = document.getElementById("selectAll");
-        const modalElement = document.getElementById("bulkDeleteModal");
+        const selectAll = document.getElementById("unifiedSelectAll");
+        const actionBar = document.getElementById("bulkActionBar");
+        const selectedCountEl = document.getElementById("selectedCount");
+
+        const modal = new bootstrap.Modal(
+            document.getElementById("bulkDeleteModal")
+        );
         const confirmBtn = document.getElementById("confirmBulkDelete");
 
-        const modal = new bootstrap.Modal(modalElement);
+        function getCheckboxes() {
+            return document.querySelectorAll(".row-checkbox");
+        }
 
-        // Select All checkbox
+        function getChecked() {
+            return document.querySelectorAll(".row-checkbox:checked");
+        }
+
+        function updateBulkBar() {
+            const count = getChecked().length;
+            selectedCountEl.textContent = count;
+            actionBar.style.display = count > 0 ? "block" : "none";
+        }
+
+        function syncSelectAll() {
+            selectAll.checked =
+                getCheckboxes().length > 0 &&
+                getCheckboxes().length === getChecked().length;
+        }
+
         selectAll.addEventListener("change", function () {
-            document.querySelectorAll("input[name='selectedIds']")
-                .forEach(cb => cb.checked = this.checked);
+            getCheckboxes().forEach(cb => cb.checked = this.checked);
+            document.querySelectorAll(".selectable")
+                .forEach(el => el.classList.toggle("table-active", this.checked));
+            updateBulkBar();
         });
 
-        // Intercept bulk delete submit
-        bulkForm.addEventListener("submit", function (e) {
-            e.preventDefault();
+        document.querySelectorAll(".selectable").forEach(el => {
+            el.addEventListener("click", e => {
+                if (e.target.closest("a,button,input")) return;
+                const cb = el.querySelector(".row-checkbox");
+                cb.checked = !cb.checked;
+                el.classList.toggle("table-active", cb.checked);
+                updateBulkBar();
+                syncSelectAll();
+            });
+        });
 
-            const selected = document.querySelectorAll("input[name='selectedIds']:checked");
-
-            if (selected.length === 0) {
-                alert("⚠️ Please select at least one player to delete.");
-                return;
+        document.addEventListener("change", e => {
+            if (e.target.classList.contains("row-checkbox")) {
+                e.target.closest(".selectable")
+                    ?.classList.toggle("table-active", e.target.checked);
+                updateBulkBar();
+                syncSelectAll();
             }
-
-            modal.show();
         });
 
-        // Confirm delete
-        confirmBtn.addEventListener("click", function () {
+        bulkForm.addEventListener("submit", e => {
+            e.preventDefault();
+            if (getChecked().length > 0) modal.show();
+        });
+
+        confirmBtn.addEventListener("click", () => {
             modal.hide();
             bulkForm.submit();
         });
+
+        // Search
+               const searchInput = document.getElementById("searchInput");
+
+        const desktopRole = document.getElementById("desktopRoleFilter");
+        const mobileRole = document.getElementById("mobileRoleFilter");
+
+        const desktopTeam = document.getElementById("desktopTeamFilter");
+        const mobileTeam = document.getElementById("mobileTeamFilter");
+
+        const desktopClear = document.getElementById("desktopClearFilters");
+        const mobileClear = document.getElementById("mobileClearFilters");
+
+        function getSelectedRole() {
+            return (desktopRole?.value || mobileRole?.value || "").toLowerCase();
+        }
+
+        function getSelectedTeam() {
+            return (desktopTeam?.value || mobileTeam?.value || "").toLowerCase();
+        }
+
+        function applyFilters() {
+            const query = searchInput.value.toLowerCase();
+            const role = getSelectedRole();
+            const team = getSelectedTeam();
+
+            document.querySelectorAll(".player-row, .player-card")
+                .forEach(item => {
+                    const name = item.dataset.name?.toLowerCase() || "";
+                    const r = item.dataset.role?.toLowerCase() || "";
+                    const t = item.dataset.team?.toLowerCase() || "";
+
+                    const matchesSearch =
+                        name.includes(query) ||
+                        r.includes(query) ||
+                        t.includes(query);
+
+                    const matchesRole = !role || r === role;
+                    const matchesTeam = !team || t === team;
+
+                    item.style.display =
+                        matchesSearch && matchesRole && matchesTeam
+                            ? ""
+                            : "none";
+                });
+        }
+
+        searchInput?.addEventListener("input", applyFilters);
+        desktopRole?.addEventListener("change", applyFilters);
+        desktopTeam?.addEventListener("change", applyFilters);
+        mobileRole?.addEventListener("change", applyFilters);
+        mobileTeam?.addEventListener("change", applyFilters);
+
+        desktopClear?.addEventListener("click", () => {
+            searchInput.value = "";
+            desktopRole.value = "";
+            desktopTeam.value = "";
+            mobileRole.value = "";
+            mobileTeam.value = "";
+            applyFilters();
+        });
+
+        mobileClear?.addEventListener("click", () => {
+            searchInput.value = "";
+            desktopRole.value = "";
+            desktopTeam.value = "";
+            mobileRole.value = "";
+            mobileTeam.value = "";
+            applyFilters();
+        });
+
     </script>
 }
 

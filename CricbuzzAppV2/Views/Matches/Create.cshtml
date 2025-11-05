@@ -1,78 +1,182 @@
 ﻿@model CricbuzzAppV2.Models.Match
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
-@{
-    ViewData["Title"] = "Add Match";
-    Layout = "_Layout";
-}
+<h2 class="mb-4 text-center">
+    <i class="fa-solid fa-calendar-plus me-1"></i>Add New Match
+</h2>
 
-<h2 class="mb-4">➕ Add New Match</h2>
+<div class="card shadow-sm mx-auto p-4"
+     style="max-width:720px;border-radius:16px;">
 
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-warning">@TempData["Error"]</div>
-}
-
-<div class="card shadow-sm p-4">
     <form asp-action="Create" method="post">
-        <div class="mb-3">
-            <label class="form-label">Team A</label>
-            <select asp-for="TeamAId" class="form-select"
-                    asp-items="@(new SelectList(ViewData["Teams"] as List<CricbuzzAppV2.Models.Team>, "TeamId", "TeamName"))">
-                <option value="">-- Select Team A --</option>
-            </select>
-            <span asp-validation-for="TeamAId" class="text-danger"></span>
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger small mb-3"></div>
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Team A <span class="text-danger">*</span>
+                </label>
+                <select asp-for="TeamAId" class="form-select"
+                        asp-items="@(new SelectList(ViewData["Teams"] as List<CricbuzzAppV2.Models.Team>, "TeamId", "TeamName"))">
+                    <option value="">Select Team A</option>
+                </select>
+                <span asp-validation-for="TeamAId"
+                      class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Team B <span class="text-danger">*</span>
+                </label>
+                <select asp-for="TeamBId" class="form-select"
+                        asp-items="@(new SelectList(ViewData["Teams"] as List<CricbuzzAppV2.Models.Team>, "TeamId", "TeamName"))">
+                    <option value="">Select Team B</option>
+                </select>
+                <span asp-validation-for="TeamBId"
+                      class="text-danger small"></span>
+                
+            </div>
+            <div id="sameTeamAlert"
+                 class="alert alert-danger small py-2 mb-3"
+                 style="display:none;">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                Team A and Team B cannot be the same.
+            </div>
+
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Match Type <span class="text-danger">*</span>
+                </label>
+                <select asp-for="MatchType" class="form-select">
+                    <option value="">Select format</option>
+                    <option value="Test">Test</option>
+                    <option value="ODI">ODI</option>
+                    <option value="T20">T20</option>
+                </select>
+                <span asp-validation-for="MatchType"
+                      class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Match Date <span class="text-danger">*</span>
+                </label>
+                <input asp-for="Date" type="date"
+                       class="form-control" />
+                <span asp-validation-for="Date"
+                      class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label fw-semibold">
+                    Venue <span class="text-danger">*</span>
+                </label>
+                <input asp-for="Venue"
+                       class="form-control"
+                       placeholder="Enter venue" />
+                <span asp-validation-for="Venue"
+                      class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label fw-semibold">
+                    Winner Team (optional)
+                </label>
+                <select asp-for="WinnerTeamId" class="form-select"
+                        asp-items="@(new SelectList(ViewData["Teams"] as List<CricbuzzAppV2.Models.Team>, "TeamId", "TeamName"))">
+                    <option value="">Select winner</option>
+                </select>
+            </div>
+
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Team B</label>
-            <select asp-for="TeamBId" class="form-select"
-                    asp-items="@(new SelectList(ViewData["Teams"] as List<CricbuzzAppV2.Models.Team>, "TeamId", "TeamName"))">
-                <option value="">-- Select Team B --</option>
-            </select>
-            <span asp-validation-for="TeamBId" class="text-danger"></span>
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <button type="submit" class="btn btn-success px-4">
+                Save
+            </button>
+            <a asp-action="Index"
+               class="btn btn-outline-secondary px-4">
+                Cancel
+            </a>
         </div>
+       
 
-        <div class="mb-3">
-            <label asp-for="MatchType" class="form-label">Match Format</label>
-            <select asp-for="MatchType" class="form-select">
-                <option value="">-- Select Format --</option>
-                <option value="Test">Test</option>
-                <option value="ODI">ODI</option>
-                <option value="T20">T20</option>
-            </select>
-            <span asp-validation-for="MatchType" class="text-danger"></span>
-        </div>
-
-
-        <div class="mb-3">
-            <label asp-for="Date" class="form-label"></label>
-            <input asp-for="Date" type="date" class="form-control" />
-            <span asp-validation-for="Date" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Venue" class="form-label"></label>
-            <input asp-for="Venue" class="form-control" placeholder="Enter venue" />
-            <span asp-validation-for="Venue" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Winner Team (optional)</label>
-            <select asp-for="WinnerTeamId" class="form-select"
-                    asp-items="@(new SelectList(ViewData["Teams"] as List<CricbuzzAppV2.Models.Team>, "TeamId", "TeamName"))">
-                <option value="">-- Select Winner --</option>
-            </select>
-            <span asp-validation-for="WinnerTeamId" class="text-danger"></span>
-        </div>
-
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-success">💾 Save</button>
-            <a asp-action="Index" class="btn btn-secondary">↩ Back to List</a>
-        </div>
     </form>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const teamA = document.getElementById("TeamAId");
+        const teamB = document.getElementById("TeamBId");
+        const winner = document.getElementById("WinnerTeamId");
+        const alertBox = document.getElementById("sameTeamAlert");
+
+        function showAlert() {
+            alertBox.style.display = "block";
+            setTimeout(() => alertBox.classList.add("show"), 10);
+        }
+
+        function hideAlert() {
+            alertBox.classList.remove("show");
+            setTimeout(() => alertBox.style.display = "none", 200);
+        }
+
+        function syncTeams() {
+            const a = teamA.value;
+            const b = teamB.value;
+
+            // Reset disabled options
+            [...teamA.options, ...teamB.options].forEach(o => o.disabled = false);
+
+            // Disable same-team selection
+            if (a) {
+                [...teamB.options].forEach(o => {
+                    if (o.value === a) o.disabled = true;
+                });
+            }
+
+            if (b) {
+                [...teamA.options].forEach(o => {
+                    if (o.value === b) o.disabled = true;
+                });
+            }
+
+            // Same team chosen → block
+            if (a && b && a === b) {
+                teamB.value = "";
+                showAlert();
+            } else {
+                hideAlert();
+            }
+
+            // Update Winner dropdown
+            updateWinnerOptions(a, b);
+        }
+
+        function updateWinnerOptions(a, b) {
+            if (!winner) return;
+
+            [...winner.options].forEach(o => {
+                if (!o.value) return;
+                o.hidden = !(o.value === a || o.value === b);
+            });
+
+            // Reset winner if invalid
+            if (winner.value && winner.value !== a && winner.value !== b) {
+                winner.value = "";
+            }
+        }
+
+        teamA.addEventListener("change", syncTeams);
+        teamB.addEventListener("change", syncTeams);
+
+        // Run once on page load (important for Edit)
+        syncTeams();
+    </script>
 }
+

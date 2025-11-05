@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<CricbuzzAppV2.Models.Team>
+
 @{
     ViewData["Title"] = "Teams";
     Layout = "_Layout";
@@ -13,34 +14,67 @@
     </a>
 </div>
 
+<!-- Search Bar -->
+<div class="d-flex align-items-center gap-2 mb-2">
+    <div class="flex-grow-1">
+        <div class="input-group shadow-sm">
+            <span class="input-group-text bg-white">
+                <i class="fa-solid fa-magnifying-glass text-muted"></i>
+            </span>
+
+            <input type="text"
+                   id="searchInput"
+                   class="form-control"
+                   placeholder="Search teams..." />
+        </div>
+    </div>
+</div>
+
 <!-- Alerts -->
 @if (TempData["Success"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div class="alert alert-success alert-dismissible fade show">
         @Html.Raw(TempData["Success"])
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <button class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
 
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <div class="alert alert-danger alert-dismissible fade show">
         @Html.Raw(TempData["Error"])
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <button class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
+
+<!-- Unified Selection Bar -->
+<div id="selectionBar"
+     class="mb-2 d-flex justify-content-between align-items-center">
+
+    <div class="form-check">
+        <input class="form-check-input"
+               type="checkbox"
+               id="unifiedSelectAll">
+
+        <label class="form-check-label fw-semibold small">
+            Select all
+        </label>
+    </div>
+
+    <span class="text-muted small">
+        Click rows or tap cards to select
+    </span>
+</div>
 
 <!-- Bulk Delete Form -->
 <form asp-action="DeleteSelected" method="post" id="bulkDeleteForm">
 
-
-    <div class="table-responsive">
+    <!-- Desktop Table -->
+    <div class="table-responsive d-none d-md-block">
         <table class="table table-hover table-bordered align-middle shadow-sm">
             <thead class="table-dark">
                 <tr>
-                    <th style="width:40px;">
-                        <input type="checkbox" id="selectAll" />
-                    </th>
+                    <th style="width:40px;"></th>
                     <th>Logo</th>
                     <th>Team Name</th>
                     <th>Country</th>
@@ -52,16 +86,22 @@
             <tbody>
                 @foreach (var team in Model)
                 {
-                    <tr>
+                    <tr class="team-row selectable"
+                        data-id="@team.TeamId"
+                        data-name="@team.TeamName"
+                        data-country="@team.Country">
+
                         <td>
                             <input type="checkbox"
+                                   class="form-check-input row-checkbox"
                                    name="selectedIds"
-                                   value="@team.TeamId" />
+                                   value="@team.TeamId"
+                                   onclick="event.stopPropagation()" />
                         </td>
 
                         <td>
                             <img src="@(string.IsNullOrEmpty(team.ImageUrl)
-                                                                 ? "https://th.bing.com/th/id/OIP.FuJz0KDQ05jfCqQmo1rypwAAAA?w=167&h=176&c=7"
+                                                                 ? "https://via.placeholder.com/60"
                                                                  : team.ImageUrl)"
                              class="rounded-circle border"
                              style="width:45px;height:45px;object-fit:cover;" />
@@ -72,29 +112,19 @@
                         <td>@team.Coach</td>
 
                         <td class="text-center">
-                            <div class="btn-group" role="group">
-
-                                <a asp-action="Details"
-                                   asp-route-id="@team.TeamId"
-                                   class="btn btn-outline-info btn-sm"
-                                   title="View">
+                            <div class="btn-group">
+                                <a asp-action="Details" asp-route-id="@team.TeamId"
+                                   class="btn btn-outline-info btn-sm">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
-
-                                <a asp-action="Edit"
-                                   asp-route-id="@team.TeamId"
-                                   class="btn btn-outline-warning btn-sm"
-                                   title="Edit">
+                                <a asp-action="Edit" asp-route-id="@team.TeamId"
+                                   class="btn btn-outline-warning btn-sm">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
-
-                                <a asp-action="Delete"
-                                   asp-route-id="@team.TeamId"
-                                   class="btn btn-outline-danger btn-sm"
-                                   title="Delete">
+                                <a asp-action="Delete" asp-route-id="@team.TeamId"
+                                   class="btn btn-outline-danger btn-sm">
                                     <i class="fa-solid fa-trash"></i>
                                 </a>
-
                             </div>
                         </td>
                     </tr>
@@ -103,13 +133,60 @@
         </table>
     </div>
 
-    <!-- Bulk Delete -->
-    <div class="mt-3">
-        <button type="submit"
-                class="btn btn-danger"
-            <i class="fa-solid fa-trash me-1"></i> Delete Selected
-        </button>
+    <!-- Mobile Cards -->
+    <div class="d-md-none">
+        @foreach (var team in Model)
+        {
+            <div class="card shadow-sm mb-3 team-card selectable"
+                 data-id="@team.TeamId"
+                 data-name="@team.TeamName"
+                 data-country="@team.Country">
+
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="fw-semibold d-flex align-items-center gap-2">
+                            <img src="@(string.IsNullOrEmpty(team.ImageUrl)
+                                                                 ? "https://via.placeholder.com/60"
+                                                                 : team.ImageUrl)"
+                             class="rounded-circle border"
+                             style="width:40px;height:40px;object-fit:cover;" />
+                        @team.TeamName
+                    </div>
+
+                        <input type="checkbox"
+                               class="form-check-input row-checkbox"
+                               name="selectedIds"
+                               value="@team.TeamId"
+                               onclick="event.stopPropagation()" />
+                    </div>
+
+                    <div class="small text-muted mb-1">
+                        <strong>Country:</strong> @team.Country
+                    </div>
+
+                    <div class="small text-muted mb-2">
+                        <strong>Coach:</strong> @team.Coach
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a asp-action="Details" asp-route-id="@team.TeamId"
+                           class="btn btn-outline-info btn-sm w-100">
+                            View
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@team.TeamId"
+                           class="btn btn-outline-warning btn-sm w-100">
+                            Edit
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@team.TeamId"
+                           class="btn btn-outline-danger btn-sm w-100">
+                            Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+                }
     </div>
+
     <!-- Bulk Delete Confirmation Modal -->
     <div class="modal fade" id="bulkDeleteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -146,43 +223,107 @@
         </div>
     </div>
 
+    <!-- Sticky Bulk Action Bar -->
+    <div id="bulkActionBar"
+         class="position-fixed bottom-0 start-0 w-100 bg-white border-top shadow-lg py-2 px-3"
+         style="display:none; z-index:1050;">
 
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <span class="fw-semibold text-muted">
+                <span id="selectedCount">0</span> team(s) selected
+            </span>
+
+            <button type="submit" class="btn btn-danger">
+                Delete Selected
+            </button>
+        </div>
+    </div>
 </form>
 
 @section Scripts {
     <script>
         const bulkForm = document.getElementById("bulkDeleteForm");
-        const selectAll = document.getElementById("selectAll");
-        const modalElement = document.getElementById("bulkDeleteModal");
+        const selectAll = document.getElementById("unifiedSelectAll");
+        const actionBar = document.getElementById("bulkActionBar");
+        const selectedCountEl = document.getElementById("selectedCount");
+
+        const modal = new bootstrap.Modal(
+            document.getElementById("bulkDeleteModal")
+        );
+
         const confirmBtn = document.getElementById("confirmBulkDelete");
 
-        const modal = new bootstrap.Modal(modalElement);
+        function getCheckboxes() {
+            return document.querySelectorAll(".row-checkbox");
+        }
 
-        // Select all logic
+        function getChecked() {
+            return document.querySelectorAll(".row-checkbox:checked");
+        }
+
+        function updateBulkBar() {
+            const count = getChecked().length;
+            selectedCountEl.textContent = count;
+            actionBar.style.display = count > 0 ? "block" : "none";
+        }
+
+        function syncSelectAll() {
+            selectAll.checked =
+                getCheckboxes().length > 0 &&
+                getCheckboxes().length === getChecked().length;
+        }
+
         selectAll.addEventListener("change", function () {
-            document.querySelectorAll("input[name='selectedIds']")
-                .forEach(cb => cb.checked = this.checked);
+            getCheckboxes().forEach(cb => cb.checked = this.checked);
+            document.querySelectorAll(".selectable")
+                .forEach(el => el.classList.toggle("table-active", this.checked));
+            updateBulkBar();
         });
 
-        // Intercept form submit
-        bulkForm.addEventListener("submit", function (e) {
-            e.preventDefault();
+        document.querySelectorAll(".selectable").forEach(el => {
+            el.addEventListener("click", e => {
+                if (e.target.closest("a,button,input")) return;
+                const cb = el.querySelector(".row-checkbox");
+                cb.checked = !cb.checked;
+                el.classList.toggle("table-active", cb.checked);
+                updateBulkBar();
+                syncSelectAll();
+            });
+        });
 
-            const selected = document.querySelectorAll("input[name='selectedIds']:checked");
-
-            if (selected.length === 0) {
-                alert("⚠️ Please select at least one team to delete.");
-                return;
+        document.addEventListener("change", e => {
+            if (e.target.classList.contains("row-checkbox")) {
+                e.target.closest(".selectable")
+                    ?.classList.toggle("table-active", e.target.checked);
+                updateBulkBar();
+                syncSelectAll();
             }
-
-            modal.show();
         });
 
-        // Confirm delete
-        confirmBtn.addEventListener("click", function () {
+        bulkForm.addEventListener("submit", e => {
+            e.preventDefault();
+            if (getChecked().length > 0) modal.show();
+        });
+
+        confirmBtn.addEventListener("click", () => {
             modal.hide();
             bulkForm.submit();
         });
+
+        // Search
+        document.getElementById("searchInput")
+            .addEventListener("input", function () {
+                const q = this.value.toLowerCase();
+                document.querySelectorAll(".team-row,.team-card")
+                    .forEach(el => {
+                        const name = el.dataset.name?.toLowerCase() || "";
+                        const country = el.dataset.country?.toLowerCase() || "";
+                        el.style.display =
+                            name.includes(q) || country.includes(q)
+                                ? ""
+                                : "none";
+                    });
+            });
     </script>
 }
 

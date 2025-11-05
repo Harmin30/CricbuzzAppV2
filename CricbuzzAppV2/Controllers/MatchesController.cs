@@ -15,6 +15,12 @@ namespace CricbuzzAppV2.Controllers
         {
             _context = context;
         }
+        private void NormalizeMatch(Match match)
+        {
+            match.MatchType = match.MatchType.Trim();
+            match.Venue = match.Venue.Trim();
+        }
+
 
         // GET: Matches
         public async Task<IActionResult> Index()
@@ -49,26 +55,47 @@ namespace CricbuzzAppV2.Controllers
             return View();
         }
 
-        // POST: Matches/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Match match)
         {
-            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+            NormalizeMatch(match);
+
+            // ❌ Same team selected
+            if (match.TeamAId == match.TeamBId)
             {
-                Console.WriteLine($"Model error: {error.ErrorMessage}");
+                ModelState.AddModelError("TeamBId",
+                    "Team A and Team B cannot be the same.");
             }
 
-            if (ModelState.IsValid)
+            // ❌ Duplicate match check
+            bool exists = await _context.Matches.AnyAsync(m =>
+                m.TeamAId == match.TeamAId &&
+                m.TeamBId == match.TeamBId &&
+                m.Date.Date == match.Date.Date &&
+                m.MatchType == match.MatchType &&
+                m.Venue == match.Venue);
+
+            if (exists)
             {
-                _context.Matches.Add(match);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError(string.Empty,
+                    "This match already exists with the same details.");
             }
 
-            ViewData["Teams"] = _context.Teams.ToList();
-            return View(match);
+            if (!ModelState.IsValid)
+            {
+                ViewData["Teams"] = _context.Teams.ToList();
+                return View(match);
+            }
+
+
+            _context.Matches.Add(match);
+            await _context.SaveChangesAsync();
+
+            AppHelper.SetSuccess(this, "✅ Match created successfully.");
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: Matches/Edit/5
         public async Task<IActionResult> Edit(int id)
@@ -89,26 +116,44 @@ namespace CricbuzzAppV2.Controllers
             if (id != match.MatchId)
                 return NotFound();
 
-            if (ModelState.IsValid)
+            NormalizeMatch(match);
+
+            bool exists = await _context.Matches.AnyAsync(m =>
+                m.MatchId != match.MatchId &&
+                m.TeamAId == match.TeamAId &&
+                m.TeamBId == match.TeamBId &&
+                m.Date.Date == match.Date.Date &&
+                m.MatchType == match.MatchType &&
+                m.Venue == match.Venue);
+
+            if (exists)
             {
-                try
-                {
-                    _context.Update(match);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.Matches.Any(m => m.MatchId == id))
-                        return NotFound();
-                    else
-                        throw;
-                }
+                ModelState.AddModelError(string.Empty,
+                    "❌ Another match with the same details already exists.");
             }
 
-            ViewData["Teams"] = _context.Teams.ToList();
-            return View(match);
+            // ❌ Same team selected
+            if (match.TeamAId == match.TeamBId)
+            {
+                ModelState.AddModelError("TeamBId",
+                    "Team A and Team B cannot be the same.");
+            }
+
+
+            if (!ModelState.IsValid)
+            {
+                ViewData["Teams"] = _context.Teams.ToList();
+                return View(match);
+            }
+
+
+            _context.Update(match);
+            await _context.SaveChangesAsync();
+
+            AppHelper.SetSuccess(this, "✏ Match updated successfully.");
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: Matches/Delete/5
         public async Task<IActionResult> Delete(int id)
@@ -125,19 +170,33 @@ namespace CricbuzzAppV2.Controllers
             return View(match);
         }
 
-        // POST: Matches/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var match = await _context.Matches.FindAsync(id);
-            if (match != null)
+            if (match == null)
+                return NotFound();
+
+            bool hasScorecards = await _context.Scorecards
+                .AnyAsync(s => s.MatchId == id);
+
+            if (hasScorecards)
             {
-                _context.Matches.Remove(match);
-                await _context.SaveChangesAsync();
+                AppHelper.SetError(this,
+                    $"❌ Match '{match.DisplayNameWithType}' cannot be deleted because it has scorecards.");
+                return RedirectToAction(nameof(Index));
             }
+
+            _context.Matches.Remove(match);
+            await _context.SaveChangesAsync();
+
+            AppHelper.SetSuccess(this,
+                $"🗑 Match '{match.DisplayNameWithType}' deleted successfully.");
+
             return RedirectToAction(nameof(Index));
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

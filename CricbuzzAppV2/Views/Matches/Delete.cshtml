@@ -1,36 +1,53 @@
 ﻿@model CricbuzzAppV2.Models.Match
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
     ViewData["Title"] = "Delete Match";
     Layout = "_Layout";
 }
 
-<h2 class="mb-4">🗑 Delete Match</h2>
+<h2 class="mb-4 text-center text-danger">
+    <i class="fa-solid fa-trash me-2"></i>Delete Match
+</h2>
 
-<div class="card shadow-sm p-4">
-    <h5>Are you sure you want to delete this match?</h5>
+<div class="card shadow-sm mx-auto p-4"
+     style="max-width:600px;border-radius:16px;">
 
+    <!-- Warning -->
+    <div class="alert alert-danger text-center">
+        <strong>Are you sure?</strong><br />
+        This action will permanently delete the match.
+    </div>
+
+    <!-- Match Info -->
     <dl class="row mt-3">
-        <dt class="col-sm-3">Team A</dt>
-        <dd class="col-sm-9">@Model.TeamA?.TeamName</dd>
+        <dt class="col-sm-4">Team A</dt>
+        <dd class="col-sm-8 fw-semibold">@Model.TeamA?.TeamName</dd>
 
-        <dt class="col-sm-3">Team B</dt>
-        <dd class="col-sm-9">@Model.TeamB?.TeamName</dd>
+        <dt class="col-sm-4">Team B</dt>
+        <dd class="col-sm-8 fw-semibold">@Model.TeamB?.TeamName</dd>
 
-        <dt class="col-sm-3">Match Type</dt>
-        <dd class="col-sm-9">@Model.MatchType</dd>
+        <dt class="col-sm-4">Match Type</dt>
+        <dd class="col-sm-8">@Model.MatchType</dd>
 
-        <dt class="col-sm-3">Date</dt>
-        <dd class="col-sm-9">@Model.Date.ToShortDateString()</dd>
+        <dt class="col-sm-4">Match Date</dt>
+        <dd class="col-sm-8">@Model.Date.ToString("dd MMM yyyy")</dd>
 
-        <dt class="col-sm-3">Venue</dt>
-        <dd class="col-sm-9">@Model.Venue</dd>
+        <dt class="col-sm-4">Venue</dt>
+        <dd class="col-sm-8">@Model.Venue</dd>
     </dl>
 
-    <form asp-action="Delete" method="post">
+    <!-- Actions -->
+    <form asp-action="Delete" method="post" class="text-center mt-4">
         <input type="hidden" asp-for="MatchId" />
-        <button type="submit" class="btn btn-danger">🗑 Delete</button>
-        <a asp-action="Index" class="btn btn-secondary">↩ Back to List</a>
+
+        <button type="submit"
+                class="btn btn-danger px-4 me-2">
+            Delete Match
+        </button>
+
+        <a asp-action="Index"
+           class="btn btn-outline-secondary px-4">
+            Cancel
+        </a>
     </form>
 </div>
