@@ -200,22 +200,9 @@ namespace CricbuzzAppV2.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ============================
-        // DELETE
-        // ============================
-        public async Task<IActionResult> Delete(int id)
-        {
-            var player = await _context.Players
-                .Include(p => p.Team)
-                .FirstOrDefaultAsync(p => p.PlayerId == id);
 
-            if (player == null)
-                return NotFound();
 
-            return View(player);
-        }
-
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -229,6 +216,7 @@ namespace CricbuzzAppV2.Controllers
             AppHelper.SetSuccess(this, $"🗑 Player '{player.FullName}' deleted.");
             return RedirectToAction(nameof(Index));
         }
+
 
         // ============================
         // BULK DELETE

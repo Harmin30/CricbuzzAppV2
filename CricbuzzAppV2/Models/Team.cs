@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace CricbuzzAppV2.Models
 {
+    [Index(nameof(TeamName), nameof(Country), IsUnique = true)]
     public class Team
     {
         public int TeamId { get; set; }
@@ -18,7 +20,6 @@ namespace CricbuzzAppV2.Models
         [Display(Name = "Coach")]
         public string Coach { get; set; }
 
-        // Final saved image path / URL
         public string? ImageUrl { get; set; }
 
         public ICollection<Player> Players { get; set; } = new List<Player>();

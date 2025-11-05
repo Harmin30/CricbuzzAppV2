@@ -155,22 +155,11 @@ namespace CricbuzzAppV2.Controllers
         }
 
 
-        // GET: Matches/Delete/5
-        public async Task<IActionResult> Delete(int id)
-        {
-            var match = await _context.Matches
-                .Include(m => m.TeamA)
-                .Include(m => m.TeamB)
-                .Include(m => m.WinnerTeam)
-                .FirstOrDefaultAsync(m => m.MatchId == id);
 
-            if (match == null)
-                return NotFound();
-
-            return View(match);
-        }
-
-        [HttpPost, ActionName("Delete")]
+        // ============================
+        // SINGLE DELETE (Unified Modal)
+        // ============================
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -196,6 +185,7 @@ namespace CricbuzzAppV2.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
 
 
         [HttpPost]

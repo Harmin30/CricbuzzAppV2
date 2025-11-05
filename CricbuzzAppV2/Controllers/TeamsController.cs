@@ -66,6 +66,21 @@ namespace CricbuzzAppV2.Controllers
                 ViewBag.Countries = CountryList.All;
                 return View(model);
             }
+            bool teamExists = await _context.Teams.AnyAsync(t =>
+     t.TeamName.Trim().ToLower() == model.TeamName.Trim().ToLower() &&
+     t.Country.Trim().ToLower() == model.Country.Trim().ToLower());
+
+
+            if (teamExists)
+            {
+                ModelState.AddModelError(nameof(model.TeamName),
+    "This team already exists in the selected country.");
+
+
+                ViewBag.Countries = CountryList.All;
+                return View(model);
+            }
+
 
 
             string imagePath = "https://th.bing.com/th/id/OIP.FuJz0KDQ05jfCqQmo1rypwAAAA?w=167&h=176&c=7&r=0&o=7&pid=1.7&rm=3";
@@ -144,6 +159,24 @@ namespace CricbuzzAppV2.Controllers
                 return View(model);
             }
 
+            bool duplicateOnEdit = await _context.Teams.AnyAsync(t =>
+     t.TeamId != model.TeamId &&
+     t.TeamName.Trim().ToLower() == model.TeamName.Trim().ToLower() &&
+     t.Country.Trim().ToLower() == model.Country.Trim().ToLower());
+
+
+            if (duplicateOnEdit)
+            {
+                ModelState.AddModelError(nameof(model.TeamName),
+    "Another team with the same name already exists in this country.");
+
+
+                ViewBag.Countries = CountryList.All;
+                return View(model);
+            }
+
+
+
             var team = await _context.Teams.FindAsync(model.TeamId);
             if (team == null)
                 return NotFound();
@@ -189,23 +222,7 @@ namespace CricbuzzAppV2.Controllers
         }
 
 
-
-        // ============================
-        // GET: Teams/Delete/5
-        // ============================
-        public async Task<IActionResult> Delete(int id)
-        {
-            var team = await _context.Teams
-                .FirstOrDefaultAsync(t => t.TeamId == id);
-
-            if (team == null)
-                return NotFound();
-
-            return View(team);
-        }
-
-        // POST: Teams/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -231,6 +248,10 @@ namespace CricbuzzAppV2.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+
+
+
 
 
         // ============================
