@@ -9,7 +9,7 @@ namespace CricbuzzAppV2.Controllers
 {
     public class TeamsController : Controller
     {
-private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
         public TeamsController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
@@ -18,18 +18,18 @@ private readonly ApplicationDbContext _context;
         }
 
         // GET: Teams
-      public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index()
         {
- var teams = await _context.Teams.ToListAsync();
-         return View(teams);
+            var teams = await _context.Teams.ToListAsync();
+            return View(teams);
         }
 
         // GET: Teams/Details/5
-     public async Task<IActionResult> Details(int id)
-  {
-     var team = await _context.Teams.FirstOrDefaultAsync(t => t.TeamId == id);
-    if (team == null)
-     return NotFound();
+        public async Task<IActionResult> Details(int id)
+        {
+            var team = await _context.Teams.FirstOrDefaultAsync(t => t.TeamId == id);
+            if (team == null)
+                return NotFound();
 
             return View(team);
         }
@@ -37,10 +37,10 @@ private readonly ApplicationDbContext _context;
         // GET: Teams/Create
         public IActionResult Create()
         {
-  return View();
-      }
+            return View();
+        }
 
-      // POST: Teams/Create
+        // POST: Teams/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Team team)
@@ -55,7 +55,7 @@ private readonly ApplicationDbContext _context;
         }
 
         // GET: Teams/Edit/5
-      public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             var team = await _context.Teams.FindAsync(id);
             if (team == null)
@@ -95,10 +95,10 @@ private readonly ApplicationDbContext _context;
         public async Task<IActionResult> Delete(int id)
         {
             var team = await _context.Teams.FirstOrDefaultAsync(t => t.TeamId == id);
-          if (team == null)
- return NotFound();
+            if (team == null)
+                return NotFound();
 
-    return View(team);
+            return View(team);
         }
 
         //
@@ -108,49 +108,49 @@ private readonly ApplicationDbContext _context;
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteSelected(List<int> selectedIds)
         {
- if (selectedIds == null || !selectedIds.Any())
-         {
-    AppHelper.SetError(this, "No teams selected for deletion.");
-           return RedirectToAction(nameof(Index));
-  }
+            if (selectedIds == null || !selectedIds.Any())
+            {
+                AppHelper.SetError(this, "No teams selected for deletion.");
+                return RedirectToAction(nameof(Index));
+            }
 
             var teams = await _context.Teams
   .Where(t => selectedIds.Contains(t.TeamId))
           .ToListAsync();
 
             var deletedTeams = new List<string>();
-     var skippedTeams = new List<string>();
+            var skippedTeams = new List<string>();
 
-         foreach (var team in teams)
-   {
-   bool hasMatches = await _context.Matches
-          .AnyAsync(m => m.TeamAId == team.TeamId || m.TeamBId == team.TeamId);
+            foreach (var team in teams)
+            {
+                bool hasMatches = await _context.Matches
+                       .AnyAsync(m => m.TeamAId == team.TeamId || m.TeamBId == team.TeamId);
 
                 if (hasMatches)
-       {
-       skippedTeams.Add($"❌ Team '{team.TeamName}' cannot be deleted because it has matches scheduled or completed.");
-        continue;
-              }
+                {
+                    skippedTeams.Add($"❌ Team '{team.TeamName}' cannot be deleted because it has matches scheduled or completed.");
+                    continue;
+                }
 
-_context.Teams.Remove(team);
-     deletedTeams.Add(team.TeamName);
+                _context.Teams.Remove(team);
+                deletedTeams.Add(team.TeamName);
 
-  // Log each deletion
-  await AuditHelper.LogDelete(_context, HttpContext, "Team", team.TeamId.ToString(),
-     $"Deleted team: {team.TeamName} from {team.Country}");
- }
+                //// Log each deletion
+                //await AuditHelper.LogDelete(_context, HttpContext, "Team", team.TeamId.ToString(),
+                //$"Deleted team: {team.TeamName} from {team.Country}");
+            }
 
-       await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-       // Success messages
+            // Success messages
             if (deletedTeams.Any())
-           AppHelper.SetSuccess(this, $"🗑 Deleted teams: {string.Join(", ", deletedTeams)}");
+                AppHelper.SetSuccess(this, $"🗑 Deleted teams: {string.Join(", ", deletedTeams)}");
 
-// Error messages for skipped teams
+            // Error messages for skipped teams
             if (skippedTeams.Any())
-         AppHelper.SetError(this, string.Join("<br/>", skippedTeams));
+                AppHelper.SetError(this, string.Join("<br/>", skippedTeams));
 
-     return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index));
         }
     }
 }

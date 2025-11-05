@@ -7,6 +7,7 @@ namespace CricbuzzAppV2.Helpers
     public static class AuditHelper
     {
         public static async Task LogAction(
+
   ApplicationDbContext context,
   HttpContext httpContext,
  string action,
