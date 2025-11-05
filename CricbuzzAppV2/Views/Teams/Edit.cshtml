@@ -1,49 +1,153 @@
-﻿@model CricbuzzAppV2.Models.Team
+﻿@model CricbuzzAppV2.ViewModels.TeamEditViewModel
+
 @{
     ViewData["Title"] = "Edit Team";
-    Layout = "_Layout";
 }
 
-<h2 class="mb-4">✏ Edit Team</h2>
+<h2 class="mb-4 text-center">
+    <i class="fa-solid fa-pen-to-square me-2"></i>Edit Team
+</h2>
 
-<div class="card shadow-sm p-4">
-    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+
+<div class="card shadow-sm mx-auto p-4" style="max-width:720px;border-radius:16px;">
+
+    <form asp-action="Edit"
+          method="post"
+          enctype="multipart/form-data">
+
+
         <input type="hidden" asp-for="TeamId" />
-        <input type="hidden" asp-for="ImageUrl" />
 
-        <div class="mb-3">
-            <label asp-for="TeamName" class="form-label"></label>
-            <input asp-for="TeamName" class="form-control" />
-            <span asp-validation-for="TeamName" class="text-danger"></span>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Team Name *</label>
+                <input asp-for="TeamName" class="form-control" />
+                <span asp-validation-for="TeamName" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Country *</label>
+                <select asp-for="Country" class="form-select">
+                    <option value="">Select a country</option>
+                    @foreach (var country in ViewBag.Countries)
+                    {
+                        <option value="@country">@country</option>
+                    }
+                </select>
+                <span asp-validation-for="Country" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label fw-semibold">Coach *</label>
+                <input asp-for="Coach" class="form-control" />
+                <span asp-validation-for="Coach" class="text-danger small"></span>
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label asp-for="Country" class="form-label"></label>
-            <input asp-for="Country" class="form-control" />
-            <span asp-validation-for="Country" class="text-danger"></span>
+        <!-- Image -->
+        <!-- Image -->
+        <div class="mt-4 row align-items-center g-4">
+            <div class="col-md-4 text-center">
+                <img id="logoPreview"
+                     src="@Model.ExistingImageUrl"
+                     class="rounded-circle border shadow-sm"
+                     style="width:120px;height:120px;object-fit:cover;" />
+            </div>
+
+            <div class="col-md-8">
+                <input asp-for="ImageFile"
+                       id="imageFile"
+                       class="form-control mb-2"
+                       type="file"
+                       accept="image/*"
+                       onchange="previewImage(this)" />
+
+                <div class="text-center text-muted my-1">— OR —</div>
+
+                <input asp-for="ImageUrlInput"
+                       id="imageUrl"
+                       class="form-control"
+                       placeholder="Paste an image link"
+                       onchange="previewImageUrl(this)" />
+
+                <small class="text-muted">
+                    You can upload an image or use a URL.
+                </small>
+
+                <!-- Priority Info Message -->
+                <div id="priorityInfo"
+                     class="text-info small mt-2"
+                     style="display:none;">
+                    ℹ️ If both options are provided, the uploaded image will be used.
+                </div>
+
+                <div id="imageError"
+                     class="text-danger small mt-2"
+                     style="display:none;">
+                    Unable to load the image from the link.
+                </div>
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label asp-for="Coach" class="form-label"></label>
-            <input asp-for="Coach" class="form-control" />
-            <span asp-validation-for="Coach" class="text-danger"></span>
-        </div>
 
-        <div class="mb-3">
-            <label asp-for="ImageUrl" class="form-label">Team Logo URL</label>
-            <input asp-for="ImageUrl" class="form-control" />
-            <span asp-validation-for="ImageUrl" class="text-danger"></span>
-            <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/default-team.png" : Model.ImageUrl)"
-                 class="mt-2 rounded-circle" style="width:80px;height:80px;object-fit:cover;" />
-        </div>
-
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-success">💾 Update</button>
-            <a asp-action="Index" class="btn btn-secondary">↩ Back to List</a>
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <button type="submit" class="btn btn-success px-4">Update</button>
+            <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
         </div>
     </form>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+         const preview = document.getElementById("logoPreview");
+        const imageError = document.getElementById("imageError");
+        const priorityInfo = document.getElementById("priorityInfo");
+        const imageFile = document.getElementById("imageFile");
+        const imageUrl = document.getElementById("imageUrl");
+
+        function previewImage(input) {
+            if (!input.files || !input.files[0]) return;
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                preview.src = e.target.result;
+                imageError.style.display = "none";
+
+                if (imageUrl.value.trim() !== "") {
+                    priorityInfo.style.display = "block";
+                } else {
+                    priorityInfo.style.display = "none";
+                }
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        function previewImageUrl(input) {
+            if (!input.value) {
+                priorityInfo.style.display = "none";
+                return;
+            }
+
+            const img = new Image();
+            img.onload = () => {
+                preview.src = input.value;
+                imageError.style.display = "none";
+
+                if (imageFile.files.length > 0) {
+                    priorityInfo.style.display = "block";
+                } else {
+                    priorityInfo.style.display = "none";
+                }
+            };
+
+            img.onerror = () => {
+                imageError.style.display = "block";
+            };
+
+            img.src = input.value;
+        }
+
+    </script>
 }

@@ -1,128 +1,177 @@
-﻿@model CricbuzzAppV2.Models.Team
-@{
-    ViewData["Title"] = "Add Team";
-    Layout = "_Layout";
-}
+﻿@model TeamCreateViewModel
 
-<h2 class="mb-4">➕ Add New Team</h2>
+<h2 class="mb-4 text-center"><i class="fa-solid fa-plus me-1"></i>Add New Team</h2>
 
-<div class="card shadow-sm p-4">
+<div class="card shadow-sm mx-auto p-4" style="max-width: 720px; border-radius: 16px;">
+
     <form asp-action="Create" method="post" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label asp-for="TeamName" class="form-label"></label>
-            <input asp-for="TeamName" class="form-control" placeholder="Enter team name" />
-            <span asp-validation-for="TeamName" class="text-danger"></span>
-        </div>
 
-        <div class="mb-3">
-            <label asp-for="Country" class="form-label"></label>
-            <input asp-for="Country" class="form-control" placeholder="Enter country" />
-            <span asp-validation-for="Country" class="text-danger"></span>
-        </div>
+        <div class="row g-3">
 
-        <div class="mb-3">
-            <label asp-for="Coach" class="form-label"></label>
-            <input asp-for="Coach" class="form-control" placeholder="Enter coach name" />
-            <span asp-validation-for="Coach" class="text-danger"></span>
-        </div>
-
-        <!-- Image Upload Section -->
-        <div class="mb-4">
-            <label class="form-label">Team Logo</label>
-
-            <!-- Image Preview -->
-            <div class="mb-3">
-                <img id="logoPreview"
-                    src="/images/default-team.png"
-                    class="rounded-circle border"
-                    style="width: 100px; height: 100px; object-fit: cover;"
-                    onerror="this.src='/images/default-team.png'; showImageError();" />
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Team Name <span class="text-danger">*</span>
+                </label>
+                <input asp-for="TeamName"
+                       class="form-control"
+                       placeholder="Enter team name" />
+                <span asp-validation-for="TeamName" class="text-danger small"></span>
             </div>
 
-            <!-- Image Upload Options -->
-            <div class="row g-3">
-                <!-- File Upload Option -->
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h6 class="card-title mb-3">Option 1: Upload Image</h6>
-                            <div class="d-flex gap-2 align-items-center">
-                                <input type="file" name="ImageFile" id="imageFile" class="form-control"
-                                    accept="image/*" onchange="previewImage(this)" />
-                            </div>
-                        </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Country <span class="text-danger">*</span>
+                </label>
+                <select asp-for="Country" class="form-select">
+                    <option value="">Select a country</option>
+
+                    @foreach (var country in ViewBag.Countries)
+                    {
+                        <option value="@country">@country</option>
+                    }
+                </select>
+                <span asp-validation-for="Country" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label fw-semibold">
+                    Coach <span class="text-danger">*</span>
+                </label>
+                <input asp-for="Coach"
+                       class="form-control"
+                       placeholder="Enter coach name" />
+                <span asp-validation-for="Coach" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <!-- Image Section -->
+        <div class="mt-4">
+            <label class="form-label fw-semibold text-center d-block">
+                Team Logo
+            </label>
+
+            <div class="row align-items-center g-4 mt-2">
+
+                <!-- LEFT: Image Preview -->
+                <div class="col-md-4 text-center">
+                    <img id="logoPreview"
+                         src="https://th.bing.com/th/id/OIP.FuJz0KDQ05jfCqQmo1rypwAAAA?w=167&h=176&c=7&r=0&o=7&pid=1.7&rm=3"
+                         class="rounded-circle border shadow-sm"
+                         style="width:140px;height:140px;object-fit:cover;" />
+                </div>
+
+                <!-- RIGHT: Options -->
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <input asp-for="ImageFile"
+                               id="imageFile"
+                               class="form-control"
+                               type="file"
+                               accept="image/*"
+                               onchange="previewImage(this)" />
+                        <small class="text-muted">
+                            Upload an image from your device
+                        </small>
+                    </div>
+
+                    <div class="text-center text-muted my-2">— OR —</div>
+
+                    <div>
+                        <input asp-for="ImageUrlInput"
+                               id="imageUrl"
+                               class="form-control"
+                               placeholder="Paste an image link"
+                               onchange="previewImageUrl(this)" />
+                        <small class="text-muted">
+                            Use an image link from the web
+                        </small>
+                    </div>
+
+                    <!-- Priority Info Message -->
+                    <div id="priorityInfo"
+                         class="text-info small mt-2"
+                         style="display:none;">
+                        ℹ️ If you use both options, the uploaded image will be used.
+                    </div>
+
+                    <div id="imageError"
+                         class="text-danger small mt-2"
+                         style="display:none;">
+                        Unable to load the image from the link.
                     </div>
                 </div>
 
-                <!-- URL Option -->
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h6 class="card-title mb-3">Option 2: Image URL</h6>
-                            <input type="url" name="ImageUrlInput" id="imageUrl" class="form-control"
-                                placeholder="Enter image URL (e.g., https://...)"
-                                onchange="previewImageUrl(this)" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Error Message -->
-            <div id="imageError" class="text-danger mt-2" style="display: none;">
-                ⚠️ Unable to load image. Please check the file or URL and try again.
             </div>
         </div>
 
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-success">💾 Save</button>
-            <a asp-action="Index" class="btn btn-secondary">↩ Back to List</a>
+
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <button type="submit" class="btn btn-success px-4">Save</button>
+            <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
         </div>
+
     </form>
+
 </div>
 
-@section Scripts {
+
+
+   @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        // Preview image from file upload
+        const preview = document.getElementById("logoPreview");
+        const imageError = document.getElementById("imageError");
+        const priorityInfo = document.getElementById("priorityInfo");
+        const imageFile = document.getElementById("imageFile");
+        const imageUrl = document.getElementById("imageUrl");
+
         function previewImage(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById('logoPreview').src = e.target.result;
-                    document.getElementById('imageUrl').value = ''; // Clear URL input
-                    document.getElementById('imageError').style.display = 'none';
+            if (!input.files || !input.files[0]) return;
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                preview.src = e.target.result;
+                imageError.style.display = "none";
+
+                // If URL already exists → show info message
+                if (imageUrl.value.trim() !== "") {
+                    priorityInfo.style.display = "block";
+                } else {
+                    priorityInfo.style.display = "none";
                 }
-                reader.readAsDataURL(input.files[0]);
-            }
+            };
+            reader.readAsDataURL(input.files[0]);
         }
 
-        // Preview image from URL
         function previewImageUrl(input) {
-            if (input.value) {
-                document.getElementById('logoPreview').src = input.value;
-                document.getElementById('imageFile').value = ''; // Clear file input
-                document.getElementById('imageError').style.display = 'none';
+            if (!input.value) {
+                priorityInfo.style.display = "none";
+                return;
             }
-        }
 
-        // Show error message when image fails to load
-        function showImageError() {
-            document.getElementById('imageError').style.display = 'block';
-        }
+            const img = new Image();
+            img.onload = () => {
+                preview.src = input.value;
+                imageError.style.display = "none";
 
-        // Form validation
-        document.querySelector('form').addEventListener('submit', function (e) {
-            const imageUrl = document.getElementById('imageUrl').value;
-            const imageFile = document.getElementById('imageFile').files[0];
-
-            // If URL is provided but invalid
-            if (imageUrl && !imageFile) {
-                if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
-                    e.preventDefault();
-                    alert('Please enter a valid image URL starting with http:// or https://');
+                // If file already exists → show info message
+                if (imageFile.files.length > 0) {
+                    priorityInfo.style.display = "block";
+                } else {
+                    priorityInfo.style.display = "none";
                 }
-            }
-        });
+            };
+
+            img.onerror = () => {
+                imageError.style.display = "block";
+            };
+
+            img.src = input.value;
+        }
     </script>
 }
+
+
+
+
