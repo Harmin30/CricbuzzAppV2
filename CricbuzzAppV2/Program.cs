@@ -29,6 +29,7 @@ app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
 
+
 // Default public route → UserPortal
 app.MapControllerRoute(
     name: "default",
@@ -41,3 +42,6 @@ app.MapControllerRoute(
     defaults: new { controller = "Account", action = "Login" });
 
 app.Run();
+
+// End of Program.cs
+
