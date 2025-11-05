@@ -1,0 +1,132 @@
+﻿@model CricbuzzAppV2.Models.BowlingScorecard
+
+@{
+    var innings = ViewBag.Innings as CricbuzzAppV2.Models.MatchInnings;
+    var players = ViewBag.Players as List<CricbuzzAppV2.Models.Player>;
+    ViewData["Title"] = "Add Bowling";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-center">
+        <div class="card shadow-lg p-4 w-100"
+             style="max-width:720px;border-radius:18px;">
+
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h4 class="fw-bold">
+                    <i class="fa-solid fa-bowling-ball text-warning me-2"></i>
+                    Bowling – @innings?.BowlingTeam?.TeamName
+                </h4>
+                <small class="text-muted">
+                    Add bowling performance for this innings
+                </small>
+            </div>
+
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="MatchInningsId" />
+
+                <!-- Validation summary -->
+                @if (!ViewContext.ViewData.ModelState.IsValid &&
+                                ViewContext.ViewData.ModelState.ErrorCount > 0)
+                {
+                    <div asp-validation-summary="All" class="alert alert-danger"></div>
+                }
+
+
+                <!-- Bowler -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        <i class="fa-solid fa-user text-primary me-1"></i>
+                        Bowler *
+                    </label>
+                    <select asp-for="PlayerId" class="form-select">
+                        <option value="">-- Select Bowler --</option>
+                        @foreach (var p in players)
+                        {
+                            <option value="@p.PlayerId">@p.FullName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="PlayerId" class="text-danger small"></span>
+                </div>
+
+                <!-- Bowling stats -->
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">
+                            <i class="fa-solid fa-stopwatch text-info me-1"></i>
+                            Overs *
+                        </label>
+                        <input asp-for="Overs"
+                               type="number"
+                               step="0.1"
+                               min="0"
+                               max="50"
+                               class="form-control" />
+                        <span asp-validation-for="Overs" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">
+                            <i class="fa-solid fa-minus text-secondary me-1"></i>
+                            Maidens
+                        </label>
+                        <input asp-for="Maidens"
+                               type="number"
+                               min="0"
+                               max="50"
+                               class="form-control" />
+                        <span asp-validation-for="Maidens" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">
+                            <i class="fa-solid fa-gauge-high text-danger me-1"></i>
+                            Runs
+                        </label>
+                        <input asp-for="RunsConceded"
+                               type="number"
+                               min="0"
+                               max="500"
+                               class="form-control" />
+                        <span asp-validation-for="RunsConceded" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">
+                            <i class="fa-solid fa-trophy text-success me-1"></i>
+                            Wickets
+                        </label>
+                        <input asp-for="Wickets"
+                               type="number"
+                               min="0"
+                               max="10"
+                               class="form-control" />
+                        <span asp-validation-for="Wickets" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <a asp-controller="Matches"
+                       asp-action="Details"
+                       asp-route-id="@innings?.MatchId"
+                       class="btn btn-outline-secondary">
+                        <i class="fa-solid fa-arrow-left me-1"></i>
+                        Back
+                    </a>
+
+                    <button class="btn btn-success btn-lg px-4">
+                        <i class="fa-solid fa-plus me-1"></i>
+                        Add Bowling Entry
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

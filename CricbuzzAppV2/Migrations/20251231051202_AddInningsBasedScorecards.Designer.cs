@@ -4,6 +4,7 @@ using CricbuzzAppV2.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CricbuzzAppV2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251231051202_AddInningsBasedScorecards")]
+    partial class AddInningsBasedScorecards
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,7 +59,7 @@ namespace CricbuzzAppV2.Migrations
                     b.ToTable("Audits");
                 });
 
-            modelBuilder.Entity("CricbuzzAppV2.Models.BattingInningsScorecard", b =>
+            modelBuilder.Entity("CricbuzzAppV2.Models.BattingScorecard", b =>
                 {
                     b.Property<int>("BattingScorecardId")
                         .ValueGeneratedOnAdd()
@@ -157,9 +160,6 @@ namespace CricbuzzAppV2.Migrations
                     b.Property<int?>("OversLimit")
                         .HasColumnType("int");
 
-                    b.Property<string>("ResultDescription")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -205,9 +205,6 @@ namespace CricbuzzAppV2.Migrations
                     b.Property<int>("BowlingTeamId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("EndTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("Extras")
                         .HasColumnType("int");
 
@@ -219,9 +216,6 @@ namespace CricbuzzAppV2.Migrations
 
                     b.Property<double>("OversBowled")
                         .HasColumnType("float");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -497,7 +491,7 @@ namespace CricbuzzAppV2.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("CricbuzzAppV2.Models.BattingInningsScorecard", b =>
+            modelBuilder.Entity("CricbuzzAppV2.Models.BattingScorecard", b =>
                 {
                     b.HasOne("CricbuzzAppV2.Models.MatchInnings", "MatchInnings")
                         .WithMany("BattingScorecards")

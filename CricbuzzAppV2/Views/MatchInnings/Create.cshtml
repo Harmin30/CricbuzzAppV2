@@ -1,0 +1,172 @@
+﻿@model CricbuzzAppV2.Models.MatchInnings
+
+@{
+    var match = ViewBag.Match as CricbuzzAppV2.Models.Match;
+    var teams = ViewBag.Teams as CricbuzzAppV2.Models.Team[];
+    var currentInnings = ViewBag.CurrentInnings as CricbuzzAppV2.Models.MatchInnings;
+
+    ViewData["Title"] = "Manage Innings";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg mx-auto p-4"
+         style="max-width:720px;border-radius:18px;">
+
+        <!-- HEADER -->
+        <div class="text-center mb-4">
+            <h3 class="fw-bold mb-1">
+                <i class="fa-solid fa-gears me-1"></i>
+                Innings Management
+            </h3>
+            <small class="text-muted">
+                Control batting and bowling for this match
+            </small>
+        </div>
+
+        <!-- MATCH INFO -->
+        <div class="alert alert-light border small text-center mb-4">
+            <strong>@match?.TeamA?.TeamName</strong>
+            vs
+            <strong>@match?.TeamB?.TeamName</strong><br />
+            <span class="text-muted">
+                @match?.MatchType · @match?.Venue
+            </span>
+        </div>
+
+        @* ============================= *@
+        @* INNINGS IN PROGRESS           *@
+        @* ============================= *@
+        @if (currentInnings != null)
+        {
+            <div class="alert alert-warning text-center">
+                <h5 class="mb-1">
+                    <i class="fa-solid fa-hourglass-half me-1"></i>
+                    Innings in Progress
+                </h5>
+
+                <div class="fw-semibold">
+                    @currentInnings.BattingTeam?.TeamName batting
+                </div>
+
+                <small class="text-muted">
+                    Innings @currentInnings.InningsNumber
+                </small>
+            </div>
+
+            <form asp-controller="MatchInnings"
+                  asp-action="EndInnings"
+                  method="post"
+                  class="text-center mt-3">
+                @Html.AntiForgeryToken()
+                <input type="hidden"
+                       name="id"
+                       value="@currentInnings.MatchInningsId" />
+
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <button type="submit"
+                            class="btn btn-danger btn-lg px-4">
+                        <i class="fa-solid fa-flag-checkered me-1"></i>
+                        End Innings
+                    </button>
+
+                    <a asp-controller="Matches"
+                       asp-action="Details"
+                       asp-route-id="@match?.MatchId"
+                       class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="fa-solid fa-arrow-left me-1"></i>
+                        Back to Match
+                    </a>
+                </div>
+
+                <div class="small text-muted mt-2">
+                    Ending innings will lock all score entries
+                </div>
+            </form>
+        }
+        else
+        {
+            @* ============================= *@
+            @* START NEW INNINGS             *@
+            @* ============================= *@
+
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div asp-validation-summary="All"
+                         class="alert alert-danger small">
+                    </div>
+                }
+
+                <input type="hidden"
+                       asp-for="MatchId"
+                       value="@match.MatchId" />
+
+                <!-- BATTING TEAM -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        <i class="fa-solid fa-cricket-bat-ball me-1"></i>
+                        Batting Team
+                    </label>
+                    <select asp-for="BattingTeamId"
+                            class="form-select">
+                        <option value="">-- Select Batting Team --</option>
+                        @foreach (var team in teams)
+                        {
+                            <option value="@team.TeamId">
+                                @team.TeamName
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="BattingTeamId"
+                          class="text-danger small"></span>
+                </div>
+
+                <!-- BOWLING TEAM -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        <i class="fa-solid fa-bullseye me-1"></i>
+                        Bowling Team
+                    </label>
+                    <select asp-for="BowlingTeamId"
+                            class="form-select">
+                        <option value="">-- Select Bowling Team --</option>
+                        @foreach (var team in teams)
+                        {
+                            <option value="@team.TeamId">
+                                @team.TeamName
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="BowlingTeamId"
+                          class="text-danger small"></span>
+                </div>
+
+                <div class="alert alert-info small text-center">
+                    Innings number will be assigned automatically
+                </div>
+
+                <div class="d-flex justify-content-center gap-3 flex-wrap mt-4">
+                    <button type="submit"
+                            class="btn btn-success btn-lg px-4">
+                        <i class="fa-solid fa-play me-1"></i>
+                        Start Innings
+                    </button>
+
+                    <a asp-controller="Matches"
+                       asp-action="Details"
+                       asp-route-id="@match?.MatchId"
+                       class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="fa-solid fa-arrow-left me-1"></i>
+                        Back to Match
+                    </a>
+                </div>
+            </form>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

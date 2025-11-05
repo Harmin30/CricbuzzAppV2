@@ -3,15 +3,38 @@
 @{
     ViewData["Title"] = "Match Details";
     Layout = "_Layout";
+
+    var currentInnings = ViewBag.CurrentInnings as CricbuzzAppV2.Models.MatchInnings;
 }
+
+@using CricbuzzAppV2.Models
+
+@{
+    var completedInnings = ViewBag.CompletedInnings as List<MatchInnings>;
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show auto-dismiss"
+         role="alert">
+        <i class="fa-solid fa-circle-check me-1"></i>
+        @TempData["Success"]
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"></button>
+    </div>
+}
+
 
 <h2 class="mb-4 text-center">
     <i class="fa-solid fa-eye me-2"></i>Match Details
 </h2>
 
-<div class="card shadow-sm mx-auto p-4"
-     style="max-width:650px;border-radius:16px;">
 
+<div class="card shadow-sm mx-auto p-4"
+     style="max-width:800px;border-radius:16px;">
+
+    <!-- Match Info -->
     <div class="row mb-2">
         <div class="col-sm-4 text-muted fw-semibold">Team A</div>
         <div class="col-sm-8">@Model.TeamA?.TeamName</div>
@@ -42,24 +65,738 @@
     </div>
     <hr />
 
+    @* Winner *@
+
     <div class="row mb-2">
-        <div class="col-sm-4 text-muted fw-semibold">Winner</div>
+        <div class="col-sm-4 text-muted fw-semibold">Result</div>
         <div class="col-sm-8">
-            @(Model.WinnerTeam?.TeamName ?? "—")
+            @if (Model.Status == MatchStatus.Completed)
+            {
+                if (Model.WinnerTeamId == Model.TeamAId)
+                {
+                    <strong>@Model.TeamA.TeamName</strong> 
+                    @Model.ResultDescription
+                }
+                else if (Model.WinnerTeamId == Model.TeamBId)
+                {
+                    <strong>@Model.TeamB.TeamName</strong> 
+                    @Model.ResultDescription
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Match tied</span>
+                }
+            }
+            else
+            {
+                <span class="text-muted">Match in progress</span>
+            }
+        </div>
+    </div>
+    <div class="alert alert-warning small text-center">
+        <div>currentInnings is null: @(currentInnings == null)</div>
+        <div>CanManageInnings: @ViewBag.CanManageInnings</div>
+        <div>Match Status: @Model.Status</div>
+    </div>
+
+
+
+    <!-- 🔥 NEW: Innings Management -->
+    <hr />
+    <div class="mt-3">
+
+        <div class="d-flex flex-wrap gap-2 justify-content-center mb-3">
+
+            @* Manage Innings Button *@
+            @if (ViewBag.CanManageInnings == true)
+            {
+                if (Model.Status != MatchStatus.Completed && currentInnings == null)
+                {
+                    <!-- ✅ ACTIVE -->
+                    <a asp-controller="MatchInnings"
+                       asp-action="Create"
+                       asp-route-matchId="@Model.MatchId"
+                       class="btn btn-primary">
+                        Manage Innings
+                    </a>
+                }
+                else
+                {
+                    <!-- 🚫 DISABLED WITH TOOLTIP -->
+                    <span class="d-inline-block"
+                          tabindex="0"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          title="Match is completed. Innings cannot be managed.">
+                        <button class="btn btn-primary disabled"
+                                type="button"
+                                aria-disabled="true">
+                            Manage Innings
+                        </button>
+                    </span>
+                }
+            }
+
+
+
+            @* Add scorecards ONLY during live innings *@
+            @if (currentInnings != null)
+            {
+                <a asp-controller="BattingScorecards"
+                   asp-action="Create"
+                   asp-route-inningsId="@currentInnings.MatchInningsId"
+                   class="btn btn-success">
+                    <i class="fa-solid fa-plus me-1"></i> Add Batting
+                </a>
+
+                <a asp-controller="BowlingScorecards"
+                   asp-action="Create"
+                   asp-route-inningsId="@currentInnings.MatchInningsId"
+                   class="btn btn-warning">
+                    <i class="fa-solid fa-plus me-1"></i> Add Bowling
+                </a>
+            }
+        </div>
+
+
+
+        @if (currentInnings != null)
+        {
+            <div class="alert alert-info text-center">
+                <i class="fa-solid fa-hourglass-half me-1"></i>
+                <strong>Innings in progress</strong><br />
+                @currentInnings.BattingTeam?.TeamName batting
+                (Innings @currentInnings.InningsNumber)
+            </div>
+
+        }
+        else if (Model.Status != MatchStatus.Completed)
+        {
+            <div class="alert alert-secondary text-center">
+                No innings in progress.
+            </div>
+        }
+
+
+    </div>
+
+    @* Scorcard *@
+
+    @if (currentInnings?.BattingScorecards != null &&
+        currentInnings.BattingScorecards.Any())
+    {
+        var totalRuns = currentInnings.BattingScorecards.Sum(x => x.Runs);
+        var totalBalls = currentInnings.BattingScorecards.Sum(x => x.BallsFaced);
+
+        var wickets = currentInnings.BattingScorecards.Count(x =>
+        !string.IsNullOrWhiteSpace(x.HowOut) &&
+        !x.HowOut.Equals("Not Out", StringComparison.OrdinalIgnoreCase));
+
+        var overs = totalBalls / 6;
+        var balls = totalBalls % 6;
+        var oversDisplay = $"{overs}.{balls}";
+
+        var runRate = totalBalls > 0
+        ? (totalRuns * 6.0 / totalBalls)
+        : 0;
+
+        <div class="alert alert-light border fw-semibold text-center mt-4">
+            <h4 class="mb-1">
+                @currentInnings.BattingTeam?.TeamName
+                <span class="text-success ms-2">
+                    @totalRuns/@wickets
+                </span>
+                <small class="text-muted ms-2">
+                    (@oversDisplay overs)
+                </small>
+            </h4>
+
+            <div class="text-muted">
+                <i class="fa-solid fa-gauge-high me-1"></i>
+                Run Rate: <strong>@runRate.ToString("0.00")</strong>
+            </div>
+        </div>
+
+    }
+    else if (currentInnings != null &&
+    currentInnings.Status == InningsStatus.InProgress)
+    {
+        <div class="alert alert-secondary text-center mt-3">
+            Batting data not added yet.
+        </div>
+    }
+
+
+    @*     <!-- DESKTOP Batting  Table -->  *@
+
+    @if (currentInnings != null &&
+        currentInnings.BattingScorecards != null &&
+        currentInnings.BattingScorecards.Any())
+    {
+        <div class="d-none d-md-block">
+            <h4 class="mt-3">
+                <i class="fa-solid fa-cricket-bat-ball me-1"></i>
+                Batting Scorecard
+            </h4>
+
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle mt-2">
+                    <thead class="table-dark">
+
+                        <tr>
+                            <th>Batsman</th>
+                            <th>R</th>
+                            <th>B</th>
+                            <th>4s</th>
+                            <th>6s</th>
+                            <th>SR</th>
+                            <th>How Out</th>
+                            <th class="text-center">Actions</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var b in currentInnings.BattingScorecards
+                                            .OrderBy(x => x.BattingPosition))
+                        {
+                            <tr>
+                                <td>@(b.Player?.FullName ?? "—")</td>
+                                <td>@b.Runs</td>
+                                <td>@b.BallsFaced</td>
+                                <td>@b.Fours</td>
+                                <td>@b.Sixes</td>
+                                <td>
+                                    @(b.BallsFaced > 0
+                                                                ? ((double)b.Runs / b.BallsFaced * 100).ToString("0.00")
+                                                                : "0.00")
+                        </td>
+                        <td>@(string.IsNullOrWhiteSpace(b.HowOut) ? "Not Out" : b.HowOut)</td>
+                        <!-- 👇 ADD THIS TD AT THE END -->
+                        <td class="text-center">
+                            @if (currentInnings.Status == InningsStatus.InProgress)
+                                    {
+                                        <!-- EDIT -->
+                                        <a asp-controller="BattingScorecards"
+                                           asp-action="Edit"
+                                           asp-route-id="@b.BattingScorecardId"
+                                           class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+
+                                        <!-- DELETE -->
+                                        <button class="btn btn-sm btn-outline-danger"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteScorecardModal"
+                                                data-id="@b.BattingScorecardId"
+                                                data-controller="BattingScorecards"
+                                                data-type="batting entry">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+
+                                    }
+                        </td>
+
+                    </tr>
+                                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+
+@* Mobile Batting Cards *@
+
+    @if (currentInnings != null &&
+        currentInnings.BattingScorecards != null &&
+        currentInnings.BattingScorecards.Any())
+    {
+        <div class="d-md-none mt-3">
+            @foreach (var b in currentInnings.BattingScorecards
+                    .OrderBy(x => x.BattingPosition))
+            {
+                <div class="card shadow-sm mb-2">
+                    <div class="card-body p-2">
+                        <div class="fw-bold">@b.Player?.FullName</div>
+
+                        <div class="small text-muted">
+                            @(string.IsNullOrWhiteSpace(b.HowOut) ? "Not Out" : b.HowOut)
+                        </div>
+
+                        <div class="d-flex justify-content-between small mt-1">
+                            <span>R: <strong>@b.Runs</strong></span>
+                            <span>B: @b.BallsFaced</span>
+                            <span>4s: @b.Fours</span>
+                            <span>6s: @b.Sixes</span>
+                            <span>
+                                SR:
+                                @(b.BallsFaced > 0
+                                                        ? ((double)b.Runs / b.BallsFaced * 100).ToString("0.0")
+                                                        : "0.0")
+                    </span>
+                    @if (currentInnings.Status == InningsStatus.InProgress)
+                            {
+                                @if (currentInnings.Status == InningsStatus.InProgress)
+                                {
+                                    <div class="text-end mt-2">
+                                        <a asp-controller="BattingScorecards"
+                                           asp-action="Edit"
+                                           asp-route-id="@b.BattingScorecardId"
+                                           class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+
+                                        <button class="btn btn-sm btn-outline-danger"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteScorecardModal"
+                                                data-id="@b.BattingScorecardId"
+                                                data-controller="BattingScorecards"
+                                                data-type="batting entry">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+
+                                    </div>
+                                }
+
+                            }
+
+                </div>
+            </div>
+        </div>
+                }
+        </div>
+    }
+
+
+
+
+    @if (currentInnings?.BowlingScorecards != null &&
+        currentInnings.BowlingScorecards.Any())
+    {
+        var totalOvers = currentInnings.BowlingScorecards.Sum(x => x.Overs);
+        var totalRunsConceded = currentInnings.BowlingScorecards.Sum(x => x.RunsConceded);
+        var totalWickets = currentInnings.BowlingScorecards.Sum(x => x.Wickets);
+
+        var economy = totalOvers > 0
+        ? totalRunsConceded / totalOvers
+        : 0;
+
+        <div class="alert alert-light border fw-semibold text-center mt-4">
+            <h5 class="mb-1">Bowling Summary</h5>
+            <div class="text-muted">
+                Overs: <strong>@totalOvers</strong> |
+                Wickets: <strong>@totalWickets</strong> |
+                Economy: <strong>@economy.ToString("0.00")</strong>
+            </div>
+        </div>
+    }
+
+@if (currentInnings != null &&
+    currentInnings.BowlingScorecards != null &&
+    currentInnings.BowlingScorecards.Any())
+{
+    <!-- DESKTOP Bowling TABLE -->
+    <div class="d-none d-md-block">
+            <h4 class="mt-3">
+               
+                Bowling Scorecard
+            </h4>
+
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle mt-2">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Bowler</th>
+                        <th>O</th>
+                        <th>M</th>
+                        <th>R</th>
+                        <th>W</th>
+                        <th>Econ</th>
+                         <th class="text-center">Actions</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var b in currentInnings.BowlingScorecards)
+                    {
+                        <tr>
+                            <td>@(b.Player?.FullName ?? "—")</td>
+                            <td>@b.Overs</td>
+                            <td>@b.Maidens</td>
+                            <td>@b.RunsConceded</td>
+                            <td>@b.Wickets</td>
+                            <td>
+                                @(b.Overs > 0
+                                    ? (b.RunsConceded / b.Overs).ToString("0.00")
+                                    : "0.00")
+                            </td>
+                        <td class="text-center">
+                            @if (currentInnings.Status == InningsStatus.InProgress)
+                                    {
+                                        <!-- EDIT -->
+                                        <a asp-controller="BowlingScorecards"
+                                           asp-action="Edit"
+                                           asp-route-id="@b.BowlingScorecardId"
+                                           class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+
+                                        <!-- DELETE -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteScorecardModal"
+                                                data-id="@b.BowlingScorecardId"
+                                                data-controller="BowlingScorecards"
+                                                data-type="bowling entry">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+
+                                    }
+                                </td>
+
+
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 
+
+
+        <!-- MOBILE Bowling CARDS -->
+        <div class="d-md-none mt-3">
+            @foreach (var b in currentInnings.BowlingScorecards)
+            {
+                <div class="card shadow-sm mb-2">
+                    <div class="card-body p-2">
+                        <div class="fw-bold">@b.Player?.FullName</div>
+
+
+                        <div class="d-flex justify-content-between small mt-1">
+                            <span>O: @b.Overs</span>
+                            <span>M: @b.Maidens</span>
+                            <span>R: @b.RunsConceded</span>
+                            <span>W: <strong>@b.Wickets</strong></span>
+                            <span>
+                                Econ:
+                                @(b.Overs > 0
+                                                        ? (b.RunsConceded / b.Overs).ToString("0.0")
+                                                        : "0.0")
+                    </span>
+                    @if (currentInnings.Status == InningsStatus.InProgress)
+                            {
+                                <div class="text-end mt-2">
+                                    <a asp-controller="BowlingScorecards"
+                                       asp-action="Edit"
+                                       asp-route-id="@b.BowlingScorecardId"
+                                       class="btn btn-sm btn-outline-primary me-1">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteScorecardModal"
+                                            data-id="@b.BowlingScorecardId"
+                                            data-controller="BowlingScorecards"
+                                            data-type="bowling entry">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+
+                                </div>
+                            }
+
+
+
+                </div>
+            </div>
+        </div>
+                }
+        </div>
+    }
+    else if (currentInnings != null)
+    {
+        <div class="alert alert-secondary text-center mt-3">
+            Bowling data not added yet.
+        </div>
+    }
+@* Completed Innings *@
+
+    @if (ViewBag.CompletedInnings != null && ViewBag.CompletedInnings.Count > 0)
+    {
+        <h3 class="mt-5 text-center">
+            <i class="fa-solid fa-clock-rotate-left me-1"></i>
+            Completed Innings
+        </h3>
+
+    @if (completedInnings != null && completedInnings.Any())
+    {
+        foreach (var inn in completedInnings.OrderBy(i => i.InningsNumber))
+        {
+            <!-- INNINGS HEADER -->
+            <div class="alert alert-light border mt-4">
+                <h4 class="mb-1">
+                    Innings @inn.InningsNumber —
+                    @inn.BattingTeam.TeamName
+                </h4>
+
+                <div class="text-muted">
+                    Score:
+                    <strong>@inn.TotalRuns/@inn.WicketsLost</strong>
+                    |
+                    Overs: @inn.OversBowled
+                </div>
+            </div>
+
+            <!-- BATTTING TABLE -->
+            @if (inn.BattingScorecards != null && inn.BattingScorecards.Any())
+            {
+                    <div class="table-responsive d-none d-md-block mb-3">
+
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Batsman</th>
+                                <th>R</th>
+                                <th>B</th>
+                                <th>4s</th>
+                                <th>6s</th>
+                                <th>SR</th>
+                                <th>How Out</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var b in inn.BattingScorecards.OrderBy(x => x.BattingPosition))
+                            {
+                                <tr>
+                                    <td>@b.Player?.FullName</td>
+                                    <td>@b.Runs</td>
+                                    <td>@b.BallsFaced</td>
+                                    <td>@b.Fours</td>
+                                    <td>@b.Sixes</td>
+                                    <td>
+                                        @(b.BallsFaced > 0
+                                                                ? ((double)b.Runs / b.BallsFaced * 100).ToString("0.00")
+                                                                : "0.00")
+                    </td>
+                    <td>@(string.IsNullOrWhiteSpace(b.HowOut) ? "Not Out" : b.HowOut)</td>
+                </tr>
+                                }
+                        </tbody>
+                    </table>
+                </div>
+            }
+                @* Mobile Batting Cards *@
+                <!-- MOBILE BATTING HEADER -->
+                <div class="d-md-none text-center fw-semibold text-muted mt-3 mb-1">
+                    Batting Scorecard
+                </div>
+
+
+                <div class="d-md-none mt-2">
+                    @foreach (var b in inn.BattingScorecards.OrderBy(x => x.BattingPosition))
+                    {
+                        <div class="card shadow-sm mb-2">
+                            <div class="card-body p-2">
+                                <div class="fw-bold">@b.Player?.FullName</div>
+
+                                <div class="small text-muted">
+                                    @(string.IsNullOrWhiteSpace(b.HowOut) ? "Not Out" : b.HowOut)
+                                </div>
+
+                                <div class="d-flex justify-content-between small mt-1">
+                                    <span>R: <strong>@b.Runs</strong></span>
+                                    <span>B: @b.BallsFaced</span>
+                                    <span>4s: @b.Fours</span>
+                                    <span>6s: @b.Sixes</span>
+                                    <span>
+                                        SR:
+                                        @(b.BallsFaced > 0
+                                                                ? ((double)b.Runs / b.BallsFaced * 100).ToString("0.0")
+                                                                : "0.0")
+                    </span>
+                </div>
+            </div>
+        </div>
+                }
+                </div>
+
+
+            <!-- BOWLING TABLE -->
+            @if (inn.BowlingScorecards != null && inn.BowlingScorecards.Any())
+            {
+                    <div class="table-responsive d-none d-md-block mb-5">
+
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Bowler</th>
+                                <th>O</th>
+                                <th>M</th>
+                                <th>R</th>
+                                <th>W</th>
+                                <th>Econ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var bw in inn.BowlingScorecards)
+                            {
+                                <tr>
+                                    <td>@bw.Player?.FullName</td>
+                                    <td>@bw.Overs</td>
+                                    <td>@bw.Maidens</td>
+                                    <td>@bw.RunsConceded</td>
+                                    <td>@bw.Wickets</td>
+                                    <td>
+                                        @(bw.Overs > 0
+                                                                ? (bw.RunsConceded / bw.Overs).ToString("0.00")
+                                                                : "0.00")
+                    </td>
+                </tr>
+                                }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+                <!-- MOBILE BOWLING HEADER -->
+                <div class="d-md-none text-center fw-semibold text-muted mt-4 mb-1">
+                    Bowling Scorecard
+                </div>
+
+
+                @* Mobile Bowling Cards *@
+                <div class="d-md-none mt-2">
+                    @foreach (var bw in inn.BowlingScorecards)
+                    {
+                        <div class="card shadow-sm mb-2">
+                            <div class="card-body p-2">
+                                <div class="fw-bold">@bw.Player?.FullName</div>
+
+                                <div class="d-flex justify-content-between small mt-1">
+                                    <span>O: @bw.Overs</span>
+                                    <span>M: @bw.Maidens</span>
+                                    <span>R: @bw.RunsConceded</span>
+                                    <span>W: <strong>@bw.Wickets</strong></span>
+                                    <span>
+                                        Econ:
+                                        @(bw.Overs > 0
+                                                                ? (bw.RunsConceded / bw.Overs).ToString("0.0")
+                                                                : "0.0")
+                    </span>
+                </div>
+            </div>
+        </div>
+                }
+                </div>
+
+        }
+      }
+    }
+
+
+
+
     <!-- Actions -->
     <div class="d-flex justify-content-center gap-3 mt-4">
-        <a asp-action="Edit"
-           asp-route-id="@Model.MatchId"
-           class="btn btn-outline-primary px-4">
-            Edit
-        </a>
+        @if (Model.Status != MatchStatus.Completed)
+        {
+            <a asp-action="Edit"
+               asp-route-id="@Model.MatchId"
+               class="btn btn-outline-primary px-4">
+                <i class="fa-solid fa-pen me-1"></i> Edit
+            </a>
+        }
+
 
         <a asp-action="Index"
            class="btn btn-outline-secondary px-4">
-            Back to List
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to List
         </a>
+
     </div>
 </div>
+
+<!-- SHARED DELETE MODAL (Batting + Bowling) -->
+<div class="modal fade" id="deleteScorecardModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">
+                    <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                    Confirm Delete
+                </h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                Are you sure you want to delete this
+                <strong id="deleteTypeText">entry</strong>?
+                <br />
+                <small class="text-muted">
+                    This action cannot be undone.
+                </small>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <form id="deleteScorecardForm"
+                      method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden"
+                           name="id"
+                           id="deleteScorecardId" />
+
+                    <button type="submit"
+                            class="btn btn-danger">
+                        <i class="fa-solid fa-trash me-1"></i>
+                        Delete
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        const deleteModal = document.getElementById('deleteScorecardModal');
+
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+
+            const id = button.getAttribute('data-id');
+            const controller = button.getAttribute('data-controller');
+            const type = button.getAttribute('data-type');
+
+            document.getElementById('deleteScorecardId').value = id;
+            document.getElementById('deleteTypeText').innerText = type;
+
+            const form = document.getElementById('deleteScorecardForm');
+            form.action = `/${controller}/DeleteConfirmed`;
+        });
+
+
+        document.querySelectorAll('[data-bs-toggle="tooltip"]')
+            .forEach(el => new bootstrap.Tooltip(el));
+
+
+    </script>
+}
+

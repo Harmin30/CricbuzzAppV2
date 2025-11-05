@@ -34,6 +34,7 @@ namespace CricbuzzAppV2.Controllers
         }
 
         // GET: Matches/Details/5
+        // GET: Matches/Details/5
         public async Task<IActionResult> Details(int id)
         {
             var match = await _context.Matches
@@ -45,8 +46,65 @@ namespace CricbuzzAppV2.Controllers
             if (match == null)
                 return NotFound();
 
+            var inningsList = await _context.MatchInnings
+                .Include(i => i.BattingTeam)
+                .Include(i => i.BowlingTeam)
+                .Include(i => i.BattingScorecards).ThenInclude(b => b.Player)
+                .Include(i => i.BowlingScorecards).ThenInclude(b => b.Player)
+                .Where(i => i.MatchId == id)
+                .OrderBy(i => i.InningsNumber)
+                .ToListAsync();
+
+            // 🔒 HARDEN: allow ONLY ONE live innings
+            var liveInnings = inningsList
+    .Where(i => i.Status == InningsStatus.InProgress && i.EndTime == null)
+    .OrderByDescending(i => i.InningsNumber)
+    .ToList();
+
+            // 🔒 HARD FIX: no innings OR more than one = force close
+            if (liveInnings.Count != 1)
+            {
+                foreach (var inn in liveInnings)
+                {
+                    inn.Status = InningsStatus.Completed;
+                    inn.EndTime = DateTime.Now;
+                }
+
+                await _context.SaveChangesAsync();
+                ViewBag.CurrentInnings = null;
+            }
+            else
+            {
+                ViewBag.CurrentInnings = liveInnings.First();
+            }
+
+
+
+            // If exactly one live innings → allow it
+            // Else (0 or >1) → treat as NO live innings
+            ViewBag.CurrentInnings = liveInnings.Count == 1
+                ? liveInnings.First()
+                : null;
+
+
+            var completedInnings = inningsList
+                .Where(i => i.Status == InningsStatus.Completed)
+                .ToList();
+
+            ViewBag.CompletedInnings = completedInnings;
+
+            // ✅ Calculate max innings
+            int maxInnings = match.MaxInningsPerTeam > 0
+                ? match.MaxInningsPerTeam * 2
+                : (match.MatchType == "Test" ? 4 : 2);
+
+            ViewBag.CanManageInnings = completedInnings.Count < maxInnings;
+
             return View(match);
         }
+
+
+
 
         // GET: Matches/Create
         public IActionResult Create()
@@ -93,7 +151,7 @@ namespace CricbuzzAppV2.Controllers
             await _context.SaveChangesAsync();
 
             AppHelper.SetSuccess(this, "✅ Match created successfully.");
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Details", new { id = match.MatchId });
         }
 
 
@@ -233,6 +291,42 @@ namespace CricbuzzAppV2.Controllers
                 AppHelper.SetError(this, string.Join("<br/>", skippedMatches));
 
             return RedirectToAction(nameof(Index));
+        }
+
+
+        private async Task CalculateWinnerAsync(int matchId)
+        {
+            var match = await _context.Matches
+                .Include(m => m.TeamA)
+                .Include(m => m.TeamB)
+                .FirstOrDefaultAsync(m => m.MatchId == matchId);
+
+            if (match == null) return;
+
+            var innings = await _context.MatchInnings
+                .Where(i => i.MatchId == matchId && i.Status == InningsStatus.Completed)
+                .ToListAsync();
+
+            if (innings.Count < 2) return; // need both innings
+
+            int teamAScore = innings
+                .Where(i => i.BattingTeamId == match.TeamAId)
+                .Sum(i => i.TotalRuns);
+
+            int teamBScore = innings
+                .Where(i => i.BattingTeamId == match.TeamBId)
+                .Sum(i => i.TotalRuns);
+
+            if (teamAScore > teamBScore)
+                match.WinnerTeamId = match.TeamAId;
+            else if (teamBScore > teamAScore)
+                match.WinnerTeamId = match.TeamBId;
+            else
+                match.WinnerTeamId = null; // Tie
+
+            match.Status = MatchStatus.Completed;
+
+            await _context.SaveChangesAsync();
         }
 
     }

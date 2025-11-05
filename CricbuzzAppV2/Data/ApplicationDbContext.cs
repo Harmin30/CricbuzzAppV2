@@ -9,51 +9,73 @@ namespace CricbuzzAppV2.Data
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor)
+        public ApplicationDbContext(
+            DbContextOptions<ApplicationDbContext> options,
+            IHttpContextAccessor httpContextAccessor)
             : base(options)
         {
             _httpContextAccessor = httpContextAccessor;
         }
 
+        // --------------------
         // DbSets
+        // --------------------
         public DbSet<Team> Teams { get; set; }
         public DbSet<Player> Players { get; set; }
         public DbSet<PlayerStats> PlayerStats { get; set; }
         public DbSet<Match> Matches { get; set; }
+
+        // OLD (keep for now)
         public DbSet<Scorecard> Scorecards { get; set; }
+
+        // NEW SCORECARD SYSTEM
+        public DbSet<MatchInnings> MatchInnings { get; set; }
+        public DbSet<BattingInningsScorecard> BattingScorecards { get; set; }
+
+        public DbSet<BowlingScorecard> BowlingScorecards { get; set; }
+
         public DbSet<PlayerPersonalInfo> PlayerPersonalInfos { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Audit> Audits { get; set; }
 
+        // --------------------
+        // Relationships
+        // --------------------
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // --- Relationships ---
+            // Player → Team
             modelBuilder.Entity<Player>()
                 .HasOne(p => p.Team)
                 .WithMany(t => t.Players)
                 .HasForeignKey(p => p.TeamId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Match → Team A
             modelBuilder.Entity<Match>()
                 .HasOne(m => m.TeamA)
                 .WithMany()
                 .HasForeignKey(m => m.TeamAId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Match → Team B
             modelBuilder.Entity<Match>()
                 .HasOne(m => m.TeamB)
                 .WithMany()
                 .HasForeignKey(m => m.TeamBId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Match → Winner
             modelBuilder.Entity<Match>()
                 .HasOne(m => m.WinnerTeam)
                 .WithMany()
                 .HasForeignKey(m => m.WinnerTeamId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // --------------------
+            // OLD Scorecard (keep)
+            // --------------------
             modelBuilder.Entity<Scorecard>()
                 .HasOne(s => s.Player)
                 .WithMany()
@@ -66,6 +88,58 @@ namespace CricbuzzAppV2.Data
                 .HasForeignKey(s => s.MatchId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // --------------------
+            // NEW MatchInnings
+            // --------------------
+            modelBuilder.Entity<MatchInnings>()
+                .HasOne(mi => mi.Match)
+                .WithMany()
+                .HasForeignKey(mi => mi.MatchId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<MatchInnings>()
+                .HasOne(mi => mi.BattingTeam)
+                .WithMany()
+                .HasForeignKey(mi => mi.BattingTeamId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MatchInnings>()
+                .HasOne(mi => mi.BowlingTeam)
+                .WithMany()
+                .HasForeignKey(mi => mi.BowlingTeamId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // --------------------
+            // BattingScorecard
+            // --------------------
+            modelBuilder.Entity<BattingInningsScorecard>()
+                .HasOne(bs => bs.MatchInnings)
+                .WithMany(mi => mi.BattingScorecards)
+                .HasForeignKey(bs => bs.MatchInningsId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<BattingInningsScorecard>()
+                .HasOne(bs => bs.Player)
+                .WithMany()
+                .HasForeignKey(bs => bs.PlayerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // --------------------
+            // BowlingScorecard
+            // --------------------
+            modelBuilder.Entity<BowlingScorecard>()
+                .HasOne(bs => bs.MatchInnings)
+                .WithMany(mi => mi.BowlingScorecards)
+                .HasForeignKey(bs => bs.MatchInningsId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<BowlingScorecard>()
+                .HasOne(bs => bs.Player)
+                .WithMany()
+                .HasForeignKey(bs => bs.PlayerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // PlayerStats
             modelBuilder.Entity<PlayerStats>()
                 .HasOne(ps => ps.Player)
                 .WithMany(p => p.PlayerStats)
@@ -73,8 +147,11 @@ namespace CricbuzzAppV2.Data
                 .OnDelete(DeleteBehavior.Cascade);
         }
 
-        // Intercept SaveChanges to record logs automatically
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        // --------------------
+        // Audit logic (UNCHANGED)
+        // --------------------
+        public override async Task<int> SaveChangesAsync(
+            CancellationToken cancellationToken = default)
         {
             await AddAuditLogsAsync();
             return await base.SaveChangesAsync(cancellationToken);
@@ -88,13 +165,11 @@ namespace CricbuzzAppV2.Data
 
         private async Task AddAuditLogsAsync()
         {
-            // ✅ Ensure EF Core has detected all pending changes
             ChangeTracker.DetectChanges();
 
             var httpContext = _httpContextAccessor.HttpContext;
             var userName = httpContext?.Session.GetString("Username") ?? "System";
 
-            // ✅ Get all entity entries that are Added / Modified / Deleted (except Audits)
             var entries = ChangeTracker.Entries()
                 .Where(e =>
                     e.Entity is not Audit &&
@@ -110,7 +185,6 @@ namespace CricbuzzAppV2.Data
                 var primaryKey = entry.Properties.FirstOrDefault(p => p.Metadata.IsPrimaryKey());
                 string entityId = primaryKey?.CurrentValue?.ToString() ?? "N/A";
 
-                // ✅ Determine the action type
                 string action = entry.State switch
                 {
                     EntityState.Added => "Created",
@@ -119,19 +193,19 @@ namespace CricbuzzAppV2.Data
                     _ => "Unknown"
                 };
 
-                // ✅ Build readable JSON details
                 string details;
 
                 if (entry.State == EntityState.Modified)
                 {
                     var changes = entry.Properties
                         .Where(p => p.IsModified)
-                        .ToDictionary(p => p.Metadata.Name,
-                                      p => new
-                                      {
-                                          OldValue = p.OriginalValue,
-                                          NewValue = p.CurrentValue
-                                      });
+                        .ToDictionary(
+                            p => p.Metadata.Name,
+                            p => new
+                            {
+                                OldValue = p.OriginalValue,
+                                NewValue = p.CurrentValue
+                            });
 
                     details = changes.Any()
                         ? JsonSerializer.Serialize(changes, new JsonSerializerOptions { WriteIndented = true })
@@ -139,14 +213,17 @@ namespace CricbuzzAppV2.Data
                 }
                 else if (entry.State == EntityState.Added)
                 {
-                    details = JsonSerializer.Serialize(entry.CurrentValues.ToObject(), new JsonSerializerOptions { WriteIndented = true });
+                    details = JsonSerializer.Serialize(
+                        entry.CurrentValues.ToObject(),
+                        new JsonSerializerOptions { WriteIndented = true });
                 }
-                else // Deleted
+                else
                 {
-                    details = JsonSerializer.Serialize(entry.OriginalValues.ToObject(), new JsonSerializerOptions { WriteIndented = true });
+                    details = JsonSerializer.Serialize(
+                        entry.OriginalValues.ToObject(),
+                        new JsonSerializerOptions { WriteIndented = true });
                 }
 
-                // ✅ Create the audit entry
                 var audit = new Audit
                 {
                     Action = action,
@@ -160,6 +237,5 @@ namespace CricbuzzAppV2.Data
                 await Audits.AddAsync(audit);
             }
         }
-
     }
 }
