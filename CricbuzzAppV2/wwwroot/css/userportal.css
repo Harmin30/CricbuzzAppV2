@@ -160,7 +160,7 @@
     }
 
 .match-header {
-    background: linear-gradient(135deg, #00a651, #007e3e);
+    background: linear-gradient(135deg, #0C3D2E, #0F5132);
     color: white;
     padding: 1rem;
     position: relative;
@@ -311,7 +311,8 @@
 
 /* Match Page Specific Styles */
 .matches-header {
-    background: linear-gradient(135deg, #00a651, #007e3e);
+/*    background: linear-gradient(135deg, #0C3D2E, #0F5132);*/
+    background: linear-gradient(135deg, #0C3D2E, #0F5132);
     padding: 2rem 0;
     margin-bottom: 2rem;
     border-radius: 10px;
