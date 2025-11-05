@@ -106,21 +106,39 @@ namespace CricbuzzAppV2.Controllers
         }
 
         // 🏏 Match Details - /UserPortal/MatchDetails/5
-        public IActionResult MatchDetails(int id)
+        public async Task<IActionResult> MatchDetails(int id)
         {
-            var match = _context.Matches
+            var match = await _context.Matches
                 .Include(m => m.TeamA)
                 .Include(m => m.TeamB)
                 .Include(m => m.WinnerTeam)
+
+                // NEW SYSTEM
+                .Include(m => m.MatchInnings)
+                    .ThenInclude(i => i.BattingTeam)
+                .Include(m => m.MatchInnings)
+                    .ThenInclude(i => i.BattingScorecards)
+                        .ThenInclude(b => b.Player)
+                .Include(m => m.MatchInnings)
+                    .ThenInclude(i => i.BowlingScorecards)
+                        .ThenInclude(b => b.Player)
+
+                // 🔥 LEGACY SYSTEM (IMPORTANT)
                 .Include(m => m.Scorecards)
                     .ThenInclude(s => s.Player)
-                .FirstOrDefault(m => m.MatchId == id);
+
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.MatchId == id);
+
 
             if (match == null)
                 return NotFound();
 
-            return View(match); // Views/UserPortal/MatchDetails.cshtml
+            return View(match);
         }
+
+
+
 
 
         // 🧩 Player CRUD - Create

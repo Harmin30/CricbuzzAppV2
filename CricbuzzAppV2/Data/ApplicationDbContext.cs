@@ -89,11 +89,11 @@ namespace CricbuzzAppV2.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             // --------------------
-            // NEW MatchInnings
+            // NEW MatchInnings (FIXED)
             // --------------------
             modelBuilder.Entity<MatchInnings>()
                 .HasOne(mi => mi.Match)
-                .WithMany()
+                .WithMany(m => m.MatchInnings)
                 .HasForeignKey(mi => mi.MatchId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -108,6 +108,7 @@ namespace CricbuzzAppV2.Data
                 .WithMany()
                 .HasForeignKey(mi => mi.BowlingTeamId)
                 .OnDelete(DeleteBehavior.Restrict);
+
 
             // --------------------
             // BattingScorecard

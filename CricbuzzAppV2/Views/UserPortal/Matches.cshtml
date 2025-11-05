@@ -3,213 +3,282 @@
 @{
     Layout = "_UserLayout";
     ViewData["Title"] = "Cricket Matches";
+
     var matchType = Context.Request.Query["matchType"].ToString();
     var searchQuery = Context.Request.Query["search"].ToString();
     var dateFilter = Context.Request.Query["dateFilter"].ToString();
 }
 
-<!-- Page Header -->
-<div class="matches-header">
-    <div class="container text-center">
-   <h1 class="h2 mb-2">Cricket Matches</h1>
-        <p class="mb-0">Stay updated with all cricket matches and scores</p>
- </div>
-</div>
+<style>
+    /* SMALLER MATCH CARD */
+    /* NARROWER CARD WIDTH */
 
-<div class="container">
-    <!-- Search and Filters -->
-    <div class="match-filters">
-        <!-- Search Bar -->
-        <div class="search-container mb-3">
-  <form method="get" class="search-form">
-         <div class="input-group">
-     <input type="text" name="search" class="form-control" 
-       placeholder="Search matches by team name or venue..." 
-    value="@searchQuery">
-           <button class="btn btn-success" type="submit">
-        <i class="bi bi-search"></i> Search
-       </button>
-          </div>
-            </form>
-        </div>
 
-        <!-- Filter Pills -->
-  <div class="filter-pills">
-       <a href="@Url.Action("Matches", "UserPortal")" 
-      class="filter-pill @(string.IsNullOrEmpty(matchType) && string.IsNullOrEmpty(dateFilter) ? "active" : "")">
-                All Matches
-            </a>
-    <a href="@Url.Action("Matches", "UserPortal", new { dateFilter = "upcoming" })" 
-         class="filter-pill @(dateFilter == "upcoming" ? "active" : "")">
-         Upcoming
-</a>
-      <a href="@Url.Action("Matches", "UserPortal", new { dateFilter = "completed" })" 
-       class="filter-pill @(dateFilter == "completed" ? "active" : "")">
-      Completed
-  </a>
-   <a href="@Url.Action("Matches", "UserPortal", new { matchType = "Test" })" 
-    class="filter-pill @(matchType == "Test" ? "active" : "")">
-        Test
-            </a>
- <a href="@Url.Action("Matches", "UserPortal", new { matchType = "ODI" })" 
-           class="filter-pill @(matchType == "ODI" ? "active" : "")">
-   ODI
-            </a>
-     <a href="@Url.Action("Matches", "UserPortal", new { matchType = "T20" })" 
-               class="filter-pill @(matchType == "T20" ? "active" : "")">
-          T20
-            </a>
-  </div>
-    </div>
 
-    <!-- Matches List -->
-    <div class="matches-container">
-        @{
-    var filteredMatches = Model.AsEnumerable();
-
-            // Apply search filter
-            if (!string.IsNullOrEmpty(searchQuery))
-    {
-        filteredMatches = filteredMatches.Where(m =>
-             (m.TeamA?.TeamName?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
-           (m.TeamB?.TeamName?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
-           (m.Venue?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false));
-            }
-
-            // Apply match type filter
- if (!string.IsNullOrEmpty(matchType))
-     {
-                filteredMatches = filteredMatches.Where(m => m.MatchType == matchType);
-        }
-
-            // Apply date filter
-      if (!string.IsNullOrEmpty(dateFilter))
-   {
-        filteredMatches = dateFilter switch
-  {
-        "upcoming" => filteredMatches.Where(m => m.Date > DateTime.Now),
-         "completed" => filteredMatches.Where(m => m.Date < DateTime.Now),
-  _ => filteredMatches
-    };
+    /* TEAM LOGO SMALLER */
+    .team-logo {
+        width: 36px; /* was 48px */
+        height: 36px;
     }
 
-          foreach (var match in filteredMatches)
+    /* VS CIRCLE SMALLER */
+    .vs-circle {
+        width: 30px;
+        height: 30px;
+        font-size: .7rem;
+    }
+
+    /* META TEXT TIGHTER */
+    .match-meta {
+        font-size: .78rem; /* was .85rem */
+        margin-bottom: 8px !important;
+    }
+
+    /* STATUS PILL SMALLER */
+    .status-pill {
+        padding: 3px 10px; /* tighter */
+        font-size: .7rem;
+    }
+
+    /* REDUCE INTERNAL SPACING */
+    .match-card .my-3 {
+        margin-top: .5rem !important;
+        margin-bottom: .5rem !important;
+    }
+
+    .match-card .mb-2 {
+        margin-bottom: .35rem !important;
+    }
+
+    .match-card .mb-3 {
+        margin-bottom: .6rem !important;
+    }
+
+    .match-card .btn {
+        padding: 4px 14px;
+        font-size: .75rem;
+    }
+    /* TIGHTER TEAMS SECTION */
+    .match-card .team-logo {
+        width: 34px;
+        height: 34px;
+    }
+
+    .match-card .fw-semibold {
+        font-size: .85rem;
+        line-height: 1.1;
+    }
+
+    /* VS smaller */
+    .vs-circle {
+        width: 26px;
+        height: 26px;
+        font-size: .65rem;
+    }
+    /* REMOVE EXTRA VERTICAL AIR */
+    .match-card .my-3 {
+        margin-top: .35rem !important;
+        margin-bottom: .35rem !important;
+    }
+
+    .match-card .mb-3 {
+        margin-bottom: .45rem !important;
+    }
+
+    .match-card .mb-2 {
+        margin-bottom: .25rem !important;
+    }
+
+    .match-meta {
+        font-size: .75rem;
+        line-height: 1.2;
+    }
+
+    .match-card .btn {
+        padding: 3px 12px;
+        font-size: .72rem;
+    }
+   @@media (max-width: 576px) {
+        .match-card
+
+    {
+        max-width: 480px;
+    }
+
+    }
+
+    /* ================= MATCH GRID ================= */
+
+    .matches-grid {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr); /* mobile */
+        gap: 16px;
+    }
+
+    /* Tablets */
+   @@media (min-width: 576px) {
+        .matches-grid
+
+    {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    }
+
+    /* Desktop */
+   @@media (min-width: 992px) {
+        .matches-grid
+
+    {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    }
+
+    .match-card {
+        border-radius: 14px;
+        padding: 12px 14px;
+        box-shadow: 0 4px 14px rgba(0,0,0,.08);
+    }
+
+</style>
+
+<!-- HEADER -->
+<div class="text-center my-4">
+    <h2 class="fw-bold mb-1">Cricket Matches</h2>
+    <p class="text-muted mb-0">Latest scores, fixtures & results</p>
+</div>
+
+<!-- SEARCH -->
+<div class="container mb-3">
+    <form method="get">
+        <div class="input-group shadow-sm">
+            <input type="text"
+                   name="search"
+                   value="@searchQuery"
+                   class="form-control"
+                   placeholder="Search by team or venue..." />
+            <button class="btn btn-success">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- FILTERS -->
+<div class="container mb-4">
+    <div class="d-flex flex-wrap gap-2 justify-content-center">
+        @{
+            string pill(string text, object route, bool active)
             {
-    <div class="match-card-new">
-    <!-- Match Status Bar -->
-          <div class="match-status-bar">
-                 <span class="match-status">
-                @{
-             var status = match.Date.Date > DateTime.Today.Date ? "Upcoming" : "Completed";
-           var statusIcon = status == "Upcoming" ? "bi-calendar-event" : "bi-calendar-check";
-  }
-    <i class="bi @statusIcon"></i>
-      @status
-       </span>
-      <span class="match-type">@match.MatchType</span>
-         </div>
-
-                    <!-- Teams Section -->
-         <div class="match-teams-section">
-                 <div class="team-vs-container">
-     <!-- Team A -->
-      <div class="team-block">
-     <img src="@(string.IsNullOrEmpty(match.TeamA?.ImageUrl) ? "/images/default-team.png" : match.TeamA.ImageUrl)" 
-      alt="@match.TeamA?.TeamName" class="team-flag" />
-                 <div class="team-info">
-  <div class="team-name">@match.TeamA?.TeamName</div>
-@if (match.WinnerTeamId == match.TeamAId)
-          {
-          <div class="winner-tag">Winner</div>
-   }
-     </div>
-   </div>
-
-    <div class="vs-text">VS</div>
-
-    <!-- Team B -->
-             <div class="team-block">
-           <img src="@(string.IsNullOrEmpty(match.TeamB?.ImageUrl) ? "/images/default-team.png" : match.TeamB.ImageUrl)" 
-             alt="@match.TeamB?.TeamName" class="team-flag" />
-         <div class="team-info">
-  <div class="team-name">@match.TeamB?.TeamName</div>
-           @if (match.WinnerTeamId == match.TeamBId)
-        {
-    <div class="winner-tag">Winner</div>
-              }
-     </div>
-     </div>
-   </div>
-
-  <!-- Match Information -->
-      <div class="match-info-bar">
-  <div class="info-item">
-       <i class="bi bi-geo-alt"></i>
-              <span>@match.Venue</span>
-        </div>
- <div class="info-item">
-            <i class="bi bi-calendar-event"></i>
-      <span>@match.Date.ToString("dd MMM yyyy")</span>
-              </div>
-               <div class="info-item">
-          <i class="bi bi-clock"></i>
-       <span>@match.Date.ToString("hh:mm tt")</span>
- </div>
-     </div>
-
-       @if (match.Scorecards != null && match.Scorecards.Any())
-   {
-         <div class="match-stats-bar">
-  <div class="stat-block">
-     <div class="stat-number">@match.Scorecards.Sum(s => s.RunsScored ?? 0)</div>
-           <div class="stat-label">Total Runs</div>
-          </div>
-        <div class="stat-block">
-        <div class="stat-number">@match.Scorecards.Sum(s => s.WicketsTaken ?? 0)</div>
-  <div class="stat-label">Wickets</div>
-        </div>
- <div class="stat-block">
-      <div class="stat-number">@match.Scorecards.Count()</div>
-    <div class="stat-label">Players</div>
-            </div>
-       </div>
-                }
-           </div>
-
-            <!-- View Details Link -->
-         <a href="@Url.Action("MatchDetails", "UserPortal", new { id = match.MatchId })" 
-              class="view-details-btn">
-     View Full Scorecard <i class="bi bi-arrow-right"></i>
-    </a>
-      </div>
-   }
+                var cls = active ? "btn-success" : "btn-outline-secondary";
+                return $"<a class='btn btn-sm {cls}' href='{Url.Action("Matches", "UserPortal", route)}'>{text}</a>";
+            }
         }
 
-    @if (!filteredMatches.Any())
-        {
-            <div class="text-center my-5">
-       <div class="mb-4">
-         <i class="bi bi-calendar-x display-1 text-muted"></i>
-    </div>
-  <h3 class="text-muted">No matches found</h3>
- <p class="text-muted">
-                    @if (!string.IsNullOrEmpty(searchQuery))
-           {
-        <span>No matches found for "@searchQuery". Try different search terms or </span>
-         <a href="@Url.Action("Matches", "UserPortal")" class="text-success">view all matches</a>
-   }
-  else
-             {
-              <span>Check back later for upcoming matches!</span>
-         }
-    </p>
-     </div>
-      }
+        @Html.Raw(pill("All", null, string.IsNullOrEmpty(matchType) && string.IsNullOrEmpty(dateFilter)))
+        @Html.Raw(pill("Upcoming", new { dateFilter = "upcoming" }, dateFilter == "upcoming"))
+        @Html.Raw(pill("Completed", new { dateFilter = "completed" }, dateFilter == "completed"))
+        @Html.Raw(pill("Test", new { matchType = "Test" }, matchType == "Test"))
+        @Html.Raw(pill("ODI", new { matchType = "ODI" }, matchType == "ODI"))
+        @Html.Raw(pill("T20", new { matchType = "T20" }, matchType == "T20"))
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        // Client-side filtering and search script can be added here if needed
-    </script>
-}
+<!-- MATCHES -->
+<div class="container">
+    <div class="matches-grid">
+
+    @{
+        var filteredMatches = Model.AsEnumerable();
+
+        if (!string.IsNullOrEmpty(searchQuery))
+        {
+            filteredMatches = filteredMatches.Where(m =>
+            (m.TeamA?.TeamName?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (m.TeamB?.TeamName?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (m.Venue?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false));
+        }
+
+        if (!string.IsNullOrEmpty(matchType))
+            filteredMatches = filteredMatches.Where(m => m.MatchType == matchType);
+
+        if (!string.IsNullOrEmpty(dateFilter))
+        {
+            filteredMatches = dateFilter switch
+            {
+                "upcoming" => filteredMatches.Where(m => m.Date > DateTime.Now),
+                "completed" => filteredMatches.Where(m => m.Date < DateTime.Now),
+                _ => filteredMatches
+            };
+        }
+
+        filteredMatches = filteredMatches.OrderByDescending(m => m.Date);
+    }
+
+    @if (!filteredMatches.Any())
+    {
+        <div class="text-center my-5">
+            <i class="bi bi-calendar-x display-4 text-muted"></i>
+            <h5 class="text-muted mt-3">No matches found</h5>
+        </div>
+    }
+    else
+    {
+        foreach (var match in filteredMatches)
+        {
+            var status = match.Status.ToString();
+            var badgeClass = match.Status switch
+            {
+                MatchStatus.Upcoming => "bg-warning text-dark",
+                MatchStatus.Live => "bg-danger",
+                MatchStatus.Completed => "bg-success",
+                _ => "bg-secondary"
+            };
+
+            <div class="match-card mb-4 p-3">
+                <!-- STATUS -->
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="status-pill @badgeClass">@status</span>
+                    <span class="text-muted small">@match.MatchType</span>
+                </div>
+
+                <!-- TEAMS -->
+                <div class="d-flex align-items-center justify-content-between text-center my-3">
+                    <div class="flex-fill">
+                        <img src="@(match.TeamA?.ImageUrl ?? "/images/default-team.png")"
+                             class="team-logo mb-1" />
+                        <div class="fw-semibold">@match.TeamA?.TeamName</div>
+                    </div>
+
+                    <div class="vs-circle mx-2">VS</div>
+
+                    <div class="flex-fill">
+                        <img src="@(match.TeamB?.ImageUrl ?? "/images/default-team.png")"
+                             class="team-logo mb-1" />
+                        <div class="fw-semibold">@match.TeamB?.TeamName</div>
+                    </div>
+                </div>
+
+                <!-- META -->
+                <div class="match-meta text-center mb-3">
+                    <div><i class="bi bi-geo-alt"></i> @match.Venue</div>
+                    <div>
+                        <i class="bi bi-calendar-event"></i>
+                        @match.Date.ToString("dd MMM yyyy • hh:mm tt")
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <div class="text-center">
+                    <a asp-action="MatchDetails"
+                       asp-route-id="@match.MatchId"
+                       class="btn btn-outline-success btn-sm rounded-pill">
+                        View Full Scorecard →
+                    </a>
+                </div>
+            </div>
+        }
+    }
+    </div>
+</div>

@@ -9,11 +9,17 @@ namespace CricbuzzAppV2.Controllers
     public class BattingScorecardsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly PlayerStatsService _statsService;
 
-        public BattingScorecardsController(ApplicationDbContext context)
+
+        public BattingScorecardsController(
+            ApplicationDbContext context,
+            PlayerStatsService statsService)
         {
             _context = context;
+            _statsService = statsService;
         }
+
 
         // GET: /BattingScorecards/Create?inningsId=5
         public async Task<IActionResult> Create(int inningsId)
@@ -87,7 +93,12 @@ namespace CricbuzzAppV2.Controllers
             _context.BattingScorecards.Add(scorecard);
             await _context.SaveChangesAsync();
 
+            // 🔥 AUTO UPDATE PLAYER STATS (Option 1)
+            await _statsService.UpdateBattingStatsAsync(scorecard);
+
+            // 🔁 Recalculate innings totals
             await RecalculateInningsTotals(scorecard.MatchInningsId);
+
 
             int matchId = await _context.MatchInnings
                 .Where(mi => mi.MatchInningsId == scorecard.MatchInningsId)

@@ -108,10 +108,13 @@ namespace CricbuzzAppV2.Controllers
 
         // GET: Matches/Create
         public IActionResult Create()
+
         {
+
             ViewData["Teams"] = _context.Teams.ToList();
             return View();
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

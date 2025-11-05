@@ -6,149 +6,307 @@
 }
 
 <style>
-    /* Hero Section */
+    /* ---------- HERO ---------- */
     .stats-hero {
-        background: linear-gradient(135deg, #00a651, #007e3e); 
-        /* background: linear-gradient(135deg, #0C3D2E, #0F5132); */
-        color: white;
+        background: linear-gradient(135deg, #00a651, #007e3e);
+        color: #fff;
         padding: 40px 20px;
         text-align: center;
-        border-radius: 12px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0,0,0,.18);
         margin-bottom: 30px;
     }
-
-
 
         .stats-hero h1 {
-            font-size: 2.2rem;
             font-weight: 700;
+            margin-bottom: 6px;
         }
 
-    /* Filter Section */
-    .filter-section {
+        .stats-hero p {
+            opacity: .95;
+            margin: 0;
+        }
+
+    /* ---------- FILTER ---------- */
+    .filter-bar {
+        background: #fff;
+        padding: 16px;
+        border-radius: 14px;
+        box-shadow: 0 4px 14px rgba(0,0,0,.08);
         margin-bottom: 25px;
-        text-align: right;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
     }
 
-    /* Player Table */
-    .stats-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 30px;
+    /* ---------- TABLE ---------- */
+    .stats-table th {
+        background: #e8f5e9;
+        color: #0b8043;
+        font-weight: 700;
+        font-size: .85rem;
+        text-transform: uppercase;
     }
 
-        .stats-table th, .stats-table td {
-            text-align: center;
-            padding: 10px;
-            vertical-align: middle;
-        }
-
-        .stats-table thead {
-            background-color: #e8f5e9;
-            font-weight: 600;
-        }
-
-        .stats-table tbody tr:hover {
-            background-color: #f1f9f1;
-            cursor: pointer;
-        }
-
-    .player-img {
-        width: 40px;
-        height: 40px;
-        object-fit: cover;
-        border-radius: 50%;
-        margin-right: 8px;
+    .stats-table td {
+        font-size: .9rem;
         vertical-align: middle;
     }
 
-    /* Badge for top players */
+    .stats-table tbody tr {
+        cursor: pointer;
+        transition: background .2s ease;
+    }
+
+        .stats-table tbody tr:hover {
+            background: #f1f9f1;
+        }
+
+    .player-img {
+        width: 38px;
+        height: 38px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+
     .badge-top {
-        background-color: #007e3e;
-        color: white;
-        padding: 3px 7px;
-        border-radius: 5px;
-        font-size: 0.8rem;
+        background: #0b8043;
+        color: #fff;
+        padding: 2px 6px;
+        border-radius: 6px;
+        font-size: .7rem;
+        margin-left: 4px;
+    }
+
+    /* ---------- MOBILE CARDS ---------- */
+    .mobile-stat-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 4px 14px rgba(0,0,0,.08);
+        margin-bottom: 14px;
+    }
+
+    .mobile-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        font-weight: 700;
+        color: #0b8043;
+    }
+
+        .mobile-header img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+    .mobile-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .mobile-box {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 12px;
+        text-align: center;
+    }
+
+    .mobile-label {
+        font-size: .7rem;
+        text-transform: uppercase;
+        color: #6c757d;
+    }
+
+    .mobile-value {
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: #0b8043;
     }
 </style>
 
+<!-- HERO -->
 <div class="stats-hero">
-    <h1>📊 Player Stats Overview</h1>
-    <p>Click on a player to view full career stats and details</p>
+    <h1><i class="fa-solid fa-chart-column me-2"></i>Player Stats Overview</h1>
+    <p>Tap a player to view complete career statistics</p>
 </div>
 
-<div class="filter-section">
-    <form method="get" class="d-inline">
-        <label for="format" class="me-2 fw-bold">Filter by Format:</label>
-        <select id="format" name="format" class="form-select d-inline-block w-auto">
+<!-- FILTER -->
+<div class="filter-bar">
+    <form method="get" class="d-flex align-items-center gap-2">
+        <label class="fw-semibold">
+            <i class="fa-solid fa-filter me-1"></i>Format
+        </label>
+
+        <select name="format" class="form-select form-select-sm w-auto">
             <option value="">All</option>
             <option value="Test">Test</option>
             <option value="ODI">ODI</option>
             <option value="T20">T20</option>
         </select>
-        <button type="submit" class="btn btn-success ms-2">Filter</button>
+
+        <button type="submit" class="btn btn-success btn-sm">
+            Apply
+        </button>
     </form>
 </div>
 
 @if (Model != null && Model.Any())
 {
-    <div class="table-responsive">
-        <table class="table stats-table table-bordered table-striped">
+    <!-- ================= DESKTOP TABLE ================= -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-bordered stats-table">
             <thead>
                 <tr>
                     <th>Player</th>
-                    <th>Total Matches</th>
-                    <th>Total Runs</th>
-                    <th>Batting Avg</th>
-                    <th>Strike Rate</th>
-                    <th>Wickets</th>
-                    <th>Economy</th>
-                    <th>100s</th>
+                    <th>M</th>
+                    <th>Runs</th>
+                    <th>Avg</th>
+                    <th>SR</th>
+                    <th>W</th>
+                    <th>Econ</th>
                     <th>50s</th>
+                    <th>100s</th>
+                    <th>200s</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var playerGroup in Model.GroupBy(ps => ps.PlayerId))
+                @foreach (var g in Model.GroupBy(ps => ps.PlayerId))
                 {
-                    var player = playerGroup.First().Player;
-                    var totalMatches = playerGroup.Sum(ps => ps.MatchesPlayed ?? 0);
-                    var totalRuns = playerGroup.Sum(ps => ps.Runs ?? 0);
-                    var totalInnings = playerGroup.Sum(ps => ps.Innings ?? 1); // prevent divide by zero
-                    var battingAvg = totalInnings > 0 ? Math.Round((double)totalRuns / totalInnings, 2) : 0;
-                    var totalBalls = playerGroup.Sum(ps => ps.BallsFaced ?? 0);
-                    var strikeRate = totalBalls > 0 ? Math.Round((double)totalRuns / totalBalls * 100, 2) : 0;
-                    var totalWickets = playerGroup.Sum(ps => ps.Wickets ?? 0);
-                    var totalEconomy = playerGroup.Sum(ps => ps.RunsConceded ?? 0);
-                    var totalOvers = playerGroup.Sum(ps => ps.BallsBowled ?? 0) / 6.0;
-                    var economyRate = totalOvers > 0 ? Math.Round(totalEconomy / totalOvers, 2) : 0;
-                    var hundreds = playerGroup.Sum(ps => ps.Hundreds ?? 0);
-                    var fifties = playerGroup.Sum(ps => ps.Fifties ?? 0);
-                    <tr onclick="location.href='@Url.Action("PlayerDetails", "UserPortal", new { id = player.PlayerId })'">
+                    var p = g.First().Player;
+
+                    var matches = g.Sum(x => x.MatchesPlayed ?? 0);
+                    var runs = g.Sum(x => x.Runs ?? 0);
+                    var inns = g.Sum(x => x.Innings ?? 0);
+                    var balls = g.Sum(x => x.BallsFaced ?? 0);
+                    var wickets = g.Sum(x => x.Wickets ?? 0);
+                    var overs = g.Sum(x => x.BallsBowled ?? 0) / 6.0;
+
+                    var fifties = g.Sum(x => x.Fifties ?? 0);
+                    var hundreds = g.Sum(x => x.Hundreds ?? 0);
+                    var doubleHundreds = g.Sum(x => x.DoubleHundreds ?? 0);
+
+                    <tr onclick="location.href='@Url.Action("PlayerDetails", "UserPortal", new { id = p.PlayerId })'">
                         <td>
-                            @if (!string.IsNullOrEmpty(player?.ImageUrl))
-                            {
-                                <img src="@player.ImageUrl" class="player-img" />
-                            }
-                            @player.FullName
+                            <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/default-player.png" : p.ImageUrl)"
+                                 class="player-img" />
+                            @p.FullName
                         </td>
-                        <td>@totalMatches</td>
-                        <td>@totalRuns</td>
-                        <td>@battingAvg</td>
-                        <td>@strikeRate</td>
-                        <td>@totalWickets</td>
-                        <td>@economyRate</td>
-                        <td>@hundreds @if(hundreds>=2){
-                        <span class="badge-top">🏆</span>
-                    }
-    </td>
-                    <td>@fifties</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+
+                        <td>@matches</td>
+                        <td>@runs</td>
+                        <td>@(inns > 0 ? (runs / (double)inns).ToString("0.00") : "0.00")</td>
+                        <td>@(balls > 0 ? (runs * 100.0 / balls).ToString("0.00") : "0.00")</td>
+                        <td>@wickets</td>
+                        <td>@(overs > 0 ? (g.Sum(x => x.RunsConceded ?? 0) / overs).ToString("0.00") : "0.00")</td>
+                        <td>@fifties</td>
+                        <td>@hundreds</td>
+                        <td>@doubleHundreds</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- ================= MOBILE CARDS ================= -->
+    <!-- ================= MOBILE CARDS ================= -->
+    <div class="d-md-none">
+        @foreach (var g in Model.GroupBy(ps => ps.PlayerId))
+        {
+            var p = g.First().Player;
+
+            var matches = g.Sum(x => x.MatchesPlayed ?? 0);
+            var innings = g.Sum(x => x.Innings ?? 0);
+            var runs = g.Sum(x => x.Runs ?? 0);
+            var balls = g.Sum(x => x.BallsFaced ?? 0);
+            var wickets = g.Sum(x => x.Wickets ?? 0);
+            var overs = g.Sum(x => x.BallsBowled ?? 0) / 6.0;
+            var runsConceded = g.Sum(x => x.RunsConceded ?? 0);
+
+            var fifties = g.Sum(x => x.Fifties ?? 0);
+            var hundreds = g.Sum(x => x.Hundreds ?? 0);
+            var doubleHundreds = g.Sum(x => x.DoubleHundreds ?? 0);
+
+            var avg = innings > 0 ? (runs / (double)innings) : 0;
+            var sr = balls > 0 ? (runs * 100.0 / balls) : 0;
+            var econ = overs > 0 ? (runsConceded / overs) : 0;
+
+            <div class="mobile-stat-card"
+                 onclick="location.href='@Url.Action("PlayerDetails", "UserPortal", new { id = p.PlayerId })'">
+
+                <!-- HEADER -->
+                <div class="mobile-header">
+                    <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/default-player.png" : p.ImageUrl)" />
+                    <div>
+                        <div>@p.FullName</div>
+                        <small class="text-muted">
+                            <i class="fa-solid fa-shirt me-1"></i>@p.Team?.TeamName
+                        </small>
+                    </div>
+                </div>
+
+                <!-- STATS GRID -->
+                <div class="mobile-grid">
+
+                    <div class="mobile-box">
+                        <div class="mobile-label">Matches</div>
+                        <div class="mobile-value">@matches</div>
+                    </div>
+
+                    <div class="mobile-box">
+                        <div class="mobile-label">Innings</div>
+                        <div class="mobile-value">@innings</div>
+                    </div>
+
+                    <div class="mobile-box">
+                        <div class="mobile-label">Runs</div>
+                        <div class="mobile-value">@runs</div>
+                    </div>
+
+                    <div class="mobile-box">
+                        <div class="mobile-label">Average</div>
+                        <div class="mobile-value">@avg.ToString("0.00")</div>
+                    </div>
+
+                    <div class="mobile-box">
+                        <div class="mobile-label">Strike Rate</div>
+                        <div class="mobile-value">@sr.ToString("0.00")</div>
+                    </div>
+
+                    <div class="mobile-box">
+                        <div class="mobile-label">Wickets</div>
+                        <div class="mobile-value">@wickets</div>
+                    </div>
+
+                    <div class="mobile-box">
+                        <div class="mobile-label">Economy</div>
+                        <div class="mobile-value">@econ.ToString("0.00")</div>
+                    </div>
+
+                    <div class="mobile-box">
+                        <div class="mobile-label">50s / 100s / 200s</div>
+                        <div class="mobile-value">
+                            @fifties / @hundreds / @doubleHundreds
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        }
+    </div>
+
+
 }
 else
 {
-    <p class="text-center fw-bold">No stats available yet.</p>
+    <p class="text-center text-muted fw-semibold">
+        No player stats available yet.
+    </p>
 }

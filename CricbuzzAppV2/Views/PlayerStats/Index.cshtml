@@ -5,16 +5,62 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-4">📊 Player Career Stats</h2>
-    <a asp-action="Create" class="btn btn-success mt-3">➕ Add New Stats</a>
+    <h2 class="mb-0">📊 Player Career Stats</h2>
 </div>
 
-<!-- ✅ Alerts -->
+<div class="alert alert-info d-flex align-items-center">
+    <i class="fa-solid fa-circle-info me-2"></i>
+    <span>
+        Player stats are <strong>automatically calculated</strong> from match scorecards.
+        Manual editing is disabled.
+    </span>
+</div>
+
+
+<!-- ================= DESKTOP SEARCH & FILTER ================= -->
+<div class="d-none d-md-flex justify-content-between align-items-center mb-3">
+
+    <!-- Search -->
+    <div class="input-group shadow-sm" style="max-width:320px;">
+        <span class="input-group-text bg-white">
+            <i class="fa-solid fa-magnifying-glass text-muted"></i>
+        </span>
+        <input type="text"
+               id="desktopStatsSearch"
+               class="form-control"
+               placeholder="Search player..." />
+    </div>
+
+    <!-- Filters -->
+    <div class="d-flex align-items-center gap-2">
+        <span class="text-muted small">Format:</span>
+
+        <select id="desktopStatsFormat"
+                class="form-select form-select-sm"
+                style="width:120px;">
+            <option value="">All</option>
+            <option value="test">Test</option>
+            <option value="odi">ODI</option>
+            <option value="t20">T20</option>
+        </select>
+
+        <button id="desktopStatsClear"
+                class="btn btn-outline-secondary btn-sm">
+            Clear
+        </button>
+    </div>
+
+</div>
+
+
+
+
+<!-- Alerts -->
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div class="alert alert-success alert-dismissible fade show">
         @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
 
@@ -30,124 +76,455 @@
     </div>
 }
 
-<form asp-action="DeleteSelected" method="post">
-    <table class="table table-striped table-hover table-bordered table-sm text-center align-middle">
-        <thead class="table-dark">
-            <tr>
-                <th rowspan="2">
-                    <input type="checkbox" id="selectAll" />
-                </th>
-                <th rowspan="2">Player Name</th>
-                <th rowspan="2">Format</th>
-                <th colspan="10">Batting Stats</th>
-                <th colspan="6">Bowling Stats</th>
-                <th rowspan="2">Actions</th>
-            </tr>
-            <tr>
-                <th>M</th>
-                <th>Inn</th>
-                <th>Runs</th>
-                <th>BF</th>
-                <th>HS</th>
-                <th>100s</th>
-                <th>50s</th>
-                <th>200s</th>
-                <th>Bat Avg</th>
-                <th>SR</th>
-                <th>Balls</th>
-                <th>Runs Conceded</th>
-                <th>Wickets</th>
-                <th>BB</th>
-                <th>Bowl Avg</th>
-                <th>Eco</th>
-            </tr>
-        </thead>
-   
+<!-- ================= BULK DELETE FORM ================= -->
+<form class="bulk-delete-form"
+      data-controller="PlayerStats"
+      method="post">
+
+    <!-- ================= DESKTOP TABLE ================= -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-bordered table-striped table-hover table-sm text-center align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th rowspan="2">
+                        <input type="checkbox" id="selectAll" />
+                    </th>
+                    <th rowspan="2" class="text-start">Player</th>
+                    <th rowspan="2">Format</th>
+                    <th colspan="10">Batting</th>
+                    <th colspan="6">Bowling</th>
+                    <th rowspan="2">Actions</th>
+                </tr>
+                <tr>
+                    <th>M</th>
+                    <th>Inns</th>
+                    <th>Runs</th>
+                    <th>Balls</th>
+                    <th>HS</th>
+                    <th>100s</th>
+                    <th>50s</th>
+                    <th>200s</th>
+                    <th>Avg</th>
+                    <th>SR</th>
+
+                    <th>Balls</th>
+                    <th>Runs</th>
+                    <th>Wkts</th>
+                    <th>BB</th>
+                    <th>Avg</th>
+                    <th>Eco</th>
+                </tr>
+            </thead>
 
 
-
-        <tbody>
-            @foreach (var playerGroup in Model.GroupBy(s => s.PlayerId))
-            {
-                var statsList = playerGroup.ToList();
-                var playerName = statsList.FirstOrDefault()?.Player?.FullName ?? "Unknown Player";
-                var formats = new[] { PlayerStats.CricketFormat.Test, PlayerStats.CricketFormat.ODI, PlayerStats.CricketFormat.T20 };
-
-                for (int i = 0; i < formats.Length; i++)
+            <tbody>
+                @foreach (var playerGroup in Model.GroupBy(s => s.PlayerId))
                 {
-                    var fmt = formats[i];
-                    var stat = statsList.FirstOrDefault(s => s.Format == fmt);
+                    var statsList = playerGroup.ToList();
+                    var playerName = statsList.FirstOrDefault()?.Player?.FullName ?? "Unknown Player";
+                    var formats = new[]
+                    {
+                                PlayerStats.CricketFormat.Test,
+                                PlayerStats.CricketFormat.ODI,
+                                PlayerStats.CricketFormat.T20
+                                };
 
-                    <tr>
-                        <td>
-                            @if (stat != null)
-                            {
-                                <input type="checkbox" name="selectedIds" value="@stat.PlayerStatsId" />
-                            }
-                        </td>
+                    for (int i = 0; i < formats.Length; i++)
+                    {
+                        var fmt = formats[i];
+                        var stat = statsList.FirstOrDefault(s => s.Format == fmt);
 
-                        @if (i == 0)
-                        {
-                            <td rowspan="3" class="align-middle text-start fw-bold">@playerName</td>
-                        }
+                        <tr class="selectable stat-row"
+                            data-player="@playerName.ToLower()"
+                            data-format="@fmt.ToString().ToLower()"
+                            data-group="player-@playerGroup.Key">
 
-                        <td class="fw-semibold">@fmt</td>
-                        <td>@(stat?.MatchesPlayed?.ToString() ?? "-")</td>
-                        <td>@(stat?.Innings?.ToString() ?? "-")</td>
-                        <td>@(stat?.Runs?.ToString() ?? "-")</td>
-                        <td>@(stat?.BallsFaced?.ToString() ?? "-")</td>
-                        <td>@(stat?.HighestScore?.ToString() ?? "-")</td>
-                        <td>@(stat?.Hundreds?.ToString() ?? "-")</td>
-                        <td>@(stat?.Fifties?.ToString() ?? "-")</td>
-                        <td>@(stat?.DoubleHundreds?.ToString() ?? "-")</td>
-                        <td>@(stat != null ? stat.BattingAverage.ToString("0.00") : "-")</td>
-                        <td>@(stat != null ? stat.StrikeRate.ToString("0.00") : "-")</td>
 
-                        <td>@(stat?.BallsBowled?.ToString() ?? "-")</td>
-                        <td>@(stat?.RunsConceded?.ToString() ?? "-")</td>
-                        <td>@(stat?.Wickets?.ToString() ?? "-")</td>
-                        <td>@(stat?.BestBowling ?? "-")</td>
-                        <td>@(stat != null ? stat.BowlingAverage.ToString("0.00") : "-")</td>
-                        <td>@(stat != null ? stat.Economy.ToString("0.00") : "-")</td>
 
-                        @if (i == 0)
-                        {
-                            <td rowspan="3" class="align-middle">
-                                <div class="d-flex flex-column">
-                                    @foreach (var f in formats)
-                                    {
-                                        var s = statsList.FirstOrDefault(x => x.Format == f);
-                                        if (s != null)
-                                        {
-                                            <div class="d-flex gap-2 mb-2">
-                                                <a asp-action="Details" asp-route-id="@s.PlayerStatsId" class="btn btn-sm btn-info">View</a>
-                                                <a asp-action="Edit" asp-route-id="@s.PlayerStatsId" class="btn btn-sm btn-warning">Edit</a>
-                                                <a asp-action="Delete" asp-route-id="@s.PlayerStatsId" class="btn btn-sm btn-danger">Delete</a>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <div class="text-muted small mb-2">No @f</div>
-                                        }
-                                    }
-                                </div>
+                            <td>
+                                @if (stat != null)
+                                {
+                                    <input type="checkbox"
+                                           class="row-checkbox"
+                                           value="@stat.PlayerStatsId" />
+                                }
                             </td>
-                        }
-                    </tr>
-                }
-            }
-        </tbody>
-    </table>
 
-    <button type="submit" class="btn btn-danger mt-2">🗑 Delete Selected</button>
+                            @if (i == 0)
+                            {
+                                <td rowspan="3" class="fw-bold text-start">@playerName</td>
+                            }
+
+                    <td>
+                        <span class="badge
+                                    @(fmt == PlayerStats.CricketFormat.Test ? "bg-dark" :
+                                                                    fmt == PlayerStats.CricketFormat.ODI ? "bg-primary" : "bg-success")">
+                            @fmt
+                        </span>
+                    </td>
+
+                            <td>@(stat?.MatchesPlayed ?? 0)</td>
+                            <td>@(stat?.Innings ?? 0)</td>
+                            <td>@(stat?.Runs ?? 0)</td>
+                            <td>@(stat?.BallsFaced ?? 0)</td>
+                            <td>@(stat?.HighestScore ?? 0)</td>
+                            <td>@(stat?.Hundreds ?? 0)</td>
+                            <td>@(stat?.Fifties ?? 0)</td>
+                            <td>@(stat?.DoubleHundreds ?? 0)</td>
+                            <td>@(stat != null ? stat.BattingAverage.ToString("0.00") : "-")</td>
+                            <td>@(stat != null ? stat.StrikeRate.ToString("0.00") : "-")</td>
+
+                            <td>@(stat?.BallsBowled ?? 0)</td>
+                            <td>@(stat?.RunsConceded ?? 0)</td>
+                            <td>@(stat?.Wickets ?? 0)</td>
+                            <td>@(stat?.BestBowling ?? "-")</td>
+                            <td>@(stat != null ? stat.BowlingAverage.ToString("0.00") : "-")</td>
+                            <td>@(stat != null ? stat.Economy.ToString("0.00") : "-")</td>
+
+                    @if (i == 0)
+                            {
+                                <td rowspan="3">
+                                    @foreach (var s in statsList)
+                                    {
+                                        <div class="d-flex gap-2 mb-2 justify-content-center">
+                                            <a asp-action="Details"
+                                               asp-route-id="@s.PlayerStatsId"
+                                               class="btn btn-sm btn-outline-primary"
+                                               title="View">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </a>
+
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger single-delete-btn"
+                                                    data-controller="PlayerStats"
+                                                    data-id="@s.PlayerStatsId"
+                                                    data-name="@($"{s.Player?.FullName} ({s.Format})")">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ================= MOBILE VIEW ================= -->
+    <div class="d-md-none mt-3">
+        <!-- Mobile Search -->
+        <div class="d-md-none mb-3">
+            <div class="input-group shadow-sm">
+                <span class="input-group-text bg-white">
+                    <i class="fa-solid fa-magnifying-glass text-muted"></i>
+                </span>
+                <input type="text"
+                       id="mobileStatsSearch"
+                       class="form-control"
+                       placeholder="Search player..." />
+            </div>
+        </div>
+
+        <ul class="nav nav-pills mobile-format-tabs mb-3">
+            <li class="nav-item flex-fill">
+                <button type="button"
+                        class="nav-link active"
+                        data-bs-toggle="pill"
+                        data-bs-target="#testTab">
+                    TEST
+                </button>
+            </li>
+            <li class="nav-item flex-fill">
+                <button type="button"
+                        class="nav-link"
+                        data-bs-toggle="pill"
+                        data-bs-target="#odiTab">
+                    ODI
+                </button>
+            </li>
+            <li class="nav-item flex-fill">
+                <button type="button"
+                        class="nav-link"
+                        data-bs-toggle="pill"
+                        data-bs-target="#t20Tab">
+                    T20
+                </button>
+            </li>
+        </ul>
+
+
+        <div class="tab-content">
+            @foreach (var format in new[]
+                        {
+                        PlayerStats.CricketFormat.Test,
+                        PlayerStats.CricketFormat.ODI,
+                        PlayerStats.CricketFormat.T20
+                        })
+            {
+                var tabId = format.ToString().ToLower() + "Tab";
+                var stats = Model.Where(s => s.Format == format).ToList();
+
+                <div class="tab-pane fade @(format == PlayerStats.CricketFormat.Test ? "show active" : "")"
+                     id="@tabId">
+
+                    @if (!stats.Any())
+                    {
+                        <div class="text-center text-muted py-4">
+                            <i class="fa-solid fa-chart-column fa-2x mb-2"></i>
+                            No @format stats available yet
+                        </div>
+                    }
+                    else
+                    {
+                        foreach (var stat in stats)
+                        {
+                            <div class="card shadow-sm mb-3 border-0 rounded-3 stat-card selectable"
+                                 data-player="@stat.Player?.FullName"
+                                 data-format="@format">
+
+                                <div class="card-body">
+                                    <div class="fw-bold mb-2">@stat.Player?.FullName</div>
+
+                                    <div class="d-flex justify-content-between text-center mb-2">
+                                        <div class="flex-fill"><strong>@stat.Runs</strong><div class="small text-muted">Runs</div></div>
+                                        <div class="flex-fill"><strong>@stat.BattingAverage.ToString("0.00")</strong><div class="small text-muted">Avg</div></div>
+                                        <div class="flex-fill"><strong>@stat.StrikeRate.ToString("0.00")</strong><div class="small text-muted">SR</div></div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between text-center small text-muted mb-2">
+                                        <div class="flex-fill">HS: @stat.HighestScore</div>
+                                        <div class="flex-fill">100s: @stat.Hundreds</div>
+                                        <div class="flex-fill">50s: @stat.Fifties</div>
+                                    </div>
+
+                                    <hr />
+
+                                    <div class="d-flex justify-content-between text-center">
+                                        <div class="flex-fill"><strong>@stat.Wickets</strong><div class="small text-muted">Wkts</div></div>
+                                        <div class="flex-fill"><strong>@stat.Economy.ToString("0.00")</strong><div class="small text-muted">Eco</div></div>
+                                        <div class="flex-fill"><strong>@stat.BestBowling</strong><div class="small text-muted">BB</div></div>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2 mt-3">
+                                    <a asp-action="Details"
+                                       asp-route-id="@stat.PlayerStatsId"
+                                       class="btn btn-outline-primary btn-sm w-100">
+                                        <i class="fa-solid fa-eye me-1"></i> View
+                                    </a>
+
+                                    <button type="button"
+                                            class="btn btn-outline-danger btn-sm w-100 single-delete-btn"
+                                            data-controller="PlayerStats"
+                                            data-id="@stat.PlayerStatsId"
+                                            data-name="@($"{stat.Player?.FullName} ({stat.Format})")">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+
+                            </div>
+                        }
+                    }
+                </div>
+            }
+        </div>
+    </div>
+    <div id="bulkActionBar"
+         class="position-fixed bottom-0 start-0 w-100 bg-white border-top shadow-lg py-2 px-3"
+         style="display:none; z-index:1050;">
+
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+
+            <span class="fw-semibold text-muted">
+                <span id="selectedCount">0</span> stat(s) selected
+            </span>
+
+            <button type="submit" class="btn btn-danger">
+                <i class="fa-solid fa-trash me-1"></i> Delete Selected
+            </button>
+
+        </div>
+    </div>
+
+
+    <button type="submit" class="btn btn-danger mt-2">
+        <i class="fa-solid fa-trash"></i> Delete Selected
+    </button>
 </form>
 
 @section Scripts {
     <script>
-        // Master checkbox toggle
-        document.getElementById("selectAll").addEventListener("change", function () {
-            const checkboxes = document.querySelectorAll("input[name='selectedIds']");
-            checkboxes.forEach(cb => cb.checked = this.checked);
-        });
+        (() => {
+
+            /* ===============================
+               BULK SELECTION + ACTION BAR
+            ================================ */
+            const selectAll = document.getElementById("selectAll");
+            const actionBar = document.getElementById("bulkActionBar");
+            const selectedCountEl = document.getElementById("selectedCount");
+
+            function updateBulkBar() {
+                const count = document.querySelectorAll(".row-checkbox:checked").length;
+                if (!actionBar || !selectedCountEl) return;
+
+                selectedCountEl.textContent = count;
+                actionBar.style.display = count > 0 ? "block" : "none";
+            }
+
+            selectAll?.addEventListener("change", function () {
+                document.querySelectorAll(".row-checkbox")
+                    .forEach(cb => cb.checked = this.checked);
+
+                document.querySelectorAll(".selectable")
+                    .forEach(el => el.classList.toggle("table-active", this.checked));
+
+                updateBulkBar();
+            });
+
+            document.addEventListener("change", e => {
+                if (!e.target.classList.contains("row-checkbox")) return;
+
+                e.target.closest(".selectable")
+                    ?.classList.toggle("table-active", e.target.checked);
+
+                updateBulkBar();
+            });
+
+            document.querySelectorAll(".selectable").forEach(el => {
+                el.addEventListener("click", e => {
+                    if (
+                        e.target.closest("a") ||
+                        e.target.closest("button") ||
+                        e.target.closest("input")
+                    ) return;
+
+                    const cb = el.querySelector(".row-checkbox");
+                    if (!cb) return;
+
+                    cb.checked = !cb.checked;
+                    el.classList.toggle("table-active", cb.checked);
+                    updateBulkBar();
+                });
+            });
+
+            /* ===============================
+               DESKTOP SEARCH + FORMAT FILTER
+               (GROUP SAFE)
+            ================================ */
+            const desktopSearch = document.getElementById("desktopStatsSearch");
+            const desktopFormat = document.getElementById("desktopStatsFormat");
+            const desktopClear = document.getElementById("desktopStatsClear");
+            const noResults = document.getElementById("statsNoResults");
+
+                    function applyDesktopFilter() {
+            const query = desktopSearch.value.trim().toLowerCase();
+            const format = desktopFormat.value; // test / odi / t20
+
+            const groups = {};
+            document.querySelectorAll(".stat-row").forEach(row => {
+                const key = row.dataset.group;
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(row);
+            });
+
+            let visiblePlayers = 0;
+
+            Object.values(groups).forEach(rows => {
+                const player = rows[0].dataset.player || "";
+
+                const matchSearch = !query || player.includes(query);
+
+                let anyRowVisible = false;
+
+                rows.forEach(row => {
+                    const rowFormat = row.dataset.format;
+
+                    const matchFormat = !format || rowFormat === format;
+                    const showRow = matchSearch && matchFormat;
+
+                    row.style.display = showRow ? "" : "none";
+                    if (showRow) anyRowVisible = true;
+                });
+
+                if (anyRowVisible) visiblePlayers++;
+            });
+
+            const hasFilter = query.length > 0 || format.length > 0;
+            noResults.classList.toggle(
+                "d-none",
+                !(hasFilter && visiblePlayers === 0)
+            );
+        }
+
+
+            desktopSearch?.addEventListener("input", applyDesktopFilter);
+            desktopFormat?.addEventListener("change", applyDesktopFilter);
+            desktopClear?.addEventListener("click", () => {
+                desktopSearch.value = "";
+                desktopFormat.value = "";
+                applyDesktopFilter();
+            });
+
+            /* ===============================
+               MOBILE SEARCH (CARDS ONLY)
+            ================================ */
+            const mobileSearch = document.getElementById("mobileStatsSearch");
+
+            mobileSearch?.addEventListener("input", function () {
+                const q = this.value.trim().toLowerCase();
+
+                document.querySelectorAll(".tab-pane.active .stat-card")
+                    .forEach(card => {
+                        const player = card.dataset.player?.toLowerCase() || "";
+                        card.style.display = player.includes(q) ? "" : "none";
+                    });
+            });
+
+        })();
     </script>
 }
+
+
+
+
+<style>
+
+    /* ===========================
+       MOBILE FORMAT TABS – FIXED VISIBILITY
+       =========================== */
+
+    .mobile-format-tabs {
+        display: flex;
+        gap: 8px;
+        padding: 6px;
+        background-color: #f1f3f5;
+        border-radius: 999px;
+    }
+
+        /* INACTIVE TABS */
+        .mobile-format-tabs .nav-link {
+            width: 100%;
+            border-radius: 999px;
+            background-color: #ffffff;
+            color: #212529 !important; /* 🔥 FORCE TEXT VISIBILITY */
+            border: 1px solid #ced4da;
+            font-weight: 600;
+            text-align: center;
+        }
+
+            /* ACTIVE TAB */
+            .mobile-format-tabs .nav-link.active {
+                background-color: #3b6ef5;
+                color: #ffffff !important; /* 🔥 FORCE TEXT VISIBILITY */
+                border-color: #3b6ef5;
+                box-shadow: 0 3px 8px rgba(59, 110, 245, 0.35);
+            }
+
+            /* TOUCH FEEDBACK */
+            .mobile-format-tabs .nav-link:active {
+                transform: scale(0.97);
+            }
+
+
+</style>

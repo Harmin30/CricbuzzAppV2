@@ -256,3 +256,41 @@ footer {
     .offcanvas-bottom .offcanvas-body {
         overflow: hidden;
     }
+
+
+/* ===========================
+   MOBILE FORMAT TABS (CRICBUZZ STYLE)
+   =========================== */
+
+.mobile-format-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 6px;
+    background: #f1f3f5;
+    border-radius: 999px;
+}
+
+    .mobile-format-tabs .nav-link {
+        width: 100%;
+        border-radius: 999px;
+        font-weight: 600;
+        text-align: center;
+        /* INACTIVE STATE (VERY IMPORTANT) */
+        background-color: #ffffff;
+        color: #212529;
+        border: 1px solid #ced4da;
+        transition: all 0.2s ease;
+    }
+
+        /* ACTIVE TAB */
+        .mobile-format-tabs .nav-link.active {
+            background-color: #0d6efd;
+            color: #ffffff;
+            border-color: #0d6efd;
+            box-shadow: 0 3px 8px rgba(13, 110, 253, 0.35);
+        }
+
+        /* TAP FEEDBACK */
+        .mobile-format-tabs .nav-link:active {
+            transform: scale(0.97);
+        }

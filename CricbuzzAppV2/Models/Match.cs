@@ -73,5 +73,10 @@ namespace CricbuzzAppV2.Models
 
         public string DisplayNameWithType =>
             $"{TeamA?.TeamName} vs {TeamB?.TeamName} ({MatchType} | {Date:dd MMM yyyy} | {Venue})";
+
+        public ICollection<MatchInnings> MatchInnings { get; set; }
+    = new List<MatchInnings>();
+
     }
+
 }

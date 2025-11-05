@@ -4,9 +4,13 @@
     ViewData["Title"] = "Edit User";
 }
 
-<h2>Edit User</h2>
+<h2 class="text-center mb-4">
+    <i class="fa-solid fa-user-pen me-2"></i>Edit User
+</h2>
 
-<div class="card shadow-sm p-4 mt-3">
+<div class="card shadow-sm mx-auto p-4"
+     style="max-width:520px;border-radius:16px;">
+
     <form asp-action="Edit" method="post">
         <input type="hidden" asp-for="UserId" />
 
@@ -14,25 +18,34 @@
         <div class="mb-3">
             <label asp-for="Username" class="form-label fw-semibold">Username</label>
             <input asp-for="Username" class="form-control" />
-            <span asp-validation-for="Username" class="text-danger"></span>
+            <span asp-validation-for="Username" class="text-danger small"></span>
         </div>
 
-        <!-- Role dropdown (only for SuperAdmin) -->
+        <!-- Role (SuperAdmin only) -->
         @if (Context.Session.GetString("Role") == "SuperAdmin")
         {
             <div class="mb-3">
                 <label asp-for="Role" class="form-label fw-semibold">Role</label>
-                <select asp-for="Role" class="form-select" asp-items="ViewBag.Roles">
+                <select asp-for="Role"
+                        class="form-select"
+                        asp-items="ViewBag.Roles">
                     <option value="">-- Select Role --</option>
                 </select>
-                <span asp-validation-for="Role" class="text-danger"></span>
+                <span asp-validation-for="Role" class="text-danger small"></span>
             </div>
         }
 
-        <button type="submit" class="btn btn-success">Save Changes</button>
-        <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-success flex-fill">
+                <i class="fa-solid fa-check me-1"></i>Save
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary flex-fill">
+                Cancel
+            </a>
+        </div>
     </form>
 
+    <!-- Alerts -->
     @if (TempData["ErrorMessage"] != null)
     {
         <div class="alert alert-danger mt-3">@TempData["ErrorMessage"]</div>

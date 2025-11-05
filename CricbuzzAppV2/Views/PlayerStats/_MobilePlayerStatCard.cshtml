@@ -1,0 +1,55 @@
+﻿@model CricbuzzAppV2.Models.PlayerStats
+
+<div class="card shadow-sm mb-3 border-0">
+    <div class="card-body">
+
+        <!-- Player + Format -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold mb-0">
+                <i class="fa-solid fa-user me-1"></i>
+                @Model.Player?.FullName
+            </h6>
+
+            <span class="badge
+                @(Model.Format == PlayerStats.CricketFormat.Test ? "bg-dark" :
+                                    Model.Format == PlayerStats.CricketFormat.ODI ? "bg-primary" : "bg-success")">
+                @Model.Format
+            </span>
+        </div>
+
+        <!-- Batting -->
+        <div class="row text-center small mb-2">
+            <div class="col-4">
+                <div class="fw-semibold">@Model.Runs</div>
+                <div class="text-muted">Runs</div>
+            </div>
+            <div class="col-4">
+                <div class="fw-semibold">@Model.BattingAverage.ToString("0.00")</div>
+                <div class="text-muted">Avg</div>
+            </div>
+            <div class="col-4">
+                <div class="fw-semibold">@Model.StrikeRate.ToString("0.00")</div>
+                <div class="text-muted">SR</div>
+            </div>
+        </div>
+
+        <hr class="my-2" />
+
+        <!-- Bowling -->
+        <div class="row text-center small">
+            <div class="col-4">
+                <div class="fw-semibold">@Model.Wickets</div>
+                <div class="text-muted">Wkts</div>
+            </div>
+            <div class="col-4">
+                <div class="fw-semibold">@Model.Economy.ToString("0.00")</div>
+                <div class="text-muted">Eco</div>
+            </div>
+            <div class="col-4">
+                <div class="fw-semibold">@Model.BestBowling</div>
+                <div class="text-muted">BB</div>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -4,54 +4,113 @@
     ViewData["Title"] = "Player Stats Details";
 }
 
-<h2 class="mb-4 text-center">📊 @Model.Player.FullName - @Model.Format Stats</h2>
-
-<div class="row g-4">
-    <!-- Batting Stats Card -->
-    <div class="col-md-6">
-        <div class="card shadow-sm border-primary">
-            <div class="card-header bg-primary text-white fw-bold">
-                🏏 Batting Stats
-            </div>
-            <div class="card-body p-3">
-                <table class="table table-sm table-bordered mb-0 text-center">
-                    <tr><th>Matches</th><td>@Model.MatchesPlayed</td></tr>
-                    <tr><th>Innings</th><td>@Model.Innings</td></tr>
-                    <tr><th>Runs</th><td>@Model.Runs</td></tr>
-                    <tr><th>Balls Faced</th><td>@Model.BallsFaced</td></tr>
-                    <tr><th>Highest Score</th><td>@Model.HighestScore</td></tr>
-                    <tr><th>100s</th><td>@Model.Hundreds</td></tr>
-                    <tr><th>50s</th><td>@Model.Fifties</td></tr>
-                    <tr><th>200s</th><td>@Model.DoubleHundreds</td></tr>
-                    <tr><th>Bat Avg</th><td>@Model.BattingAverage.ToString("0.00")</td></tr>
-                    <tr><th>Strike Rate</th><td>@Model.StrikeRate.ToString("0.00")</td></tr>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bowling Stats Card -->
-    <div class="col-md-6">
-        <div class="card shadow-sm border-success">
-            <div class="card-header bg-success text-white fw-bold">
-                🎯 Bowling Stats
-            </div>
-            <div class="card-body p-3">
-                <table class="table table-sm table-bordered mb-0 text-center">
-                    <tr><th>Balls Bowled</th><td>@Model.BallsBowled</td></tr>
-                    <tr><th>Runs Conceded</th><td>@Model.RunsConceded</td></tr>
-                    <tr><th>Wickets</th><td>@Model.Wickets</td></tr>
-                    <tr><th>Best Bowling</th><td>@Model.BestBowling</td></tr>
-                    <tr><th>Bowling Avg</th><td>@Model.BowlingAverage.ToString("0.00")</td></tr>
-                    <tr><th>Economy</th><td>@Model.Economy.ToString("0.00")</td></tr>
-                </table>
-            </div>
-        </div>
-    </div>
+<!-- Header -->
+<div class="text-center mb-3">
+    <h2 class="fw-bold mb-1">
+        <i class="fa-solid fa-user me-1"></i>
+        @Model.Player?.FullName
+    </h2>
+    <span class="badge
+        @(Model.Format == PlayerStats.CricketFormat.Test ? "bg-dark" :
+                    Model.Format == PlayerStats.CricketFormat.ODI ? "bg-primary" : "bg-success")">
+        @Model.Format
+    </span>
 </div>
 
-<div class="mt-4 text-center">
-    <a asp-action="Edit" asp-route-id="@Model.PlayerStatsId" class="btn btn-warning me-2">✏️ Edit</a>
-    <a asp-action="Delete" asp-route-id="@Model.PlayerStatsId" class="btn btn-danger me-2">🗑 Delete</a>
-    <a asp-action="Index" class="btn btn-secondary">⬅️ Back to List</a>
+<!-- Info -->
+<div class="alert alert-info d-flex align-items-center">
+    <i class="fa-solid fa-circle-info me-2"></i>
+    These stats are <strong>automatically calculated</strong> from match scorecards.
+</div>
+
+<div class="row g-4">
+
+    <!-- 🏏 Batting Stats -->
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100 border-0">
+            <div class="card-header bg-primary text-white fw-semibold">
+                <i class="fa-solid fa-baseball-bat-ball me-1"></i>
+                Batting
+            </div>
+
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        <tr><th>Matches</th><td>@(Model.MatchesPlayed ?? 0)</td></tr>
+                        <tr><th>Innings</th><td>@(Model.Innings ?? 0)</td></tr>
+                        <tr><th>Runs</th><td class="fw-bold">@Model.Runs</td></tr>
+                        <tr><th>Balls Faced</th><td>@Model.BallsFaced</td></tr>
+                        <tr><th>Highest Score</th><td>@Model.HighestScore</td></tr>
+                        <tr><th>100s</th><td>@Model.Hundreds</td></tr>
+                        <tr><th>50s</th><td>@Model.Fifties</td></tr>
+                        <tr><th>200s</th><td>@Model.DoubleHundreds</td></tr>
+                        <tr>
+                            <th>Average</th>
+                            <td class="fw-semibold text-primary">
+                                @Model.BattingAverage.ToString("0.00")
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Strike Rate</th>
+                            <td class="fw-semibold text-success">
+                                @Model.StrikeRate.ToString("0.00")
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🎯 Bowling Stats -->
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100 border-0">
+            <div class="card-header bg-success text-white fw-semibold">
+                <i class="fa-solid fa-bowling-ball me-1"></i>
+                Bowling
+            </div>
+
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        <tr><th>Balls Bowled</th><td>@Model.BallsBowled</td></tr>
+                        <tr><th>Runs Conceded</th><td>@Model.RunsConceded</td></tr>
+                        <tr>
+                            <th>Wickets</th>
+                            <td class="fw-bold">@Model.Wickets</td>
+                        </tr>
+                        <tr><th>Best Bowling</th><td>@(Model.BestBowling ?? "—")</td></tr>
+                        <tr>
+                            <th>Average</th>
+                            <td class="fw-semibold text-primary">
+                                @Model.BowlingAverage.ToString("0.00")
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Economy</th>
+                            <td class="fw-semibold text-danger">
+                                @Model.Economy.ToString("0.00")
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Actions -->
+<div class="mt-4 d-flex justify-content-center gap-2 flex-wrap">
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fa-solid fa-arrow-left me-1"></i>
+        Back to Stats
+    </a>
+
+    <a asp-action="Delete"
+       asp-route-id="@Model.PlayerStatsId"
+       class="btn btn-outline-danger">
+        <i class="fa-solid fa-trash me-1"></i>
+        Delete
+    </a>
 </div>

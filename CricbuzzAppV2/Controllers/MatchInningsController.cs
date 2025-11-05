@@ -41,6 +41,8 @@ namespace CricbuzzAppV2.Controllers
             return View();
         }
 
+
+
         // POST: Start Innings
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -106,6 +108,7 @@ namespace CricbuzzAppV2.Controllers
 
             innings.InningsNumber = totalInnings + 1;
             innings.Status = InningsStatus.InProgress;
+            innings.StartTime = DateTime.Now;
 
             _context.MatchInnings.Add(innings);
 
@@ -116,6 +119,7 @@ namespace CricbuzzAppV2.Controllers
 
             return RedirectToAction("Details", "Matches", new { id = innings.MatchId });
         }
+
 
         // POST: End Innings
         [HttpPost]

@@ -2,32 +2,184 @@
 
 @{
     Layout = "_UserLayout";
-    ViewData["Title"] = @Model.TeamName;
+    ViewData["Title"] = Model.TeamName;
 }
-<a href="@Url.Action("Teams", "UserPortal")" class="btn btn-success mb-3">← Back to Teams</a>
 
-<h1 class="text-success mb-4">@Model.TeamName 🏏</h1>
+<div class="container my-4">
 
-<div class="mb-3">
-    <p><strong>Country:</strong> @Model.Country</p>
-    <p><strong>Coach:</strong> @Model.Coach</p>
-</div>
+    <!-- BACK -->
+    <a href="@Url.Action("Teams", "UserPortal")" class="btn-back mb-3">
+        <i class="fa-solid fa-arrow-left me-1"></i> Back to Teams
+    </a>
 
-<h3 class="mb-3">Players</h3>
-<div class="row">
-    @foreach (var player in Model.Players)
-    {
-        <div class="col-md-3">
-            <div class="card mb-3" onclick="location.href='@Url.Action("PlayerDetails", "UserPortal", new { id = player.PlayerId })'" style="cursor:pointer;">
-                @if (!string.IsNullOrEmpty(player.ImageUrl))
-                {
-                    <img src="@player.ImageUrl" class="card-img-top" style="height:200px;object-fit:cover;" />
-                }
-                <div class="card-body text-center">
-                    <h5 class="card-title">@player.FullName</h5>
-                    <p class="card-text">@player.Role</p>
-                </div>
+    <!-- TEAM HEADER (COMPACT) -->
+    <div class="team-header mb-4">
+        <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/default-team.png" : Model.ImageUrl)"
+             class="team-logo"
+             onerror="this.src='/images/default-team.png'" />
+
+        <div>
+            <h2 class="mb-1">@Model.TeamName</h2>
+            <div class="text-muted small">
+                <i class="fa-solid fa-globe me-1"></i>@Model.Country
+                <span class="mx-2">•</span>
+                <i class="fa-solid fa-user-tie me-1"></i>@Model.Coach
             </div>
+        </div>
+    </div>
+
+    <!-- PLAYERS -->
+    <h5 class="section-title mb-2">
+        <i class="fa-solid fa-people-group me-2"></i> Players
+    </h5>
+
+    @if (Model.Players != null && Model.Players.Any())
+    {
+        <div class="player-list">
+            @foreach (var player in Model.Players)
+            {
+                <div class="player-row"
+                     onclick="location.href='@Url.Action("PlayerDetails", "UserPortal", new { id = player.PlayerId })'">
+
+                    <img src="@(string.IsNullOrEmpty(player.ImageUrl) ? "/images/default-player.png" : player.ImageUrl)"
+                         class="player-avatar"
+                         onerror="this.src='/images/default-player.png'" />
+
+                    <div class="player-info">
+                        <div class="player-name">@player.FullName</div>
+                        <div class="player-meta">
+                            <i class="fa-solid fa-user-tag me-1"></i>@player.Role
+                        </div>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-right arrow"></i>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-secondary text-center">
+            No players available for this team yet.
         </div>
     }
 </div>
+
+<style>
+    /* BACK BUTTON */
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        background: #2d6a4f;
+        color: #fff;
+        border-radius: 999px;
+        text-decoration: none;
+        font-size: .9rem;
+    }
+
+        .btn-back:hover {
+            background: #1b4332;
+            color: #fff;
+        }
+
+    /* TEAM HEADER */
+    .team-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: #f8f9fa;
+        border-radius: 14px;
+        padding: 14px 16px;
+    }
+
+    .team-logo {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #dee2e6;
+        background: #fff;
+    }
+
+    /* SECTION TITLE */
+    .section-title {
+        font-weight: 700;
+        color: #1b4332;
+    }
+
+    /* PLAYER LIST */
+    .player-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .player-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 10px 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.06);
+        cursor: pointer;
+        transition: background .2s ease;
+    }
+
+        .player-row:hover {
+            background: #f8f9fa;
+        }
+
+    .player-avatar {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #e9ecef;
+    }
+
+    .player-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .player-name {
+        font-weight: 600;
+        font-size: .95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .player-meta {
+        font-size: .8rem;
+        color: #6c757d;
+    }
+
+    .arrow {
+        color: #adb5bd;
+        font-size: .9rem;
+    }
+
+    /* MOBILE REFINEMENT */
+   @@media (max-width: 768px) {
+        .team-header
+
+    {
+        padding: 12px;
+    }
+
+    .team-logo {
+        width: 56px;
+        height: 56px;
+    }
+
+    .player-row {
+        padding: 10px;
+    }
+
+    }
+</style>

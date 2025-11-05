@@ -5,190 +5,172 @@
     ViewData["Title"] = "Teams";
 }
 
-<div class="container-fluid py-4">
- <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <a href="@Url.Action("Index", "UserPortal")" class="btn-back">
-       <i class="bi bi-arrow-left"></i> Back to Home
-            </a>
-            <h2 class="mt-3 mb-0 text-primary">
-          <i class="bi bi-trophy-fill"></i> Cricket Teams
-     </h2>
-    <p class="text-muted">Discover and explore cricket teams from around the world</p>
-        </div>
+<div class="container my-4">
+
+    <!-- HEADER -->
+    <div class="mb-4">
+        <a href="@Url.Action("Index", "UserPortal")" class="btn-back">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to Home
+        </a>
+
+        <h3 class="mt-3 mb-1 page-title">
+            <i class="fa-solid fa-trophy me-2"></i>Cricket Teams
+        </h3>
+
+        <p class="text-muted mb-0">
+            Discover and explore cricket teams from around the world
+        </p>
     </div>
 
-    <!-- Teams Grid -->
-    <div class="team-grid">
+    <!-- TEAM LIST -->
+    <div class="team-list">
         @foreach (var team in Model.OrderBy(t => t.TeamName))
-  {
-            <div class="team-card" onclick="location.href='@Url.Action("TeamDetails", "UserPortal", new { id = team.TeamId })'">
-  <div class="team-header">
-        <div class="team-logo-wrapper">
-   <img src="@(string.IsNullOrEmpty(team.ImageUrl) ? "/images/default-team.png" : team.ImageUrl)"
-          class="team-logo" alt="@team.TeamName Logo"
-        onerror="this.src='/images/default-team.png'" />
-             </div>
+        {
+            <div class="team-row"
+                 onclick="location.href='@Url.Action("TeamDetails", "UserPortal", new { id = team.TeamId })'">
+
+                <!-- LOGO -->
+                <img src="@(string.IsNullOrEmpty(team.ImageUrl) ? "/images/default-team.png" : team.ImageUrl)"
+                     class="team-avatar"
+                     onerror="this.src='/images/default-team.png'" />
+
+                <!-- INFO -->
+                <div class="team-info">
+                    <div class="team-name">@team.TeamName</div>
+
+                    <div class="team-meta">
+                        <span>
+                            <i class="fa-solid fa-globe me-1"></i>@team.Country
+                        </span>
+
+                        <span class="dot">•</span>
+
+                        <span>
+                            <i class="fa-solid fa-people-group me-1"></i>@team.Players.Count Players
+                        </span>
+                    </div>
+                </div>
+
+                <!-- ARROW -->
+                <i class="fa-solid fa-chevron-right arrow"></i>
             </div>
-
-         <div class="team-content">
-      <h3 class="team-name">@team.TeamName</h3>
-         <div class="team-details">
- <div class="detail-item">
-            <i class="bi bi-globe2"></i>
-       <span>@team.Country</span>
-          </div>
-<div class="detail-item">
-           <i class="bi bi-person-badge"></i>
-              <span>@team.Coach</span>
-    </div>
-            <div class="detail-item">
-              <i class="bi bi-people-fill"></i>
-          <span>@team.Players.Count Players</span>
-              </div>
-       </div>
-
-            <div class="view-details">
-       View Team Details <i class="bi bi-arrow-right"></i>
-           </div>
-</div>
-  </div>
         }
     </div>
 </div>
 
 <style>
-    .container-fluid {
-    max-width: 1400px;
-        margin: 0 auto;
-        padding: 0 20px;
-    }
-
+    /* ---------- BACK BUTTON ---------- */
     .btn-back {
-      display: inline-flex;
+        display: inline-flex;
         align-items: center;
         gap: 8px;
-     padding: 8px 16px;
-     background: linear-gradient(135deg, #40916c, #2d6a4f);
-   color: white;
-    border-radius: 50px;
+        padding: 6px 16px;
+        background: #2d6a4f;
+        color: #fff;
+        border-radius: 999px;
         text-decoration: none;
-        transition: all 0.3s ease;
-        font-weight: 500;
+        font-size: .9rem;
     }
 
-    .btn-back:hover {
-        background: linear-gradient(135deg, #2d6a4f, #1a4731);
-      transform: translateY(-2px);
- color: white;
+        .btn-back:hover {
+            background: #1b4332;
+            color: #fff;
+        }
+
+    /* ---------- PAGE TITLE ---------- */
+    .page-title {
+        font-weight: 700;
+        color: #1b4332;
     }
 
-    .team-grid {
-        display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 24px;
-        padding: 20px 0;
+    /* ---------- TEAM LIST ---------- */
+    .team-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 10px;
     }
 
-    .team-card {
-        background: white;
-     border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    transition: all 0.3s ease;
-     cursor: pointer;
+    .team-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: #fff;
+        border-radius: 14px;
+        padding: 12px 14px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.06);
+        cursor: pointer;
+        transition: background .2s ease;
     }
 
-    .team-card:hover {
-      transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-    }
+        .team-row:hover {
+            background: #f8f9fa;
+        }
 
-    .team-header {
-        position: relative;
-        padding: 20px;
-        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-        text-align: center;
-    }
-
-    .team-logo-wrapper {
-        width: 100px;
-        height: 100px;
-        margin: 0 auto;
+    /* ---------- TEAM LOGO ---------- */
+    .team-avatar {
+        width: 52px;
+        height: 52px;
         border-radius: 50%;
-        overflow: hidden;
-        border: 3px solid white;
-   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-
-    .team-logo {
-        width: 100%;
-     height: 100%;
         object-fit: cover;
-        transition: transform 0.3s ease;
+        background: #e9ecef;
+        border: 2px solid #dee2e6;
+        flex-shrink: 0;
     }
 
- .team-card:hover .team-logo {
-        transform: scale(1.1);
-    }
-
-    .team-content {
-        padding: 20px;
+    /* ---------- TEAM INFO ---------- */
+    .team-info {
+        flex: 1;
+        min-width: 0;
     }
 
     .team-name {
-        margin: 0 0 15px 0;
-        font-size: 1.4rem;
         font-weight: 600;
-        color: #2c3e50;
+        font-size: 1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .team-details {
-      display: flex;
-   flex-direction: column;
-        gap: 10px;
-        margin-bottom: 20px;
-    }
-
-    .detail-item {
+    .team-meta {
+        font-size: .85rem;
+        color: #6c757d;
         display: flex;
         align-items: center;
-        gap: 10px;
-        color: #666;
+        flex-wrap: wrap;
+        gap: 6px;
     }
 
-    .detail-item i {
-     font-size: 1.1rem;
-        color: #40916c;
-    }
-
-    .view-details {
-        display: inline-flex;
-   align-items: center;
-        gap: 8px;
-      color: #40916c;
-     font-weight: 500;
-   transition: gap 0.3s ease;
-    }
-
-    .team-card:hover .view-details {
-        gap: 12px;
-    }
-
-    @@media (max-width: 768px) {
-  .team-grid {
- grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 16px;
-}
-
-        .team-logo-wrapper {
-            width: 80px;
-height: 80px;
- }
-
-.team-name {
-      font-size: 1.2rem;
+        .team-meta i {
+            color: #40916c;
         }
-  }
+
+    .dot {
+        opacity: .6;
+    }
+
+    /* ---------- ARROW ---------- */
+    .arrow {
+        color: #adb5bd;
+        font-size: .9rem;
+    }
+
+    /* ---------- MOBILE REFINEMENT ---------- */
+   @@media (max-width: 768px) {
+        .team-row
+
+    {
+        padding: 10px 12px;
+    }
+
+    .team-avatar {
+        width: 46px;
+        height: 46px;
+    }
+
+    .team-name {
+        font-size: .95rem;
+    }
+
+    }
 </style>

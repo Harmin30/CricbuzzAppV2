@@ -7,217 +7,321 @@
 
 <style>
     body {
-        background-color: #f4f5f7;
+        background: #f4f6f8;
     }
 
-    .player-details-container {
-        max-width: 1100px;
-        margin: 40px auto;
-        background: #ffffff;
-        border-radius: 15px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-    }
-
-    .player-header {
-        background: #00a651;
+    /* ---------- HEADER ---------- */
+    .player-hero {
+        background: linear-gradient(135deg, #00a651, #007e3e);
         color: #fff;
-        text-align: center;
         padding: 40px 20px;
+        border-radius: 18px;
+        text-align: center;
+        box-shadow: 0 10px 28px rgba(0,0,0,.18);
     }
 
-        .player-header img {
-            width: 160px;
-            height: 160px;
-            object-fit: cover;
+        .player-hero img {
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
-            border: 4px solid #ffffff;
-            margin-bottom: 15px;
+            object-fit: cover;
+            border: 4px solid #fff;
+            margin-bottom: 12px;
         }
 
-        .player-header h2 {
+        .player-hero h2 {
             font-weight: 700;
+            margin-bottom: 4px;
         }
 
-        .player-header p {
-            color: #f0f0f0;
+        .player-hero .meta {
+            font-size: .95rem;
+            opacity: .95;
         }
 
-    .stats-section, .personal-info {
-        padding: 30px;
+    /* ---------- SECTION ---------- */
+    .section {
+        background: #fff;
+        border-radius: 16px;
+        padding: 24px;
+        margin-top: 30px;
+        box-shadow: 0 6px 18px rgba(0,0,0,.08);
     }
 
     .section-title {
-        color: #00a651;
-        font-weight: bold;
-        border-left: 5px solid #00a651;
-        padding-left: 10px;
-        margin-top: 30px;
-        margin-bottom: 15px;
-        font-size: 1.2rem;
+        font-weight: 700;
+        color: #0b8043;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .stats-table th, .stats-table td, .info-table th, .info-table td {
-        text-align: center;
-        padding: 10px;
-        vertical-align: middle;
+    /* ---------- PERSONAL INFO ---------- */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
     }
 
-    .stats-table th, .info-table th {
-        background-color: #e8f5e9;
-        color: #006622;
+    .info-card {
+        background: #f8f9fa;
+        border-radius: 14px;
+        padding: 14px;
+    }
+
+    .info-label {
+        font-size: .75rem;
+        text-transform: uppercase;
+        color: #6c757d;
+        margin-bottom: 4px;
+    }
+
+    .info-value {
         font-weight: 600;
+        color: #212529;
     }
 
-    .stats-table td, .info-table td {
-        background-color: #ffffff;
-        color: #333;
+    /* ---------- STATS ---------- */
+    .format-badge {
+        background: #e8f5e9;
+        color: #0b8043;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: .8rem;
+        display: inline-block;
+        margin-bottom: 10px;
     }
 
-    .stats-table tr:nth-child(even) td,
-    .info-table tr:nth-child(even) td {
-        background-color: #f9f9f9;
+    .stats-table th {
+        background: #e8f5e9;
+        color: #0b8043;
+        font-weight: 600;
+        font-size: .85rem;
     }
 
+    .stats-table td {
+        font-size: .9rem;
+    }
+
+    /* ---------- MOBILE STATS CARDS ---------- */
+    .stat-card {
+        background: #f8f9fa;
+        border-radius: 14px;
+        padding: 12px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+        .stat-card span {
+            font-weight: 600;
+        }
+
+    /* ---------- BACK BUTTON ---------- */
     .back-btn {
         display: inline-block;
-        margin-bottom: 20px;
-        background-color: #00a651;
-        color: white;
-        border-radius: 25px;
-        padding: 10px 20px;
+        margin-top: 25px;
+        background: #00a651;
+        color: #fff;
+        border-radius: 999px;
+        padding: 8px 22px;
         text-decoration: none;
-        transition: background-color 0.3s ease;
+        font-size: .9rem;
     }
 
         .back-btn:hover {
-            background-color: #007e3e;
-            color: white;
+            background: #007e3e;
+            color: #fff;
         }
 
-    .format-title {
-        font-size: 1.1rem;
-        font-weight: bold;
-        color: #333;
-        margin-top: 20px;
+    /* ---------- MOBILE STAT GRID ---------- */
+    .mobile-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .stat-box {
+        background: #f8f9fa;
+        border-radius: 14px;
+        padding: 14px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,.06);
+    }
+
+    .stat-label {
+        font-size: .7rem;
+        text-transform: uppercase;
+        color: #6c757d;
+        margin-bottom: 4px;
+        letter-spacing: .5px;
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #0b8043;
+    }
+
+    /* Format wrapper (clean vertical rhythm) */
+    .format-section {
+        margin-bottom: 32px;
+    }
+
+    /* Mobile fine-tuning */
+   @@media (max-width: 768px) {
+        .format-badge
+
+    {
+        display:table;
+        margin-bottom: 14px;
+    }
+
+    .mobile-stat-grid {
+        margin-top: 6px;
+    }
+
+    }
     }
 </style>
 
-<div class="player-details-container">
+<div class="container my-4">
 
-    <!-- Player Header -->
-    <div class="player-header">
-        <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/default-player.png" : Model.ImageUrl)" alt="@Model.FullName" />
+    <!-- HERO -->
+    <div class="player-hero">
+        <img src="@(string.IsNullOrEmpty(Model.ImageUrl)
+                         ? "/images/default-player.png"
+                         : Model.ImageUrl)" />
+
         <h2>@Model.FullName</h2>
-        <p>@Model.Role • @Model.Team?.TeamName</p>
+        <div class="meta">
+            @Model.Role • @Model.Team?.TeamName
+        </div>
     </div>
 
-    <!-- Personal Info -->
+    <!-- PERSONAL INFO -->
     @if (Model.PlayerPersonalInfo != null)
     {
-        <div class="personal-info">
-            <h3 class="section-title">Personal Info</h3>
-            <table class="table info-table table-bordered">
-                <tbody>
-                    <tr>
-                        <th>Date of Birth</th>
-                        <td>@Model.PlayerPersonalInfo.DateOfBirth.ToString("dd MMM yyyy")</td>
-                    </tr>
-                    <tr>
-                        <th>Birth Place</th>
-                        <td>@Model.PlayerPersonalInfo.BirthPlace</td>
-                    </tr>
-                    <tr>
-                        <th>Height</th>
-                        <td>@Model.PlayerPersonalInfo.Height</td>
-                    </tr>
-                    <tr>
-                        <th>Batting Style</th>
-                        <td>@Model.PlayerPersonalInfo.BattingStyle</td>
-                    </tr>
-                    <tr>
-                        <th>Bowling Style</th>
-                        <td>@Model.PlayerPersonalInfo.BowlingStyle</td>
-                    </tr>
-                    <tr>
-                        <th>Role</th>
-                        <td>@Model.PlayerPersonalInfo.Role</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="section">
+            <div class="section-title">
+                <i class="fa-solid fa-user"></i> Personal Information
+            </div>
+
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-label">Date of Birth</div>
+                    <div class="info-value">@Model.PlayerPersonalInfo.DateOfBirth.ToString("dd MMM yyyy")</div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-label">Birth Place</div>
+                    <div class="info-value">@Model.PlayerPersonalInfo.BirthPlace</div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-label">Height</div>
+                    <div class="info-value">@Model.PlayerPersonalInfo.Height</div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-label">Batting Style</div>
+                    <div class="info-value">@Model.PlayerPersonalInfo.BattingStyle</div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-label">Bowling Style</div>
+                    <div class="info-value">@Model.PlayerPersonalInfo.BowlingStyle</div>
+                </div>
+            </div>
         </div>
     }
 
-    <!-- Stats Section -->
-    <div class="stats-section">
-        <a href="@Url.Action("Players", "UserPortal")" class="back-btn">← Back to Players</a>
+    <!-- STATS -->
+    <div class="section">
+        <div class="section-title">
+            <i class="fa-solid fa-chart-column"></i> Career Statistics
+        </div>
+
 
         @if (Model.PlayerStats != null && Model.PlayerStats.Any())
         {
             foreach (var stats in Model.PlayerStats)
             {
-                <div class="format-title">@stats.Format Format</div>
+                <div class="format-section">
+                    <div class="format-badge">
+                        <i class="fa-solid fa-cricket-bat-ball me-1"></i>
+                        @stats.Format Format
+                    </div>
 
-                <!-- Batting Stats -->
-                <h4 class="section-title">Batting Stats</h4>
-                <table class="table table-bordered stats-table">
-                    <thead>
-                        <tr>
-                            <th>Matches</th>
-                            <th>Innings</th>
-                            <th>Runs</th>
-                            <th>Highest</th>
-                            <th>100s</th>
-                            <th>50s</th>
-                            <th>Double 100s</th>
-                            <th>Average</th>
-                            <th>Strike Rate</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>@stats.MatchesPlayed</td>
-                            <td>@stats.Innings</td>
-                            <td>@stats.Runs</td>
-                            <td>@stats.HighestScore</td>
-                            <td>@stats.Hundreds</td>
-                            <td>@stats.Fifties</td>
-                            <td>@stats.DoubleHundreds</td>
-                            <td>@stats.BattingAverage</td>
-                            <td>@stats.StrikeRate</td>
-                        </tr>
-                    </tbody>
-                </table>
 
-                <!-- Bowling Stats -->
-                <h4 class="section-title">Bowling Stats</h4>
-                <table class="table table-bordered stats-table">
-                    <thead>
-                        <tr>
-                            <th>Balls Bowled</th>
-                            <th>Runs Conceded</th>
-                            <th>Wickets</th>
-                            <th>Best Bowling</th>
-                            <th>Average</th>
-                            <th>Economy</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>@stats.BallsBowled</td>
-                            <td>@stats.RunsConceded</td>
-                            <td>@stats.Wickets</td>
-                            <td>@stats.BestBowling</td>
-                            <td>@stats.BowlingAverage</td>
-                            <td>@stats.Economy</td>
-                        </tr>
-                    </tbody>
-                </table>
+                    <!-- DESKTOP TABLES -->
+                    <div class="table-responsive d-none d-md-block">
+                        <table class="table table-bordered stats-table mb-4">
+                            <thead>
+                                <tr>
+                                    <th>M</th>
+                                    <th>Inn</th>
+                                    <th>Runs</th>
+                                    <th>HS</th>
+                                    <th>100s</th>
+                                    <th>50s</th>
+                                    <th>Avg</th>
+                                    <th>SR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@stats.MatchesPlayed</td>
+                                    <td>@stats.Innings</td>
+                                    <td>@stats.Runs</td>
+                                    <td>@stats.HighestScore</td>
+                                    <td>@stats.Hundreds</td>
+                                    <td>@stats.Fifties</td>
+                                    <td>@stats.BattingAverage</td>
+                                    <td>@stats.StrikeRate</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- MOBILE STATS -->
+                    <div class="d-md-none">
+                        <div class="mobile-stat-grid">
+                            <div class="stat-box">
+                                <div class="stat-label">Runs</div>
+                                <div class="stat-value">@stats.Runs</div>
+                            </div>
+
+                            <div class="stat-box">
+                                <div class="stat-label">Average</div>
+                                <div class="stat-value">@stats.BattingAverage</div>
+                            </div>
+
+                            <div class="stat-box">
+                                <div class="stat-label">Strike Rate</div>
+                                <div class="stat-value">@stats.StrikeRate</div>
+                            </div>
+
+                            <div class="stat-box">
+                                <div class="stat-label">Highest</div>
+                                <div class="stat-value">@stats.HighestScore</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
             }
         }
         else
         {
             <p class="text-muted">No stats available for this player yet.</p>
         }
+
+        <a asp-action="Players" class="back-btn">← Back to Players</a>
     </div>
 </div>

@@ -1,10 +1,14 @@
 ﻿using CricbuzzAppV2.Data;
 using CricbuzzAppV2.Filters;
+using CricbuzzAppV2.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services
+
+builder.Services.AddScoped<PlayerStatsService>();
+
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add(new SessionCheckAttribute()); // global session check
